@@ -1,0 +1,21 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .card {
+    @apply flex items-center justify-center;
+    width: 200px;
+    height: 100px;
+    background: theme('colors.my-primary');
+    color: white;
+    border-radius: 12px;
+  }
+}
+.shadow-glow {
+  box-shadow: 0px 10px 15px rgba(0, 122, 255, 0.4);
+}
+
+.scale-110:hover {
+  transform: scale(1.1);
+}
