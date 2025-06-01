@@ -4,11 +4,11 @@ import axios from 'axios';
 interface AuthStore {
   account: string | null;
   role: string | null;
-  token: string | null;
+  token: string;
   hasCheckedAuth: boolean;
   setAuth: (
-    account: string,
-    rule: string,
+    account: string | null,
+    rule: string | null,
     token: string,
     hasCheckedAuth: boolean,
   ) => void;
@@ -18,15 +18,10 @@ interface AuthStore {
 const useAuthStore = create<AuthStore>((set) => ({
   account: null,
   role: null,
-  token: null,
+  token: '',
   hasCheckedAuth: false,
   // 設定登入狀態
-  setAuth: (
-    account: string,
-    role: string,
-    token: string,
-    hasCheckedAuth: boolean,
-  ) => {
+  setAuth: (account, role, token, hasCheckedAuth) => {
     axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     localStorage.setItem('token', token);
     set((state) => ({
@@ -45,7 +40,7 @@ const useAuthStore = create<AuthStore>((set) => ({
       ...state,
       account: null,
       role: null,
-      token: null,
+      token: '',
       hasCheckedAuth: true,
     }));
   },

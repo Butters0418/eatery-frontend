@@ -1,6 +1,6 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, NavLink } from 'react-router-dom';
 import useAuthStore from '../../stores/useAuthStore';
 import { yupResolver } from '@hookform/resolvers/yup';
 import TextField from '@mui/material/TextField';
@@ -15,6 +15,7 @@ interface FormValues {
 
 function LoginPage() {
   const { hasCheckedAuth, token, role, setAuth, setLogout } = useAuthStore();
+  const [errorMsg, setErrorMsg] = useState<string>('');
   const navigate = useNavigate();
 
   // 判斷是否已經登入
@@ -95,13 +96,28 @@ function LoginPage() {
       }
     } catch (err) {
       console.log(err);
+      if (axios.isAxiosError(err)) {
+        switch (err.response?.status) {
+          case 401:
+            setErrorMsg(err.response.data.message);
+            break;
+          case 403:
+            setErrorMsg(err.response.data.message);
+            break;
+          default:
+            setErrorMsg('登入失敗，請稍後再試');
+            break;
+        }
+      } else {
+        setErrorMsg('登入失敗，請稍後再試');
+      }
     }
   };
 
   return (
     <div className="flex h-full border">
-      <div className="m-auto w-96 rounded-md border border-gray-600 p-6">
-        <h1 className="text-xl font-bold">登入</h1>
+      <div className="m-auto w-96 rounded-md border border-gray-300 p-6">
+        <h1 className="text-xl font-bold tracking-wide text-zinc-800">登入</h1>
         <form className="mt-6 grid gap-6" onSubmit={handleSubmit(onSubmit)}>
           <Controller
             name="account"
@@ -139,9 +155,19 @@ function LoginPage() {
               />
             )}
           />
-          <Button variant="contained" type="submit" color="primary">
-            登入
-          </Button>
+          <div className="flex justify-end">
+            <NavLink to="/forgot-password" className="text-sm text-zinc-400">
+              忘記密碼
+            </NavLink>
+          </div>
+          <div>
+            {errorMsg && (
+              <p className="mb-2 text-sm text-red-500">{errorMsg}</p>
+            )}
+            <Button variant="contained" type="submit" color="primary" fullWidth>
+              登入
+            </Button>
+          </div>
         </form>
       </div>
     </div>
