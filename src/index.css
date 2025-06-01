@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@400;500;600;700&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -5,17 +7,17 @@
 @layer components {
   .card {
     @apply flex items-center justify-center;
-    width: 200px;
-    height: 100px;
-    background: theme('colors.my-primary');
-    color: white;
-    border-radius: 12px;
   }
 }
-.shadow-glow {
-  box-shadow: 0px 10px 15px rgba(0, 122, 255, 0.4);
+
+body {
+  font-family:
+    'Noto Sans TC', 'Montserrat', 'Roboto', Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  position: relative;
 }
 
-.scale-110:hover {
-  transform: scale(1.1);
+.outline {
+  outline: 1px solid black;
 }
