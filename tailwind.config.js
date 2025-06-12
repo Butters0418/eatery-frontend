@@ -5,38 +5,33 @@ export default {
     extend: {
       colors: {
         primary: {
-          DEFAULT: '#ffaa00',
-          light: '#ffbb33',
-          dark: '#cc8800',
+          light: '#FF9B54',
+          DEFAULT: '#FF7629',
+          dark: '#E35A00',
         },
         secondary: {
-          DEFAULT: '#f4a7b9',
-          light: '#f8c4d1',
-          dark: '#d37d90',
+          light: '#F0F9FF',
+          DEFAULT: '#38B2AC',
+          dark: '#2C7A7B',
         },
-        warning: {
-          DEFAULT: '#d3381c',
-          light: '#e25c4f',
-          dark: '#a82c16',
+        grey: {
+          light: '#F7F7F7',
+          DEFAULT: '#6B7280',
+          dark: '#374151',
         },
-        info: {
-          DEFAULT: '#58a6dc',
-          light: '#7fbce6',
-          dark: '#357bb3',
+        error: {
+          light: '#FF7A70',
+          DEFAULT: '#FF4B3E',
+          dark: '#CC392F',
         },
-        success: {
-          DEFAULT: '#91c788',
-          light: '#afd4aa',
-          dark: '#6f9f66',
-        },
-        background: {
-          DEFAULT: '#f9f5ef',
-          paper: '#ffffff',
-        },
-        text: {
-          primary: '#333333',
-          secondary: '#666666',
-        },
+      },
+      boxShadow: {
+        custom:
+          '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+      },
+      borderRadius: {
+        xl: '1rem',
+        '2xl': '1.5rem',
       },
     },
   },

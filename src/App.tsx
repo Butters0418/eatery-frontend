@@ -4,43 +4,31 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 const theme = createTheme({
   palette: {
     primary: {
-      main: '#ffaa00',
-      light: '#ffbb33',
-      dark: '#cc8800',
+      light: '#FF9B54',
+      main: '#FF7629',
+      dark: '#E35A00',
       contrastText: '#ffffff',
     },
     secondary: {
-      main: '#f4a7b9',
-      light: '#f8c4d1',
-      dark: '#d37d90',
-      contrastText: '#333333',
-    },
-    warning: {
-      main: '#d3381c',
-      light: '#e25c4f',
-      dark: '#a82c16',
+      light: '#F0F9FF',
+      main: '#38B2AC',
+      dark: '#2C7A7B',
       contrastText: '#ffffff',
     },
-    info: {
-      main: '#58a6dc',
-      light: '#7fbce6',
-      dark: '#357bb3',
+    error: {
+      light: '#FF7A70',
+      main: '#FF4B3E',
+      dark: '#CC392F',
       contrastText: '#ffffff',
     },
-    success: {
-      main: '#91c788',
-      light: '#afd4aa',
-      dark: '#6f9f66',
-      contrastText: '#ffffff',
+    grey: {
+      100: '#F7F7F7',
+      500: '#6B7280',
+      900: '#374151',
     },
-    background: {
-      default: '#f9f5ef',
-      paper: '#ffffff',
-    },
-    text: {
-      primary: '#333333',
-      secondary: '#666666',
-    },
+  },
+  shape: {
+    borderRadius: 16, // 預設圓角（看你是否想對應 xl 或 2xl）
   },
 });
 
