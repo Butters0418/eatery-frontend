@@ -1,29 +1,34 @@
 import { useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
-import { useNavigate } from 'react-router-dom';
-import useAuthStore from '../../stores/useAuthStore';
-import { yupResolver } from '@hookform/resolvers/yup';
-import { forgotPasswordSchema } from './loginSchema';
+import { useNavigate, NavLink } from 'react-router-dom';
 import axios from 'axios';
-import TextField from '@mui/material/TextField';
+import { yupResolver } from '@hookform/resolvers/yup';
+
+// 自定義 hooks/stores
+import useAuthStore from '../../stores/useAuthStore';
+import useRedirectIfLoggedIn from '../../utils/useRedirectIfLoggedIn';
+import { forgotPasswordSchema } from './loginSchema';
+import ConfirmDialog from './ConfirmDialog';
+
+// Material UI 元件
+import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
-import Box from '@mui/material/Box';
-import Dialog from '@mui/material/Dialog';
-import DialogTitle from '@mui/material/DialogTitle';
-import DialogContent from '@mui/material/DialogContent';
-import DialogActions from '@mui/material/DialogActions';
+import LinearProgress from '@mui/material/LinearProgress';
+import TextField from '@mui/material/TextField';
 
 interface FormValues {
   account: string;
 }
 
 function ForgotPassword() {
-  const { setAuth } = useAuthStore();
+  const { isLoading, isCheckingAuth, setAuth, setLoading } = useAuthStore();
   const [errorMsg, setErrorMsg] = useState<string>('');
-  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [open, setOpen] = useState<boolean>(false);
   const navigate = useNavigate();
+
+  // 判斷是否已經登入
+  useRedirectIfLoggedIn();
 
   // react-hooks-form 設定
   const {
@@ -40,15 +45,14 @@ function ForgotPassword() {
   // 表單 submit 事件
   const onSubmit = async (data: FormValues) => {
     setErrorMsg('');
-    setIsLoading(true);
+    setLoading(true);
     try {
       await axios.post(
         `${import.meta.env.VITE_API_URL}/api/resend-verification-code`,
         data,
       );
       const account = data.account;
-      setIsLoading(false);
-      setAuth(account, null, '', true);
+      setAuth(account, null, '', false);
       setOpen(true);
     } catch (err) {
       if (axios.isAxiosError(err)) {
@@ -63,28 +67,31 @@ function ForgotPassword() {
       } else {
         setErrorMsg('發生錯誤，請稍後再試');
       }
-      setIsLoading(false);
+    } finally {
+      setLoading(false);
     }
   };
 
   // dialog 關閉導至 Verify 頁
   const handleDialogClose = () => {
+    console.log('導航到驗證頁面');
     setOpen(false);
-    navigate('/verify-code');
+    navigate('/verify-code', { replace: true });
   };
 
+  // 如果正在檢查認證狀態，顯示進度條
+  if (isCheckingAuth) {
+    return <LinearProgress color="primary" />;
+  }
   return (
     <>
-      <div className="flex h-full border">
-        <div className="m-auto w-96 rounded-md border border-gray-300 p-6">
-          <h1 className="text-xl font-bold tracking-wide text-zinc-800">
-            寄送驗証碼
-          </h1>
-          <p className="mt-1 tracking-wide text-zinc-500">
-            僅限解鎖管理員帳號
-            <br />
-            員工帳號解鎖請洽【管理員】
-          </p>
+      <div className="flex min-h-screen flex-col items-center justify-center bg-grey-light p-4 md:p-8">
+        {/* card */}
+        <div className="w-full max-w-md rounded-2xl bg-white p-8 shadow-custom">
+          <div className="text-center">
+            <h1 className="text-3xl font-bold text-primary">Eatery</h1>
+            <p className="text-neutral mt-2">忘記密碼</p>
+          </div>
           <form className="mt-6 grid gap-6" onSubmit={handleSubmit(onSubmit)}>
             <Controller
               name="account"
@@ -100,14 +107,16 @@ function ForgotPassword() {
                   size="small"
                   color="primary"
                   autoComplete="account"
-                  placeholder="text@gmail.com"
+                  placeholder="butters.test.demo@gmail.com"
                 />
               )}
             />
 
-            <div>
+            <div className="relative mt-6">
               {errorMsg && (
-                <p className="mb-2 text-sm text-red-500">{errorMsg}</p>
+                <p className="absolute -top-7 left-0 mb-2 ml-2 text-sm text-error">
+                  {errorMsg}
+                </p>
               )}
               <Button
                 variant="contained"
@@ -119,35 +128,34 @@ function ForgotPassword() {
               >
                 {isLoading ? (
                   <Box sx={{ display: 'flex' }}>
-                    <CircularProgress size="25px" color="inherit" />
+                    <CircularProgress size="28px" color="inherit" />
                   </Box>
                 ) : (
-                  '取得驗証碼'
+                  <p className="text-lg">發送驗證碼</p>
                 )}
               </Button>
             </div>
+            <div className="flex justify-center">
+              <NavLink
+                to="/login"
+                className="text-center text-sm text-primary hover:text-primary-dark"
+              >
+                返回登入頁面
+              </NavLink>
+            </div>
           </form>
         </div>
+        <div className="mt-8 text-center text-sm text-grey">
+          &copy; 2025 Eatery 餐飲管理系統. 保留所有權利.
+        </div>
       </div>
-
-      <Dialog
+      <ConfirmDialog
         open={open}
-        maxWidth="xs"
-        fullWidth
-        onClose={(event, reason) => {
-          if (reason !== 'backdropClick' && reason !== 'escapeKeyDown') {
-            handleDialogClose();
-          }
-        }}
-      >
-        <DialogTitle>系統通知</DialogTitle>
-        <DialogContent>驗証碼已寄出</DialogContent>
-        <DialogActions>
-          <Button onClick={handleDialogClose} variant="contained">
-            確定
-          </Button>
-        </DialogActions>
-      </Dialog>
+        title="驗證碼已寄出"
+        message="請查看您的電子郵件信箱，"
+        buttonText="前往驗證"
+        onClose={handleDialogClose}
+      />
     </>
   );
 }
