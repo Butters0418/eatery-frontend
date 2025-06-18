@@ -1,6 +1,5 @@
 import style from '@emotion/styled';
 export const SMainSwiper = style.div`
-  position: relative;
   .main-swiper-pagination {
     display: flex;
     justify-content: center;

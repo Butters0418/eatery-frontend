@@ -24,7 +24,9 @@ function CustomerPage() {
     } else if (!isOpen && cartItems > 0) {
       setIsOpen(true);
     } else {
-      setCartItems(cartItems + 1);
+      if (cartItems < 20) {
+        setCartItems(cartItems + 1);
+      }
     }
   };
 
@@ -39,6 +41,7 @@ function CustomerPage() {
       setCartItems(cartItems - 1);
     }
   };
+
   return (
     <div className="bg-grey-light">
       <header className="border-b border-gray-200 bg-white p-4 text-center">
@@ -47,11 +50,11 @@ function CustomerPage() {
 
       <nav className="border-b border-gray-200 bg-white p-2">123</nav>
 
-      <main className="container mx-auto p-3 xl:max-w-[1280px]">
+      <main className="container mx-auto overflow-hidden p-3 xl:max-w-[1280px]">
         {/* 熱門商品 */}
-        <div className="">
+        <div className="py-2">
           <h2 className="text-2xl font-bold">熱門商品</h2>
-          <SMainSwiper>
+          <SMainSwiper className="relative mt-3 md:mt-4">
             <Swiper
               className="main-swiper"
               modules={[Navigation, Pagination]}
@@ -71,7 +74,7 @@ function CustomerPage() {
                 clickable: true,
               }}
             >
-              <SwiperSlide className="w-56 pb-6 pt-3 md:w-[270px] md:pb-8">
+              <SwiperSlide className="w-56 pb-6 md:w-[270px] md:pb-8">
                 <div
                   className="block overflow-hidden rounded-xl bg-white shadow-lg duration-300"
                   onClick={() => {
@@ -167,7 +170,7 @@ function CustomerPage() {
                   </div>
                 </div>
               </SwiperSlide>
-              <SwiperSlide className="w-56 pb-6 pt-3 md:w-[270px] md:pb-8">
+              <SwiperSlide className="w-56 pb-6 md:w-[270px] md:pb-8">
                 <div
                   className="block overflow-hidden rounded-xl bg-white shadow-lg duration-300"
                   onClick={() => {
@@ -193,7 +196,7 @@ function CustomerPage() {
                   </div>
                 </div>
               </SwiperSlide>
-              <SwiperSlide className="w-56 pb-6 pt-3 md:w-[270px] md:pb-8">
+              <SwiperSlide className="w-56 pb-6 md:w-[270px] md:pb-8">
                 <div
                   className="block overflow-hidden rounded-xl bg-white shadow-lg duration-300"
                   onClick={() => {
@@ -219,7 +222,7 @@ function CustomerPage() {
                   </div>
                 </div>
               </SwiperSlide>
-              <SwiperSlide className="w-56 pb-6 pt-3 md:w-[270px] md:pb-8">
+              <SwiperSlide className="w-56 pb-6 md:w-[270px] md:pb-8">
                 <div
                   className="block overflow-hidden rounded-xl bg-white shadow-lg duration-300"
                   onClick={() => {
@@ -245,7 +248,7 @@ function CustomerPage() {
                   </div>
                 </div>
               </SwiperSlide>
-              <SwiperSlide className="w-56 pb-6 pt-3 md:w-[270px] md:pb-8">
+              <SwiperSlide className="w-56 pb-6 md:w-[270px] md:pb-8">
                 <div
                   className="block overflow-hidden rounded-xl bg-white shadow-lg duration-300"
                   onClick={() => {
@@ -271,7 +274,7 @@ function CustomerPage() {
                   </div>
                 </div>
               </SwiperSlide>
-              <SwiperSlide className="w-56 pb-6 pt-3 md:w-[270px] md:pb-8">
+              <SwiperSlide className="w-56 pb-6 md:w-[270px] md:pb-8">
                 <div
                   className="block overflow-hidden rounded-xl bg-white shadow-lg duration-300"
                   onClick={() => {
@@ -297,7 +300,7 @@ function CustomerPage() {
                   </div>
                 </div>
               </SwiperSlide>
-              <SwiperSlide className="w-56 pb-6 pt-3 md:w-[270px] md:pb-8">
+              <SwiperSlide className="w-56 pb-6 md:w-[270px] md:pb-8">
                 <div
                   className="block overflow-hidden rounded-xl bg-white shadow-lg duration-300"
                   onClick={() => {
@@ -332,6 +335,237 @@ function CustomerPage() {
               <FaAngleRight className="[.swiper-button-disabled_&]:text-gray-400" />
             </div>
           </SMainSwiper>
+        </div>
+
+        {/* 其他商品 */}
+        <div className="mt-3 py-2 md:mt-4">
+          <h2 className="text-2xl font-bold">主食類</h2>
+          <div className="mt-2 grid grid-cols-1 gap-1.5 md:mt-4 md:grid-cols-2 md:gap-4">
+            <div className="relative flex justify-between rounded-lg border border-gray-200 bg-white">
+              <div className="flex flex-col p-2.5 md:p-4">
+                <h3 className="text-base font-medium md:text-lg">
+                  好吃炸雞好吃炸雞好吃炸雞
+                </h3>
+                <p className="text-sm text-gray-600 md:text-base">
+                  <span className="text-[0.8em]">$</span>150
+                </p>
+                <p className="mt-auto">
+                  <span className="inline-block rounded-full bg-primary px-2 text-sm text-white md:text-base">
+                    熱門商品
+                  </span>
+                </p>
+              </div>
+              <img
+                src="https://images.unsplash.com/photo-1626645738196-c2a7c87a8f58?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Nnx8ZnJpZWQlMjBjaGlja2VufGVufDB8fDB8fHww&auto=format&fit=crop&w=800&q=60"
+                alt=""
+                className="h-28 w-32 rounded-lg object-cover md:h-36 md:w-44"
+              />
+              <div
+                className="text-md absolute bottom-2 right-2 h-8 w-24 md:h-9 md:w-[108px] md:text-lg"
+                onClick={(e) => {
+                  e.stopPropagation();
+                }}
+              >
+                <motion.div
+                  className="absolute right-0 top-0 h-full w-9 rounded-full bg-white shadow-lg"
+                  initial={false}
+                  animate={{ width: isOpen ? '100%' : '33.3%' }}
+                  transition={{ duration: 0.3 }}
+                ></motion.div>
+                {/* +1 */}
+                <button
+                  className="absolute right-0 top-0 z-10 flex h-full w-1/3 items-center justify-center rounded-full"
+                  onClick={handleAddToCart}
+                >
+                  {!isOpen && cartItems > 0 ? (
+                    <p className="pb-0.5 font-semibold">{cartItems}</p>
+                  ) : (
+                    <HiOutlinePlusSm />
+                  )}
+                </button>
+                {/* 數字 */}
+
+                <AnimatePresence>
+                  {isOpen && (
+                    <motion.p
+                      className="absolute bottom-0.5 right-1/3 z-20 flex h-full w-1/3 items-center justify-center font-semibold"
+                      initial={{ opacity: 0 }}
+                      animate={{
+                        opacity: 1,
+                        transition: { duration: 0.3, delay: 0.2 },
+                      }}
+                      exit={{
+                        opacity: 0,
+                        transition: { duration: 0.1, delay: 0 }, // 移除退場的延遲
+                      }}
+                    >
+                      {cartItems}
+                    </motion.p>
+                  )}
+                </AnimatePresence>
+
+                {/* -1 或垃圾桶 */}
+                <AnimatePresence>
+                  {isOpen && (
+                    <motion.button
+                      className="absolute right-2/3 z-10 flex h-full w-1/3 items-center justify-center rounded-full"
+                      onClick={handleRemoveFromCart}
+                      initial={{ opacity: 0 }}
+                      animate={{
+                        opacity: 1,
+                        transition: { duration: 0.3, delay: 0.2 },
+                      }}
+                      exit={{
+                        opacity: 0,
+                        transition: { duration: 0.1, delay: 0 }, // 移除退場的延遲
+                      }}
+                    >
+                      {cartItems > 1 ? (
+                        <HiOutlineMinusSm />
+                      ) : (
+                        <FaRegTrashCan className="text-error-dark" />
+                      )}
+                    </motion.button>
+                  )}
+                </AnimatePresence>
+              </div>
+            </div>
+            <div className="relative flex justify-between rounded-lg border border-gray-200 bg-white">
+              <div className="flex flex-col p-2.5 md:p-4">
+                <h3 className="text-base font-medium md:text-lg">
+                  好吃炸雞好吃炸雞好吃炸雞
+                </h3>
+                <p className="text-sm text-gray-600 md:text-base">
+                  <span className="text-[0.8em]">$</span>150
+                </p>
+                <p className="mt-auto">
+                  <span className="inline-block rounded-full bg-primary px-2 text-sm text-white md:text-base">
+                    熱門商品
+                  </span>
+                </p>
+              </div>
+              <img
+                src="https://images.unsplash.com/photo-1626645738196-c2a7c87a8f58?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Nnx8ZnJpZWQlMjBjaGlja2VufGVufDB8fDB8fHww&auto=format&fit=crop&w=800&q=60"
+                alt=""
+                className="h-28 w-32 rounded-lg object-cover md:h-36 md:w-44"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-3 py-2 md:mt-4">
+          <h2 className="text-2xl font-bold">主食類</h2>
+          <div className="mt-2 grid grid-cols-1 gap-1.5 md:mt-4 md:grid-cols-2 md:gap-4">
+            <div className="relative flex justify-between rounded-lg border border-gray-200 bg-white">
+              <div className="flex flex-col p-2.5 md:p-4">
+                <h3 className="text-base font-medium md:text-lg">
+                  好吃炸雞好吃炸雞好吃炸雞
+                </h3>
+                <p className="text-sm text-gray-600 md:text-base">
+                  <span className="text-[0.8em]">$</span>150
+                </p>
+                <p className="mt-auto">
+                  <span className="inline-block rounded-full bg-primary px-2 text-sm text-white md:text-base">
+                    熱門商品
+                  </span>
+                </p>
+              </div>
+              <img
+                src="https://images.unsplash.com/photo-1626645738196-c2a7c87a8f58?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Nnx8ZnJpZWQlMjBjaGlja2VufGVufDB8fDB8fHww&auto=format&fit=crop&w=800&q=60"
+                alt=""
+                className="h-28 w-32 rounded-lg object-cover md:h-36 md:w-44"
+              />
+              <div
+                className="text-md absolute bottom-2 right-2 h-8 w-24 md:h-9 md:w-[108px] md:text-lg"
+                onClick={(e) => {
+                  e.stopPropagation();
+                }}
+              >
+                <motion.div
+                  className="absolute right-0 top-0 h-full w-9 rounded-full bg-white shadow-lg"
+                  initial={false}
+                  animate={{ width: isOpen ? '100%' : '33.3%' }}
+                  transition={{ duration: 0.3 }}
+                ></motion.div>
+                {/* +1 */}
+                <button
+                  className="absolute right-0 top-0 z-10 flex h-full w-1/3 items-center justify-center rounded-full"
+                  onClick={handleAddToCart}
+                >
+                  {!isOpen && cartItems > 0 ? (
+                    <p className="pb-0.5 font-semibold">{cartItems}</p>
+                  ) : (
+                    <HiOutlinePlusSm />
+                  )}
+                </button>
+                {/* 數字 */}
+
+                <AnimatePresence>
+                  {isOpen && (
+                    <motion.p
+                      className="absolute bottom-0.5 right-1/3 z-20 flex h-full w-1/3 items-center justify-center font-semibold"
+                      initial={{ opacity: 0 }}
+                      animate={{
+                        opacity: 1,
+                        transition: { duration: 0.3, delay: 0.2 },
+                      }}
+                      exit={{
+                        opacity: 0,
+                        transition: { duration: 0.1, delay: 0 }, // 移除退場的延遲
+                      }}
+                    >
+                      {cartItems}
+                    </motion.p>
+                  )}
+                </AnimatePresence>
+
+                {/* -1 或垃圾桶 */}
+                <AnimatePresence>
+                  {isOpen && (
+                    <motion.button
+                      className="absolute right-2/3 z-10 flex h-full w-1/3 items-center justify-center rounded-full"
+                      onClick={handleRemoveFromCart}
+                      initial={{ opacity: 0 }}
+                      animate={{
+                        opacity: 1,
+                        transition: { duration: 0.3, delay: 0.2 },
+                      }}
+                      exit={{
+                        opacity: 0,
+                        transition: { duration: 0.1, delay: 0 }, // 移除退場的延遲
+                      }}
+                    >
+                      {cartItems > 1 ? (
+                        <HiOutlineMinusSm />
+                      ) : (
+                        <FaRegTrashCan className="text-error-dark" />
+                      )}
+                    </motion.button>
+                  )}
+                </AnimatePresence>
+              </div>
+            </div>
+            <div className="relative flex justify-between rounded-lg border border-gray-200 bg-white">
+              <div className="flex flex-col p-2.5 md:p-4">
+                <h3 className="text-base font-medium md:text-lg">
+                  好吃炸雞好吃炸雞好吃炸雞
+                </h3>
+                <p className="text-sm text-gray-600 md:text-base">
+                  <span className="text-[0.8em]">$</span>150
+                </p>
+                <p className="mt-auto">
+                  <span className="inline-block rounded-full bg-primary px-2 text-sm text-white md:text-base">
+                    熱門商品
+                  </span>
+                </p>
+              </div>
+              <img
+                src="https://images.unsplash.com/photo-1626645738196-c2a7c87a8f58?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Nnx8ZnJpZWQlMjBjaGlja2VufGVufDB8fDB8fHww&auto=format&fit=crop&w=800&q=60"
+                alt=""
+                className="h-28 w-32 rounded-lg object-cover md:h-36 md:w-44"
+              />
+            </div>
+          </div>
         </div>
       </main>
     </div>
