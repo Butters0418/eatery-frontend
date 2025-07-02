@@ -1,0 +1,122 @@
+import { HiOutlineMinusSm, HiOutlinePlusSm } from 'react-icons/hi';
+import { FaRegTrashCan } from 'react-icons/fa6';
+import { Product } from '../../../types/productType';
+import { motion, AnimatePresence } from 'framer-motion';
+import useAddToCartStore from '../../../stores/useAddToCartStore.ts';
+
+interface CartButtonGroupProps {
+  group: string;
+  item: Product;
+  currentProductId: string | null;
+  setCurrentProductId: (id: string | null) => void;
+}
+
+function CartButtonGroup({
+  group,
+  item,
+  currentProductId,
+  setCurrentProductId,
+}: CartButtonGroupProps) {
+  const { cart, addToCart, removeFromCart } = useAddToCartStore();
+
+  // 目前數量 or 0
+  const quantity: number =
+    cart.find((cartItem) => cartItem.id === item.id)?.quantity || 0;
+
+  // 當前商品的 groupId (用於判斷展開使用)
+  const groupId = item.id ? `${group}_${item.id}` : null;
+
+  // +增加商品
+  const addItemHandler = (product: Product) => {
+    console.log('groupId  ', groupId);
+    setCurrentProductId(groupId);
+    addToCart(product);
+  };
+
+  // -減少商品
+  const removeItemHandler = (id: string) => {
+    if (quantity <= 1) {
+      setCurrentProductId(null);
+    }
+    removeFromCart(id);
+  };
+  return (
+    <div
+      className="text-md absolute bottom-2 right-2 h-8 w-24 md:h-9 md:w-[108px] md:text-lg"
+      onClick={(e) => {
+        e.stopPropagation();
+      }}
+    >
+      <motion.div
+        className="absolute right-0 top-0 h-full w-9 rounded-full bg-white shadow-lg"
+        initial={false}
+        animate={{
+          width: groupId === currentProductId ? '100%' : '33.3%',
+        }}
+        transition={{ duration: 0.3 }}
+      ></motion.div>
+      <button
+        className="absolute right-0 top-0 z-10 flex h-full w-1/3 items-center justify-center rounded-full"
+        onClick={() => {
+          addItemHandler(item);
+        }}
+      >
+        {quantity > 0 && currentProductId !== groupId ? (
+          <p className="pb-0.5 font-semibold text-secondary">{quantity}</p>
+        ) : (
+          <HiOutlinePlusSm className="text-gray-500" />
+        )}
+      </button>
+      {/* 數字 */}
+
+      <AnimatePresence>
+        {groupId === currentProductId && (
+          <motion.p
+            className="absolute bottom-0.5 right-1/3 z-20 flex h-full w-1/3 items-center justify-center font-semibold text-secondary"
+            initial={{ opacity: 0 }}
+            animate={{
+              opacity: 1,
+              transition: { duration: 0.3, delay: 0.2 },
+            }}
+            exit={{
+              opacity: 0,
+              transition: { duration: 0.1, delay: 0 },
+            }}
+          >
+            {quantity}
+          </motion.p>
+        )}
+      </AnimatePresence>
+
+      {/* -1 或垃圾桶 */}
+      <AnimatePresence>
+        {groupId === currentProductId && (
+          <motion.button
+            className="absolute right-2/3 z-10 flex h-full w-1/3 items-center justify-center rounded-full"
+            onClick={() => {
+              if (item.id) {
+                removeItemHandler(item.id);
+              }
+            }}
+            initial={{ opacity: 0 }}
+            animate={{
+              opacity: 1,
+              transition: { duration: 0.3, delay: 0.2 },
+            }}
+            exit={{
+              opacity: 0,
+              transition: { duration: 0.1, delay: 0 },
+            }}
+          >
+            {quantity > 1 ? (
+              <HiOutlineMinusSm className="text-gray-500" />
+            ) : (
+              <FaRegTrashCan className="text-error-light" />
+            )}
+          </motion.button>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+export default CartButtonGroup;

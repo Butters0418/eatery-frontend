@@ -1,67 +1,37 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
+
 import { Navigation, Pagination } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
-import { HiOutlineMinusSm, HiOutlinePlusSm } from 'react-icons/hi';
-import { FaRegTrashCan, FaAngleRight, FaAngleLeft } from 'react-icons/fa6';
-import { TbBowlChopsticks } from 'react-icons/tb';
-import { motion, AnimatePresence } from 'framer-motion';
+
+import { FaAngleRight, FaAngleLeft } from 'react-icons/fa6';
 
 import { SMainSwiper } from './style.ts';
-import Dialog from '@mui/material/Dialog';
-import Button from '@mui/material/Button';
-import ButtonGroup from '@mui/material/ButtonGroup';
-import { RiFileList3Line } from 'react-icons/ri';
 import { formatNumber } from '../../utils/formatNumber.ts';
-
-// 本地資料
 import { menuData } from '../../constants/menuData.ts';
 import { Product } from '../../types/productType.ts';
+
+import CartButtonGroup from './components/CartButtonGroup.tsx';
+
 // 顧客點餐頁
 function CustomerPage() {
-  const [isOpen, setIsOpen] = useState<boolean>(false);
-  const [cartItems, setCartItems] = useState<number>(0);
+  const [currentProductId, setCurrentProductId] = useState<string | null>(null);
 
-  //  處理加入購物車的邏輯
-  const handleAddToCart = () => {
-    // 如果未展開且數量為0，則展開且數量加1
-    if (!isOpen && cartItems === 0) {
-      setIsOpen(true);
-      setCartItems(cartItems + 1);
-      // 如果未展開且數量大於0，則僅展開
-    } else if (!isOpen && cartItems > 0) {
-      setIsOpen(true);
-    } else {
-      if (cartItems < 20) {
-        setCartItems(cartItems + 1);
-      }
-    }
-  };
-
-  // 處理減少購物車的邏輯
-  const handleRemoveFromCart = () => {
-    if (cartItems === 1) {
-      setIsOpen(false);
-      setCartItems(0);
-      return;
-    }
-    if (cartItems > 0) {
-      setCartItems(cartItems - 1);
-    }
-  };
-  // 將 menuData 按照 category 分組
-  const groupedData = menuData.reduce(
-    (acc, item) => {
-      if (!acc[item.category]) {
-        acc[item.category] = [];
-      }
-      acc[item.category].push(item);
-      return acc;
-    },
-    {} as Record<string, Product[]>,
-  );
+  // menuData 以 category 分組
+  const groupedData = useMemo(() => {
+    return menuData.reduce(
+      (acc, item) => {
+        if (!acc[item.category]) {
+          acc[item.category] = [];
+        }
+        acc[item.category].push(item);
+        return acc;
+      },
+      {} as Record<string, Product[]>,
+    );
+  }, []);
 
   return (
     <div className="bg-grey-light pb-28 md:pb-48">
@@ -104,90 +74,19 @@ function CustomerPage() {
                       className="w-56 pb-6 md:w-[270px] md:pb-8"
                       key={popularItem.id}
                     >
-                      <div
-                        className="block overflow-hidden rounded-xl bg-white shadow-lg duration-300"
-                        onClick={() => {
-                          setIsOpen(false);
-                        }}
-                      >
+                      <div className="block overflow-hidden rounded-xl bg-white shadow-lg duration-300">
                         <div className="relative">
                           <img
                             src={popularItem.imageUrl}
                             alt={popularItem.name}
                             className="h-44 w-full object-cover md:h-48"
                           />
-
-                          <div
-                            className="text-md absolute bottom-2 right-2 h-8 w-24 md:h-9 md:w-[108px] md:text-lg"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                            }}
-                          >
-                            <motion.div
-                              className="absolute right-0 top-0 h-full w-9 rounded-full bg-white shadow-lg"
-                              initial={false}
-                              animate={{ width: isOpen ? '100%' : '33.3%' }}
-                              transition={{ duration: 0.3 }}
-                            ></motion.div>
-                            {/* +1 */}
-                            <button
-                              className="absolute right-0 top-0 z-10 flex h-full w-1/3 items-center justify-center rounded-full"
-                              onClick={handleAddToCart}
-                            >
-                              {!isOpen && cartItems > 0 ? (
-                                <p className="pb-0.5 font-semibold text-secondary">
-                                  {cartItems}
-                                </p>
-                              ) : (
-                                <HiOutlinePlusSm className="text-gray-500" />
-                              )}
-                            </button>
-                            {/* 數字 */}
-
-                            <AnimatePresence>
-                              {isOpen && (
-                                <motion.p
-                                  className="absolute bottom-0.5 right-1/3 z-20 flex h-full w-1/3 items-center justify-center font-semibold text-secondary"
-                                  initial={{ opacity: 0 }}
-                                  animate={{
-                                    opacity: 1,
-                                    transition: { duration: 0.3, delay: 0.2 },
-                                  }}
-                                  exit={{
-                                    opacity: 0,
-                                    transition: { duration: 0.1, delay: 0 },
-                                  }}
-                                >
-                                  {cartItems}
-                                </motion.p>
-                              )}
-                            </AnimatePresence>
-
-                            {/* -1 或垃圾桶 */}
-                            <AnimatePresence>
-                              {isOpen && (
-                                <motion.button
-                                  className="absolute right-2/3 z-10 flex h-full w-1/3 items-center justify-center rounded-full"
-                                  onClick={handleRemoveFromCart}
-                                  initial={{ opacity: 0 }}
-                                  animate={{
-                                    opacity: 1,
-                                    transition: { duration: 0.3, delay: 0.2 },
-                                  }}
-                                  exit={{
-                                    opacity: 0,
-                                    transition: { duration: 0.1, delay: 0 },
-                                  }}
-                                >
-                                  {cartItems > 1 ? (
-                                    <HiOutlineMinusSm className="text-gray-500" />
-                                  ) : (
-                                    <FaRegTrashCan className="text-error-light" />
-                                  )}
-                                </motion.button>
-                              )}
-                            </AnimatePresence>
-                          </div>
+                          <CartButtonGroup
+                            group={'papular'}
+                            item={popularItem}
+                            currentProductId={currentProductId}
+                            setCurrentProductId={setCurrentProductId}
+                          />
                         </div>
 
                         <div className="p-2 px-3">
@@ -247,77 +146,12 @@ function CustomerPage() {
                         alt={item.name}
                         className="h-28 w-32 rounded-lg object-cover md:h-36 md:w-44"
                       />
-                      <div
-                        className="text-md absolute bottom-2 right-2 h-8 w-24 md:h-9 md:w-[108px] md:text-lg"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                        }}
-                      >
-                        <motion.div
-                          className="absolute right-0 top-0 h-full w-9 rounded-full bg-white shadow-lg"
-                          initial={false}
-                          animate={{ width: isOpen ? '100%' : '33.3%' }}
-                          transition={{ duration: 0.3 }}
-                        ></motion.div>
-                        {/* +1 */}
-                        <button
-                          className="absolute right-0 top-0 z-10 flex h-full w-1/3 items-center justify-center rounded-full"
-                          onClick={handleAddToCart}
-                        >
-                          {!isOpen && cartItems > 0 ? (
-                            <p className="pb-0.5 font-semibold text-secondary">
-                              {cartItems}
-                            </p>
-                          ) : (
-                            <HiOutlinePlusSm className="text-gray-500" />
-                          )}
-                        </button>
-                        {/* 數字 */}
-
-                        <AnimatePresence>
-                          {isOpen && (
-                            <motion.p
-                              className="absolute bottom-0.5 right-1/3 z-20 flex h-full w-1/3 items-center justify-center font-semibold text-secondary"
-                              initial={{ opacity: 0 }}
-                              animate={{
-                                opacity: 1,
-                                transition: { duration: 0.3, delay: 0.2 },
-                              }}
-                              exit={{
-                                opacity: 0,
-                                transition: { duration: 0.1, delay: 0 }, // 移除退場的延遲
-                              }}
-                            >
-                              {cartItems}
-                            </motion.p>
-                          )}
-                        </AnimatePresence>
-
-                        {/* -1 或垃圾桶 */}
-                        <AnimatePresence>
-                          {isOpen && (
-                            <motion.button
-                              className="absolute right-2/3 z-10 flex h-full w-1/3 items-center justify-center rounded-full"
-                              onClick={handleRemoveFromCart}
-                              initial={{ opacity: 0 }}
-                              animate={{
-                                opacity: 1,
-                                transition: { duration: 0.3, delay: 0.2 },
-                              }}
-                              exit={{
-                                opacity: 0,
-                                transition: { duration: 0.1, delay: 0 }, // 移除退場的延遲
-                              }}
-                            >
-                              {cartItems > 1 ? (
-                                <HiOutlineMinusSm className="text-gray-500" />
-                              ) : (
-                                <FaRegTrashCan className="text-error-light" />
-                              )}
-                            </motion.button>
-                          )}
-                        </AnimatePresence>
-                      </div>
+                      <CartButtonGroup
+                        group={'normal'}
+                        item={item}
+                        currentProductId={currentProductId}
+                        setCurrentProductId={setCurrentProductId}
+                      />
                     </li>
                   );
                 })}

@@ -22,3 +22,8 @@ export interface AddonOption {
   name: string;
   price: number;
 }
+
+// 商品與數量的結合型別
+export interface ProductWithQuantity extends Product {
+  quantity: number;
+}
