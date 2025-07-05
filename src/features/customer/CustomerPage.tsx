@@ -12,12 +12,20 @@ import { SMainSwiper } from './style.ts';
 import { formatNumber } from '../../utils/formatNumber.ts';
 import { menuData } from '../../constants/menuData.ts';
 import { Product } from '../../types/productType.ts';
-
+import Button from '@mui/material/Button';
+import useAddToCartStore from '../../stores/useAddToCartStore.ts';
 import CartButtonGroup from './components/CartButtonGroup.tsx';
+import CheckCartsDialog from './components/CheckCartsDialog.tsx';
 
 // 顧客點餐頁
 function CustomerPage() {
+  const { cart } = useAddToCartStore();
   const [currentProductId, setCurrentProductId] = useState<string | null>(null);
+  const [cartOpen, setCartOpen] = useState(false); // 控制購物車彈窗開關
+
+  // 購物物總數量
+  const totalQuantity =
+    cart.reduce((total, item) => total + item.quantity, 0) || 0;
 
   // menuData 以 category 分組
   const groupedData = useMemo(() => {
@@ -160,6 +168,26 @@ function CustomerPage() {
           );
         })}
       </main>
+
+      {/* 查看購物車按鈕 */}
+      <Button
+        variant="contained"
+        color="primary"
+        className="bottom-5 left-1/2 z-50 -translate-x-1/2 !shadow-xl md:bottom-10"
+        sx={{
+          position: 'fixed',
+          fontSize: { xs: '1rem', md: '1.25rem' },
+          borderRadius: 2,
+        }}
+        onClick={() => {
+          setCartOpen(true);
+        }}
+      >
+        查看購物車{totalQuantity > 0 && `(${totalQuantity})`}
+      </Button>
+
+      {/* 購物車彈窗 */}
+      <CheckCartsDialog cartOpen={cartOpen} setCartOpen={setCartOpen} />
     </div>
   );
 }

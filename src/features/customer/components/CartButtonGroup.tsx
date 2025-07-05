@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import useAddToCartStore from '../../../stores/useAddToCartStore.ts';
 
 interface CartButtonGroupProps {
-  group: string;
+  group: string; // div 中區塊位置
   item: Product;
   currentProductId: string | null;
   setCurrentProductId: (id: string | null) => void;
@@ -19,7 +19,7 @@ function CartButtonGroup({
 }: CartButtonGroupProps) {
   const { cart, addToCart, removeFromCart } = useAddToCartStore();
 
-  // 目前數量 or 0
+  // 當前商品在購物車中的數量
   const quantity: number =
     cart.find((cartItem) => cartItem.id === item.id)?.quantity || 0;
 
@@ -28,7 +28,6 @@ function CartButtonGroup({
 
   // +增加商品
   const addItemHandler = (product: Product) => {
-    console.log('groupId  ', groupId);
     setCurrentProductId(groupId);
     addToCart(product);
   };
