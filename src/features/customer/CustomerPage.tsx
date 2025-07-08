@@ -7,6 +7,7 @@ import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 
 import { FaAngleRight, FaAngleLeft } from 'react-icons/fa6';
+import { RiFileList3Line } from 'react-icons/ri';
 
 import { SMainSwiper } from './style.ts';
 import { formatNumber } from '../../utils/formatNumber.ts';
@@ -16,12 +17,14 @@ import Button from '@mui/material/Button';
 import useAddToCartStore from '../../stores/useAddToCartStore.ts';
 import CartButtonGroup from './components/CartButtonGroup.tsx';
 import CheckCartsDialog from './components/CheckCartsDialog.tsx';
+import CheckOrdersDialog from './components/CheckOrdersDialog.tsx';
 
 // 顧客點餐頁
 function CustomerPage() {
   const { cart } = useAddToCartStore();
   const [currentProductId, setCurrentProductId] = useState<string | null>(null);
   const [cartOpen, setCartOpen] = useState(false); // 控制購物車彈窗開關
+  const [orderOpen, setOrderOpen] = useState(false); // 控制訂單明細彈窗開關
 
   // 購物物總數量
   const totalQuantity =
@@ -42,13 +45,11 @@ function CustomerPage() {
   }, []);
 
   return (
-    <div className="bg-grey-light pb-28 md:pb-48">
+    <div className="overflow-hidden bg-grey-light pb-28 md:pb-48">
       <header className="border-b border-gray-200 bg-white p-4 text-center">
         <h1 className="text-2xl font-bold text-primary">Eatery</h1>
       </header>
-
       <nav className="border-b border-gray-200 bg-white p-2">123</nav>
-
       <main className="container mx-auto p-3 xl:max-w-[1280px]">
         {/* 熱門商品 */}
         <div className="py-2">
@@ -168,7 +169,6 @@ function CustomerPage() {
           );
         })}
       </main>
-
       {/* 查看購物車按鈕 */}
       <Button
         variant="contained"
@@ -179,15 +179,33 @@ function CustomerPage() {
           fontSize: { xs: '1rem', md: '1.25rem' },
           borderRadius: 2,
         }}
-        onClick={() => {
-          setCartOpen(true);
-        }}
+        onClick={() => setCartOpen(true)}
       >
         查看購物車{totalQuantity > 0 && `(${totalQuantity})`}
       </Button>
 
       {/* 購物車彈窗 */}
       <CheckCartsDialog cartOpen={cartOpen} setCartOpen={setCartOpen} />
+
+      {/* 查看訂單明細按鈕*/}
+      <Button
+        variant="contained"
+        color="secondary"
+        className="bottom-5 right-2 z-50 !shadow-xl md:bottom-10 md:right-5"
+        sx={{
+          position: 'fixed',
+          fontSize: { xs: '1.25rem', md: '1.5rem' },
+          borderRadius: 4,
+          padding: { xs: 1.5, md: 2 },
+          minWidth: 'auto',
+        }}
+        onClick={() => setOrderOpen(true)}
+      >
+        <RiFileList3Line />
+      </Button>
+
+      {/* 訂單明細彈窗 */}
+      <CheckOrdersDialog orderOpen={orderOpen} setOrderOpen={setOrderOpen} />
     </div>
   );
 }
