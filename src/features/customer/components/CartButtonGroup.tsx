@@ -21,23 +21,28 @@ function CartButtonGroup({
 
   // 當前商品在購物車中的數量
   const quantity: number =
-    cart.find((cartItem) => cartItem.id === item.id)?.quantity || 0;
+    cart.find((cartItem) => cartItem.productId === item.productId)?.qty || 0;
 
   // 當前商品的 groupId (用於判斷展開使用)
-  const groupId = item.id ? `${group}_${item.id}` : null;
+  const groupId = item.productId ? `${group}_${item.productId}` : null;
 
   // +增加商品
   const addItemHandler = (product: Product) => {
+    const newProduct = {
+      ...product,
+      compositeId: product.productId!,
+    };
     setCurrentProductId(groupId);
-    addToCart(product);
+
+    addToCart(newProduct, 1);
   };
 
   // -減少商品
-  const removeItemHandler = (id: string) => {
+  const removeItemHandler = (compiledId: string) => {
     if (quantity <= 1) {
       setCurrentProductId(null);
     }
-    removeFromCart(id);
+    removeFromCart(compiledId);
   };
   return (
     <div
@@ -93,8 +98,8 @@ function CartButtonGroup({
           <motion.button
             className="absolute right-2/3 z-10 flex h-full w-1/3 items-center justify-center rounded-full"
             onClick={() => {
-              if (item.id) {
-                removeItemHandler(item.id);
+              if (item.productId) {
+                removeItemHandler(item.productId);
               }
             }}
             initial={{ opacity: 0 }}

@@ -20,7 +20,7 @@ import {
 
 export const menuData: Product[] = [
   {
-    id: uuidv4(),
+    productId: uuidv4(),
     name: '牛肉麵',
     description: '濃郁紅燒湯頭，搭配軟嫩牛肉與彈牙麵條！',
     price: 140,
@@ -62,7 +62,7 @@ export const menuData: Product[] = [
     ],
   },
   {
-    id: uuidv4(),
+    productId: uuidv4(),
     name: '餛飩麵',
     description: '皮薄餡多的餛飩，搭配Q彈細麵，清爽不油膩。',
     price: 100,
@@ -104,7 +104,7 @@ export const menuData: Product[] = [
     ],
   },
   {
-    id: uuidv4(),
+    productId: uuidv4(),
     name: '乾意麵',
     description: '香肉燥拌勻手工意麵。',
     price: 55,
@@ -147,7 +147,7 @@ export const menuData: Product[] = [
   },
 
   {
-    id: uuidv4(),
+    productId: uuidv4(),
     name: '水餃 (10顆)',
     description: '手工豬肉高麗菜水餃。',
     price: 30,
@@ -155,9 +155,10 @@ export const menuData: Product[] = [
     imageUrl: dumpling,
     isAvailable: true,
     isPopular: false,
+    addons: null,
   },
   {
-    id: uuidv4(),
+    productId: uuidv4(),
     name: '高麗菜',
     description: '-',
     price: 35,
@@ -165,9 +166,10 @@ export const menuData: Product[] = [
     imageUrl: cabbage,
     isAvailable: true,
     isPopular: false,
+    addons: null,
   },
   {
-    id: uuidv4(),
+    productId: uuidv4(),
     name: '魯蛋 (1顆)',
     description: '-',
     price: 15,
@@ -175,9 +177,10 @@ export const menuData: Product[] = [
     imageUrl: braisedEgg,
     isAvailable: true,
     isPopular: true,
+    addons: null,
   },
   {
-    id: uuidv4(),
+    productId: uuidv4(),
     name: '豆干 (3份)',
     description: '-',
     price: 30,
@@ -185,9 +188,10 @@ export const menuData: Product[] = [
     imageUrl: tofu,
     isAvailable: true,
     isPopular: true,
+    addons: null,
   },
   {
-    id: uuidv4(),
+    productId: uuidv4(),
     name: '海帶',
     description: '-',
     price: 30,
@@ -195,9 +199,10 @@ export const menuData: Product[] = [
     imageUrl: kelp,
     isAvailable: true,
     isPopular: false,
+    addons: null,
   },
   {
-    id: uuidv4(),
+    productId: uuidv4(),
     name: '地瓜葉',
     description: '-',
     price: 35,
@@ -205,9 +210,10 @@ export const menuData: Product[] = [
     imageUrl: sweetPotatoLeaf,
     isAvailable: true,
     isPopular: true,
+    addons: null,
   },
   {
-    id: uuidv4(),
+    productId: uuidv4(),
     name: '豬耳朵',
     description: '-',
     price: 45,
@@ -215,9 +221,10 @@ export const menuData: Product[] = [
     imageUrl: pigEar,
     isAvailable: true,
     isPopular: false,
+    addons: null,
   },
   {
-    id: uuidv4(),
+    productId: uuidv4(),
     name: '蛋花湯',
     description: '金黃蛋絲搭配清爽湯頭。',
     price: 25,
@@ -225,9 +232,10 @@ export const menuData: Product[] = [
     imageUrl: eggDropSoup,
     isAvailable: true,
     isPopular: false,
+    addons: null,
   },
   {
-    id: uuidv4(),
+    productId: uuidv4(),
     name: '貢丸湯',
     description: 'Q 彈扎實的手工貢丸，湯頭清甜回甘。',
     price: 30,
@@ -235,9 +243,10 @@ export const menuData: Product[] = [
     imageUrl: meatballSoup,
     isAvailable: true,
     isPopular: true,
+    addons: null,
   },
   {
-    id: uuidv4(),
+    productId: uuidv4(),
     name: '古早味紅茶',
     description: '古早味紅茶香濃甘醇，微甜不膩。',
     price: 20,
@@ -275,7 +284,7 @@ export const menuData: Product[] = [
     ],
   },
   {
-    id: uuidv4(),
+    productId: uuidv4(),
     name: '冬瓜茶',
     description: '清涼解渴的冬瓜茶，甘甜順口。',
     price: 20,

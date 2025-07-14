@@ -7,6 +7,7 @@ import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 
 import { FaAngleRight, FaAngleLeft } from 'react-icons/fa6';
+import { HiOutlinePlusSm } from 'react-icons/hi';
 import { RiFileList3Line } from 'react-icons/ri';
 
 import { SMainSwiper } from './style.ts';
@@ -18,6 +19,7 @@ import useAddToCartStore from '../../stores/useAddToCartStore.ts';
 import CartButtonGroup from './components/CartButtonGroup.tsx';
 import CheckCartsDialog from './components/CheckCartsDialog.tsx';
 import CheckOrdersDialog from './components/CheckOrdersDialog.tsx';
+import AddProductDialog from './components/AddProductDialog.tsx';
 
 // 顧客點餐頁
 function CustomerPage() {
@@ -25,10 +27,11 @@ function CustomerPage() {
   const [currentProductId, setCurrentProductId] = useState<string | null>(null);
   const [cartOpen, setCartOpen] = useState(false); // 控制購物車彈窗開關
   const [orderOpen, setOrderOpen] = useState(false); // 控制訂單明細彈窗開關
+  const [productOpen, setProductOpen] = useState(false); // 控制商品詳細彈窗開關
+  const [modelProduct, setModelProduct] = useState<Product | null>(null); // 當前選擇的商品
 
   // 購物物總數量
-  const totalQuantity =
-    cart.reduce((total, item) => total + item.quantity, 0) || 0;
+  const totalQuantity = cart.reduce((total, item) => total + item.qty, 0) || 0;
 
   // menuData 以 category 分組
   const groupedData = useMemo(() => {
@@ -81,21 +84,35 @@ function CustomerPage() {
                   return (
                     <SwiperSlide
                       className="w-56 pb-6 md:w-[270px] md:pb-8"
-                      key={popularItem.id}
+                      key={popularItem.productId}
                     >
-                      <div className="block overflow-hidden rounded-xl bg-white shadow-lg duration-300">
+                      <div
+                        className="block cursor-pointer overflow-hidden rounded-xl bg-white shadow-lg duration-300"
+                        onClick={() => {
+                          setModelProduct(popularItem);
+                          setProductOpen(true);
+                        }}
+                      >
                         <div className="relative">
                           <img
                             src={popularItem.imageUrl}
                             alt={popularItem.name}
                             className="h-44 w-full object-cover md:h-48"
                           />
-                          <CartButtonGroup
-                            group={'papular'}
-                            item={popularItem}
-                            currentProductId={currentProductId}
-                            setCurrentProductId={setCurrentProductId}
-                          />
+
+                          {/* 購物車按鈕組 */}
+                          {popularItem.addons ? (
+                            <p className="absolute bottom-2 right-2 flex h-9 w-9 items-center justify-center rounded-full bg-white shadow-lg">
+                              <HiOutlinePlusSm className="text-gray-500" />
+                            </p>
+                          ) : (
+                            <CartButtonGroup
+                              group={'papular'}
+                              item={popularItem}
+                              currentProductId={currentProductId}
+                              setCurrentProductId={setCurrentProductId}
+                            />
+                          )}
                         </div>
 
                         <div className="p-2 px-3">
@@ -131,8 +148,12 @@ function CustomerPage() {
                 {items.map((item) => {
                   return (
                     <li
-                      key={item.id}
-                      className="relative flex justify-between rounded-lg border border-gray-200 bg-white"
+                      key={item.productId}
+                      className="relative flex cursor-pointer justify-between rounded-lg border border-gray-200 bg-white"
+                      onClick={() => {
+                        setModelProduct(item);
+                        setProductOpen(true);
+                      }}
                     >
                       <div className="flex flex-col p-2.5 md:p-4">
                         <h3 className="text-base font-medium md:text-lg">
@@ -155,12 +176,19 @@ function CustomerPage() {
                         alt={item.name}
                         className="h-28 w-32 rounded-lg object-cover md:h-36 md:w-44"
                       />
-                      <CartButtonGroup
-                        group={'normal'}
-                        item={item}
-                        currentProductId={currentProductId}
-                        setCurrentProductId={setCurrentProductId}
-                      />
+
+                      {item.addons ? (
+                        <p className="absolute bottom-2 right-2 flex h-9 w-9 items-center justify-center rounded-full bg-white shadow-lg">
+                          <HiOutlinePlusSm className="text-gray-500" />
+                        </p>
+                      ) : (
+                        <CartButtonGroup
+                          group={'normal'}
+                          item={item}
+                          currentProductId={currentProductId}
+                          setCurrentProductId={setCurrentProductId}
+                        />
+                      )}
                     </li>
                   );
                 })}
@@ -206,6 +234,29 @@ function CustomerPage() {
 
       {/* 訂單明細彈窗 */}
       <CheckOrdersDialog orderOpen={orderOpen} setOrderOpen={setOrderOpen} />
+
+      {/* 商品詳細資訊 */}
+      <Button
+        variant="contained"
+        color="info"
+        className="left-1/2 top-5 z-50 -translate-x-1/2 !shadow-xl"
+        sx={{
+          position: 'fixed',
+          fontSize: { xs: '1rem', md: '1.25rem' },
+          borderRadius: 2,
+        }}
+        onClick={() => setProductOpen(true)}
+      >
+        打開商品詳細資訊
+      </Button>
+
+      {modelProduct && (
+        <AddProductDialog
+          product={modelProduct}
+          productOpen={productOpen}
+          setProductOpen={setProductOpen}
+        />
+      )}
     </div>
   );
 }

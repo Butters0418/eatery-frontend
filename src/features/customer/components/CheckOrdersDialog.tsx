@@ -12,6 +12,8 @@ function CheckOrdersDialog({
   return (
     <Dialog
       open={orderOpen}
+      autoFocus
+      disableRestoreFocus
       sx={{
         '& .MuiDialog-paper': {
           maxWidth: { xs: 500 },

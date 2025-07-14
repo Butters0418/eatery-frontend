@@ -1,50 +1,82 @@
 import { create } from 'zustand';
-import { Product, ProductWithQuantity } from '../types/productType';
+import { ProductWithCompositeId, ProductWithQty } from '../types/productType';
 
 interface AddToCartStore {
-  cart: ProductWithQuantity[];
+  cart: ProductWithQty[];
   currentProductId: string | null;
-  addToCart: (product: Product) => void;
+  getTotalPrice: () => number;
+  addToCart: (product: ProductWithCompositeId, num: number) => void;
   removeFromCart: (productId: string) => void;
 }
 
-const useAddToCartStore = create<AddToCartStore>((set) => ({
+const useAddToCartStore = create<AddToCartStore>((set, get) => ({
   cart: [],
   currentProductId: null,
-  addToCart: (product: Product) => {
+  tableId: null,
+  tableToken: null,
+  // 計算總金額的方法
+  getTotalPrice: () => {
+    const { cart } = get();
+    return cart.reduce((total, item) => {
+      // 基本價格
+      let itemTotal = item.price * item.qty;
+
+      // 加料選項價格
+      if (item.addons) {
+        item.addons.forEach((group) => {
+          group.options.forEach((option) => {
+            if (option.selected) {
+              itemTotal += option.price * item.qty;
+            }
+          });
+        });
+      }
+
+      return total + itemTotal;
+    }, 0);
+  },
+  // 新增商品到購物車
+  addToCart: (product: ProductWithCompositeId, num = 1) => {
     set((state) => {
-      const existingProduct = state.cart.find((item) => item.id === product.id);
+      const existingProduct = state.cart.find(
+        (item) => item.compositeId === product.compositeId,
+      );
       if (existingProduct) {
         // 若商品存在於購物車，則更新數量
         return {
           cart: state.cart.map((item) =>
-            item.id === product.id
-              ? { ...item, quantity: (item.quantity || 1) + 1 }
+            item.compositeId === product.compositeId
+              ? { ...item, qty: (item.qty || 1) + num }
               : item,
           ),
         };
       } else {
         // 不在購物車中，則新增到購物車
-        return { cart: [...state.cart, { ...product, quantity: 1 }] };
+        return { cart: [...state.cart, { ...product, qty: num }] };
       }
     });
   },
 
-  removeFromCart: (id: string) => {
+  // 從購物車中移除商品
+  removeFromCart: (compositeId: string) => {
     set((state) => {
-      const existingProduct = state.cart.find((item) => item.id === id);
+      const existingProduct = state.cart.find(
+        (item) => item.compositeId === compositeId,
+      );
       if (existingProduct) {
-        if (existingProduct.quantity > 1) {
+        if (existingProduct.qty > 1) {
           // 若數量大於1，則減少數量
           return {
             cart: state.cart.map((item) =>
-              item.id === id ? { ...item, quantity: item.quantity - 1 } : item,
+              item.compositeId === compositeId
+                ? { ...item, qty: item.qty - 1 }
+                : item,
             ),
           };
         } else {
           // 若數量等於1，則從購物車移除
           return {
-            cart: state.cart.filter((item) => item.id !== id),
+            cart: state.cart.filter((item) => item.compositeId !== compositeId),
           };
         }
       }

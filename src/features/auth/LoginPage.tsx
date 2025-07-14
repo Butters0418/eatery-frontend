@@ -88,6 +88,7 @@ function LoginPage() {
   if (isCheckingAuth) {
     return <LinearProgress color="primary" />;
   }
+
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-grey-light p-4 md:p-8">
       {/* card */}

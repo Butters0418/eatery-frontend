@@ -4,16 +4,42 @@ import { HiOutlineMinusSm, HiOutlinePlusSm } from 'react-icons/hi';
 import { FaRegTrashCan } from 'react-icons/fa6';
 import useAddToCartStore from '../../../stores/useAddToCartStore.ts';
 import { formatNumber } from '../../../utils/formatNumber';
+import { AddonGroup, ProductWithQty } from '../../../types/productType.ts';
 interface CheckCartsDialogProps {
   cartOpen: boolean;
   setCartOpen: (open: boolean) => void;
 }
-function CheckCartsDialog({ cartOpen, setCartOpen }: CheckCartsDialogProps) {
-  const { cart, addToCart, removeFromCart } = useAddToCartStore();
 
+const addonsString = (addons: AddonGroup[]) => {
+  return addons
+    .map((group) => group.options.find((opt) => opt.selected)?.name)
+    .filter(Boolean)
+    .join(' / ');
+};
+
+const priceWithAddons = (product: ProductWithQty) => {
+  // 基本價格 × 數量
+  let total = product.price;
+
+  // 加上選擇的配料價格
+  product.addons?.forEach((group) => {
+    const selectedOption = group.options.find((opt) => opt.selected);
+    if (selectedOption) {
+      total += selectedOption.price;
+    }
+  });
+  return total;
+};
+
+function CheckCartsDialog({ cartOpen, setCartOpen }: CheckCartsDialogProps) {
+  const { cart, addToCart, removeFromCart, getTotalPrice } =
+    useAddToCartStore();
+  console.log(cart);
   return (
     <Dialog
       open={cartOpen}
+      autoFocus
+      disableRestoreFocus
       sx={{
         '& .MuiDialog-paper': {
           maxWidth: { xs: 500 },
@@ -52,7 +78,7 @@ function CheckCartsDialog({ cartOpen, setCartOpen }: CheckCartsDialogProps) {
                   return (
                     <li
                       className="flex items-stretch justify-between border-b border-gray-200 px-1 py-2 text-left"
-                      key={item.id}
+                      key={item.compositeId}
                     >
                       <img
                         className="h-16 w-[70px] self-center rounded-md object-cover md:h-20 md:w-24"
@@ -64,12 +90,15 @@ function CheckCartsDialog({ cartOpen, setCartOpen }: CheckCartsDialogProps) {
                         <h3 className="text-base font-medium md:text-lg">
                           {item.name}
                         </h3>
-                        <p className="text-xs text-gray-400 md:text-sm">
-                          加麵 / 加大
-                        </p>
+                        {item.addons && (
+                          <p className="text-xs text-gray-400 md:text-sm">
+                            {addonsString(item.addons)}
+                          </p>
+                        )}
+
                         <p className="mt-auto text-sm font-semibold text-primary md:text-lg">
                           <small>$</small>
-                          {item.price}
+                          {priceWithAddons(item)}
                         </p>
                       </div>
 
@@ -77,25 +106,25 @@ function CheckCartsDialog({ cartOpen, setCartOpen }: CheckCartsDialogProps) {
                         <button
                           className="flex items-center justify-center"
                           onClick={() => {
-                            if (item.id) {
-                              removeFromCart(item.id);
+                            if (item.compositeId) {
+                              removeFromCart(item.compositeId);
                             }
                           }}
                         >
-                          {item.quantity > 1 ? (
+                          {item.qty > 1 ? (
                             <HiOutlineMinusSm className="text-gray-500" />
                           ) : (
                             <FaRegTrashCan className="text-error-light" />
                           )}
                         </button>
                         <p className="flex items-center justify-center pb-0.5 font-semibold text-secondary">
-                          {item.quantity}
+                          {item.qty}
                         </p>
                         <button
                           className="flex items-center justify-center"
                           onClick={() => {
-                            if (item.quantity < 20) {
-                              addToCart(item);
+                            if (item.qty < 20) {
+                              addToCart(item, 1);
                             }
                           }}
                         >
@@ -111,12 +140,7 @@ function CheckCartsDialog({ cartOpen, setCartOpen }: CheckCartsDialogProps) {
               訂單金額 :{' '}
               <span className="text-primary">
                 <small>$</small>
-                {formatNumber(
-                  cart.reduce(
-                    (total, item) => total + item.price * item.quantity,
-                    0,
-                  ),
-                )}
+                {formatNumber(getTotalPrice())}
               </span>
             </h3>
             <Button
