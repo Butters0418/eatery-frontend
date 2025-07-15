@@ -5,11 +5,13 @@ import { FaRegTrashCan } from 'react-icons/fa6';
 import useAddToCartStore from '../../../stores/useAddToCartStore.ts';
 import { formatNumber } from '../../../utils/formatNumber';
 import { AddonGroup, ProductWithQty } from '../../../types/productType.ts';
+import axios from 'axios';
 interface CheckCartsDialogProps {
   cartOpen: boolean;
   setCartOpen: (open: boolean) => void;
 }
 
+// 配料取出選擇字串
 const addonsString = (addons: AddonGroup[]) => {
   return addons
     .map((group) => group.options.find((opt) => opt.selected)?.name)
@@ -17,6 +19,7 @@ const addonsString = (addons: AddonGroup[]) => {
     .join(' / ');
 };
 
+// 統計價格(前端用)
 const priceWithAddons = (product: ProductWithQty) => {
   // 基本價格 × 數量
   let total = product.price;
@@ -32,9 +35,25 @@ const priceWithAddons = (product: ProductWithQty) => {
 };
 
 function CheckCartsDialog({ cartOpen, setCartOpen }: CheckCartsDialogProps) {
-  const { cart, addToCart, removeFromCart, getTotalPrice } =
+  const { cart, addToCart, removeFromCart, getTotalPrice, buildOrderPayload } =
     useAddToCartStore();
-  console.log(cart);
+
+  const apiUrl = 'http://localhost:3080/api/orders';
+
+  const submitHandler = async () => {
+    const payload = buildOrderPayload();
+    console.log('訂單資料:', payload);
+
+    try {
+      const response = await axios.post(apiUrl, payload);
+      console.log('訂單提交成功:', response.data);
+      // setCartOpen(false); // 關閉購物車對話框
+    } catch (error) {
+      console.error('訂單提交失敗:', error);
+      // alert('訂單提交失敗，請稍後再試。');
+    }
+  };
+
   return (
     <Dialog
       open={cartOpen}
@@ -144,7 +163,7 @@ function CheckCartsDialog({ cartOpen, setCartOpen }: CheckCartsDialogProps) {
               </span>
             </h3>
             <Button
-              onClick={() => setCartOpen(false)}
+              onClick={submitHandler}
               variant="contained"
               color="primary"
               fullWidth

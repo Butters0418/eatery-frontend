@@ -221,6 +221,9 @@ function AddProductDialog({
             color="primary"
             sx={{ borderRadius: 2, mt: 2 }}
             fullWidth
+            onClick={() => {
+              setProductOpen(false);
+            }}
           >
             <p className="text-lg">
               {/* 計算選了幾項 */}

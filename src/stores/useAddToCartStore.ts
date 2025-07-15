@@ -1,12 +1,20 @@
 import { create } from 'zustand';
-import { ProductWithCompositeId, ProductWithQty } from '../types/productType';
+import {
+  ProductWithCompositeId,
+  ProductWithQty,
+  OrderPayload,
+} from '../types/productType';
 
 interface AddToCartStore {
+  tableId: string | null;
+  tableToken: string | null;
+  setTable: (tableId: string | null, tableToken: string | null) => void;
   cart: ProductWithQty[];
   currentProductId: string | null;
   getTotalPrice: () => number;
   addToCart: (product: ProductWithCompositeId, num: number) => void;
   removeFromCart: (productId: string) => void;
+  buildOrderPayload: () => OrderPayload;
 }
 
 const useAddToCartStore = create<AddToCartStore>((set, get) => ({
@@ -14,6 +22,15 @@ const useAddToCartStore = create<AddToCartStore>((set, get) => ({
   currentProductId: null,
   tableId: null,
   tableToken: null,
+
+  // 設定桌號 & 桌號 Token
+  setTable: (tableId, tableToken) => {
+    set(() => ({
+      tableId,
+      tableToken,
+    }));
+  },
+
   // 計算總金額的方法
   getTotalPrice: () => {
     const { cart } = get();
@@ -35,6 +52,7 @@ const useAddToCartStore = create<AddToCartStore>((set, get) => ({
       return total + itemTotal;
     }, 0);
   },
+
   // 新增商品到購物車
   addToCart: (product: ProductWithCompositeId, num = 1) => {
     set((state) => {
@@ -83,6 +101,30 @@ const useAddToCartStore = create<AddToCartStore>((set, get) => ({
       // 如果商品不存在於購物車，則回傳當前狀態
       return { cart: state.cart };
     });
+  },
+
+  // 組出訂單的 payload
+  buildOrderPayload: () => {
+    const { cart, tableId, tableToken } = get();
+    return {
+      orderType: '內用',
+      tableId,
+      tableToken,
+      orderList: [
+        {
+          item: cart.map(
+            ({ productId, name, price, qty, addons, compositeId }) => ({
+              productId: productId!,
+              name,
+              price,
+              qty,
+              addons,
+              compositeId,
+            }),
+          ),
+        },
+      ],
+    };
   },
 }));
 

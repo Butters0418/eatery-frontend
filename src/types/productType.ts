@@ -33,3 +33,23 @@ export interface ProductWithCompositeId extends Product {
 export interface ProductWithQty extends ProductWithCompositeId {
   qty: number;
 }
+
+export interface OrderPayload {
+  orderType: '內用' | '外帶';
+  tableId: string | null;
+  tableToken: string | null;
+  orderList: OrderGroup[];
+}
+
+export interface OrderGroup {
+  item: OrderItem[];
+}
+
+export interface OrderItem {
+  productId: string;
+  name: string;
+  price: number;
+  qty: number;
+  compositeId: string | null;
+  addons: AddonGroup[] | null;
+}

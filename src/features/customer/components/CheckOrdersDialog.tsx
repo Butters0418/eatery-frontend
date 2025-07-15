@@ -115,7 +115,9 @@ function CheckOrdersDialog({
           ※用餐完畢後請至櫃臺結帳，謝謝 !
         </p>
         <Button
-          onClick={() => setOrderOpen(false)}
+          onClick={() => {
+            setOrderOpen(false);
+          }}
           variant="outlined"
           color="secondary"
           sx={{ borderRadius: 2 }}

@@ -1,5 +1,5 @@
-import { useMemo, useState } from 'react';
-
+import { useEffect, useMemo, useState } from 'react';
+import queryString from 'query-string';
 import { Navigation, Pagination } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
@@ -9,7 +9,6 @@ import 'swiper/css/pagination';
 import { FaAngleRight, FaAngleLeft } from 'react-icons/fa6';
 import { HiOutlinePlusSm } from 'react-icons/hi';
 import { RiFileList3Line } from 'react-icons/ri';
-
 import { SMainSwiper } from './style.ts';
 import { formatNumber } from '../../utils/formatNumber.ts';
 import { menuData } from '../../constants/menuData.ts';
@@ -23,12 +22,22 @@ import AddProductDialog from './components/AddProductDialog.tsx';
 
 // 顧客點餐頁
 function CustomerPage() {
-  const { cart } = useAddToCartStore();
-  const [currentProductId, setCurrentProductId] = useState<string | null>(null);
+  const { cart, setTable } = useAddToCartStore();
+  const [currentProductId, setCurrentProductId] = useState<string | null>(null); // 當前選擇的商品 ID
+  const [modelProduct, setModelProduct] = useState<Product | null>(null); // 當前選擇的商品區塊
   const [cartOpen, setCartOpen] = useState(false); // 控制購物車彈窗開關
   const [orderOpen, setOrderOpen] = useState(false); // 控制訂單明細彈窗開關
   const [productOpen, setProductOpen] = useState(false); // 控制商品詳細彈窗開關
-  const [modelProduct, setModelProduct] = useState<Product | null>(null); // 當前選擇的商品
+
+  const query = useMemo(() => queryString.parse(location.search), []); // 解析 query string
+
+  // 當 query 變化時，設置桌號和 Token
+  useEffect(() => {
+    if (query.tableId && query.tableToken) {
+      setTable(query.tableId as string, query.tableToken as string);
+    }
+    return () => setTable(null, null);
+  }, [query]);
 
   // 購物物總數量
   const totalQuantity = cart.reduce((total, item) => total + item.qty, 0) || 0;
@@ -197,6 +206,7 @@ function CustomerPage() {
           );
         })}
       </main>
+
       {/* 查看購物車按鈕 */}
       <Button
         variant="contained"
@@ -250,6 +260,7 @@ function CustomerPage() {
         打開商品詳細資訊
       </Button>
 
+      {/* 商品詳細燈箱 */}
       {modelProduct && (
         <AddProductDialog
           product={modelProduct}

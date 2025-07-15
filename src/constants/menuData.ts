@@ -20,7 +20,7 @@ import {
 
 export const menuData: Product[] = [
   {
-    productId: uuidv4(),
+    productId: '687217ff5f3ae3892f5d82cd',
     name: '牛肉麵',
     description: '濃郁紅燒湯頭，搭配軟嫩牛肉與彈牙麵條！',
     price: 140,
@@ -224,7 +224,7 @@ export const menuData: Product[] = [
     addons: null,
   },
   {
-    productId: uuidv4(),
+    productId: '68721c30fa9e459299e4fe89',
     name: '蛋花湯',
     description: '金黃蛋絲搭配清爽湯頭。',
     price: 25,
