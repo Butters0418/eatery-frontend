@@ -10,7 +10,7 @@ import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import { Product } from '../../../types/productType';
-import useAddToCartStore from '../../../stores/useAddToCartStore.ts';
+import useAddToCartStore from '../../../stores/useCartStore.ts';
 
 // 表單數據類型定義
 interface FormValues {

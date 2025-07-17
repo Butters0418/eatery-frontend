@@ -2,7 +2,7 @@ import { HiOutlineMinusSm, HiOutlinePlusSm } from 'react-icons/hi';
 import { FaRegTrashCan } from 'react-icons/fa6';
 import { Product } from '../../../types/productType';
 import { motion, AnimatePresence } from 'framer-motion';
-import useAddToCartStore from '../../../stores/useAddToCartStore.ts';
+import useAddToCartStore from '../../../stores/useCartStore.ts';
 
 interface CartButtonGroupProps {
   group: string; // div 中區塊位置

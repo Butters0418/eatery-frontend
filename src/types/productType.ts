@@ -1,5 +1,6 @@
 // 商品型別
 export interface Product {
+  _id?: string; // MongoDB 的 id
   productId?: string;
   name: string;
   description: string;

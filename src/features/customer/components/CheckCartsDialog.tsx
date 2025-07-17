@@ -1,14 +1,25 @@
+import { useState } from 'react';
 import Dialog from '@mui/material/Dialog';
 import Button from '@mui/material/Button';
 import { HiOutlineMinusSm, HiOutlinePlusSm } from 'react-icons/hi';
 import { FaRegTrashCan } from 'react-icons/fa6';
-import useAddToCartStore from '../../../stores/useAddToCartStore.ts';
+import useAddToCartStore from '../../../stores/useCartStore.ts';
 import { formatNumber } from '../../../utils/formatNumber';
 import { AddonGroup, ProductWithQty } from '../../../types/productType.ts';
 import axios from 'axios';
+import Box from '@mui/material/Box';
+import CircularProgress from '@mui/material/CircularProgress';
 interface CheckCartsDialogProps {
   cartOpen: boolean;
   setCartOpen: (open: boolean) => void;
+  setSubmitResultOpen: (open: boolean) => void;
+  setSubmitResult: (
+    result: {
+      success: boolean;
+      title: string;
+      message: string;
+    } | null,
+  ) => void;
 }
 
 // 配料取出選擇字串
@@ -34,25 +45,48 @@ const priceWithAddons = (product: ProductWithQty) => {
   return total;
 };
 
-function CheckCartsDialog({ cartOpen, setCartOpen }: CheckCartsDialogProps) {
+// post api
+const apiUrl = import.meta.env.VITE_API_URL;
+
+function CheckCartsDialog({
+  cartOpen,
+  setCartOpen,
+  setSubmitResultOpen,
+  setSubmitResult,
+}: CheckCartsDialogProps) {
   const { cart, addToCart, removeFromCart, getTotalPrice, buildOrderPayload } =
     useAddToCartStore();
+  const [isLoading, setIsLoading] = useState(false); // api 請求狀態
 
-  const apiUrl = 'http://localhost:3080/api/orders';
-
+  // 送訂單
   const submitHandler = async () => {
     const payload = buildOrderPayload();
-    console.log('訂單資料:', payload);
+    setIsLoading(true);
 
     try {
-      const response = await axios.post(apiUrl, payload);
+      const response = await axios.post(`${apiUrl}/api/orders`, payload);
       console.log('訂單提交成功:', response.data);
       // setCartOpen(false); // 關閉購物車對話框
-    } catch (error) {
-      console.error('訂單提交失敗:', error);
-      // alert('訂單提交失敗，請稍後再試。');
+      setSubmitResult({
+        success: true,
+        title: '訂單提交成功!',
+        message: '點擊下方查詢訂單明細',
+      });
+    } catch {
+      setSubmitResult({
+        success: false,
+        title: '訂單提交失敗!',
+        message: '請重新掃描桌號 QR Code 或聯絡服務人員',
+      });
+    } finally {
+      setIsLoading(false);
+      setCartOpen(false); // 關閉購物車對話框
+      setSubmitResultOpen(true); // 開啟訂單提交結果對話框
     }
   };
+
+  // 取得明細
+  const getOrderDetails = async () => {};
 
   return (
     <Dialog
@@ -168,8 +202,15 @@ function CheckCartsDialog({ cartOpen, setCartOpen }: CheckCartsDialogProps) {
               color="primary"
               fullWidth
               sx={{ borderRadius: 2 }}
+              disabled={isLoading}
             >
-              <p className="text-lg">送出訂單</p>
+              {isLoading ? (
+                <Box sx={{ display: 'flex' }}>
+                  <CircularProgress size="28px" color="inherit" />
+                </Box>
+              ) : (
+                <p className="text-lg">送出訂單</p>
+              )}
             </Button>
           </>
         )}

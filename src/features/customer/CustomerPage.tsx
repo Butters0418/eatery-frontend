@@ -11,23 +11,25 @@ import { HiOutlinePlusSm } from 'react-icons/hi';
 import { RiFileList3Line } from 'react-icons/ri';
 import { SMainSwiper } from './style.ts';
 import { formatNumber } from '../../utils/formatNumber.ts';
-import { menuData } from '../../constants/menuData.ts';
 import { Product } from '../../types/productType.ts';
 import Button from '@mui/material/Button';
-import useAddToCartStore from '../../stores/useAddToCartStore.ts';
+import useAddToCartStore from '../../stores/useCartStore.ts';
 import CartButtonGroup from './components/CartButtonGroup.tsx';
 import CheckCartsDialog from './components/CheckCartsDialog.tsx';
 import CheckOrdersDialog from './components/CheckOrdersDialog.tsx';
 import AddProductDialog from './components/AddProductDialog.tsx';
-
+import { useProductStore } from '../../stores/useProductStore.ts';
+import SubmitOrderDialog from './components/SubmitResultDialog.tsx';
 // 顧客點餐頁
 function CustomerPage() {
-  const { cart, setTable } = useAddToCartStore();
+  const { isLoading, products, fetchProducts } = useProductStore(); // 取得商品資料的 store
+  const { cart, setTable } = useAddToCartStore(); // 取得購物車資料的 store
   const [currentProductId, setCurrentProductId] = useState<string | null>(null); // 當前選擇的商品 ID
   const [modelProduct, setModelProduct] = useState<Product | null>(null); // 當前選擇的商品區塊
+  const [productOpen, setProductOpen] = useState(false); // 控制商品詳細彈窗開關
   const [cartOpen, setCartOpen] = useState(false); // 控制購物車彈窗開關
   const [orderOpen, setOrderOpen] = useState(false); // 控制訂單明細彈窗開關
-  const [productOpen, setProductOpen] = useState(false); // 控制商品詳細彈窗開關
+  const [submitResultOpen, setSubmitResultOpen] = useState(false); // 控制訂單提交彈窗開關
 
   const query = useMemo(() => queryString.parse(location.search), []); // 解析 query string
 
@@ -39,12 +41,18 @@ function CustomerPage() {
     return () => setTable(null, null);
   }, [query]);
 
-  // 購物物總數量
-  const totalQuantity = cart.reduce((total, item) => total + item.qty, 0) || 0;
+  // 取得商品 api
+  useEffect(() => {
+    if (!products) {
+      fetchProducts();
+    }
+    console.log('products', products);
+  }, [products]);
 
   // menuData 以 category 分組
   const groupedData = useMemo(() => {
-    return menuData.reduce(
+    if (!products) return {};
+    return products.reduce(
       (acc, item) => {
         if (!acc[item.category]) {
           acc[item.category] = [];
@@ -54,7 +62,17 @@ function CustomerPage() {
       },
       {} as Record<string, Product[]>,
     );
-  }, []);
+  }, [products]);
+
+  // 購物物總數量
+  const totalQuantity = cart.reduce((total, item) => total + item.qty, 0) || 0;
+
+  // api 送出訂單回傳結果 for 燈箱用
+  const [submitResult, seSubmitResult] = useState<{
+    success: boolean;
+    title: string;
+    message: string;
+  } | null>(null);
 
   return (
     <div className="overflow-hidden bg-grey-light pb-28 md:pb-48">
@@ -87,56 +105,57 @@ function CustomerPage() {
                 clickable: true,
               }}
             >
-              {menuData
-                .filter((item) => item.isPopular)
-                .map((popularItem) => {
-                  return (
-                    <SwiperSlide
-                      className="w-56 pb-6 md:w-[270px] md:pb-8"
-                      key={popularItem.productId}
-                    >
-                      <div
-                        className="block cursor-pointer overflow-hidden rounded-xl bg-white shadow-lg duration-300"
-                        onClick={() => {
-                          setModelProduct(popularItem);
-                          setProductOpen(true);
-                        }}
+              {products?.length !== 0 &&
+                products
+                  ?.filter((item) => item.isPopular)
+                  .map((popularItem) => {
+                    return (
+                      <SwiperSlide
+                        className="w-56 pb-6 md:w-[270px] md:pb-8"
+                        key={popularItem.productId}
                       >
-                        <div className="relative">
-                          <img
-                            src={popularItem.imageUrl}
-                            alt={popularItem.name}
-                            className="h-44 w-full object-cover md:h-48"
-                          />
-
-                          {/* 購物車按鈕組 */}
-                          {popularItem.addons ? (
-                            <p className="absolute bottom-2 right-2 flex h-9 w-9 items-center justify-center rounded-full bg-white shadow-lg">
-                              <HiOutlinePlusSm className="text-gray-500" />
-                            </p>
-                          ) : (
-                            <CartButtonGroup
-                              group={'papular'}
-                              item={popularItem}
-                              currentProductId={currentProductId}
-                              setCurrentProductId={setCurrentProductId}
+                        <div
+                          className="block cursor-pointer overflow-hidden rounded-xl bg-white shadow-lg duration-300"
+                          onClick={() => {
+                            setModelProduct(popularItem);
+                            setProductOpen(true);
+                          }}
+                        >
+                          <div className="relative">
+                            <img
+                              src={popularItem.imageUrl}
+                              alt={popularItem.name}
+                              className="h-44 w-full object-cover md:h-48"
                             />
-                          )}
-                        </div>
 
-                        <div className="p-2 px-3">
-                          <h3 className="text-base font-semibold md:text-lg">
-                            {popularItem.name}
-                          </h3>
-                          <p className="text-sm text-gray-600 md:text-base">
-                            <span className="text-[0.8em]">$</span>
-                            {formatNumber(popularItem.price)}
-                          </p>
+                            {/* 購物車按鈕組 */}
+                            {popularItem.addons ? (
+                              <p className="absolute bottom-2 right-2 flex h-9 w-9 items-center justify-center rounded-full bg-white shadow-lg">
+                                <HiOutlinePlusSm className="text-gray-500" />
+                              </p>
+                            ) : (
+                              <CartButtonGroup
+                                group={'papular'}
+                                item={popularItem}
+                                currentProductId={currentProductId}
+                                setCurrentProductId={setCurrentProductId}
+                              />
+                            )}
+                          </div>
+
+                          <div className="p-2 px-3">
+                            <h3 className="text-base font-semibold md:text-lg">
+                              {popularItem.name}
+                            </h3>
+                            <p className="text-sm text-gray-600 md:text-base">
+                              <span className="text-[0.8em]">$</span>
+                              {formatNumber(popularItem.price)}
+                            </p>
+                          </div>
                         </div>
-                      </div>
-                    </SwiperSlide>
-                  );
-                })}
+                      </SwiperSlide>
+                    );
+                  })}
             </Swiper>
             <div className="main-swiper-pagination z-50"></div>
             <div className="main-swiper-prev absolute left-0 top-1/2 z-50 flex h-10 w-10 -translate-x-1/2 -translate-y-3/4 items-center justify-center rounded-full bg-white shadow-lg">
@@ -223,7 +242,12 @@ function CustomerPage() {
       </Button>
 
       {/* 購物車彈窗 */}
-      <CheckCartsDialog cartOpen={cartOpen} setCartOpen={setCartOpen} />
+      <CheckCartsDialog
+        cartOpen={cartOpen}
+        setCartOpen={setCartOpen}
+        setSubmitResult={seSubmitResult}
+        setSubmitResultOpen={setSubmitResultOpen}
+      />
 
       {/* 查看訂單明細按鈕*/}
       <Button
@@ -268,6 +292,12 @@ function CustomerPage() {
           setProductOpen={setProductOpen}
         />
       )}
+
+      <SubmitOrderDialog
+        open={submitResultOpen}
+        submitResult={submitResult}
+        setSubmitResultOpen={setSubmitResultOpen}
+      />
     </div>
   );
 }
