@@ -16,7 +16,7 @@ import Button from '@mui/material/Button';
 import useAddToCartStore from '../../stores/useCartStore.ts';
 import CartButtonGroup from './components/CartButtonGroup.tsx';
 import CheckCartsDialog from './components/CheckCartsDialog.tsx';
-import CheckOrdersDialog from './components/CheckOrdersDialog.tsx';
+import CheckOrdersDialog from './components/CheckReceiptDialog.tsx';
 import AddProductDialog from './components/AddProductDialog.tsx';
 import { useProductStore } from '../../stores/useProductStore.ts';
 import SubmitOrderDialog from './components/SubmitResultDialog.tsx';
@@ -28,7 +28,7 @@ function CustomerPage() {
   const [modelProduct, setModelProduct] = useState<Product | null>(null); // 當前選擇的商品區塊
   const [productOpen, setProductOpen] = useState(false); // 控制商品詳細彈窗開關
   const [cartOpen, setCartOpen] = useState(false); // 控制購物車彈窗開關
-  const [orderOpen, setOrderOpen] = useState(false); // 控制訂單明細彈窗開關
+  const [receiptOpen, setReceiptOpen] = useState(false); // 控制訂單明細彈窗開關
   const [submitResultOpen, setSubmitResultOpen] = useState(false); // 控制訂單提交彈窗開關
 
   const query = useMemo(() => queryString.parse(location.search), []); // 解析 query string
@@ -261,13 +261,16 @@ function CustomerPage() {
           padding: { xs: 1.5, md: 2 },
           minWidth: 'auto',
         }}
-        onClick={() => setOrderOpen(true)}
+        onClick={() => setReceiptOpen(true)}
       >
         <RiFileList3Line />
       </Button>
 
       {/* 訂單明細彈窗 */}
-      <CheckOrdersDialog orderOpen={orderOpen} setOrderOpen={setOrderOpen} />
+      <CheckOrdersDialog
+        receiptOpen={receiptOpen}
+        setReceiptOpen={setReceiptOpen}
+      />
 
       {/* 商品詳細資訊 */}
       <Button

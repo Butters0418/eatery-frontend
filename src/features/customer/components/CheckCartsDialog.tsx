@@ -9,6 +9,8 @@ import { AddonGroup, ProductWithQty } from '../../../types/productType.ts';
 import axios from 'axios';
 import Box from '@mui/material/Box';
 import CircularProgress from '@mui/material/CircularProgress';
+import { formatReceiptData } from '../../../utils/formatReceiptData.ts';
+import { useReceiptStore } from '../../../stores/useReceiptStore.ts';
 interface CheckCartsDialogProps {
   cartOpen: boolean;
   setCartOpen: (open: boolean) => void;
@@ -54,25 +56,34 @@ function CheckCartsDialog({
   setSubmitResultOpen,
   setSubmitResult,
 }: CheckCartsDialogProps) {
-  const { cart, addToCart, removeFromCart, getTotalPrice, buildOrderPayload } =
-    useAddToCartStore();
+  const {
+    cart,
+    addToCart,
+    removeFromCart,
+    getTotalPrice,
+    buildOrderPayload,
+    clearCart,
+    tableToken,
+  } = useAddToCartStore();
+  const { setReceipt } = useReceiptStore();
   const [isLoading, setIsLoading] = useState(false); // api 請求狀態
 
   // 送訂單
   const submitHandler = async () => {
     const payload = buildOrderPayload();
     setIsLoading(true);
-
+    console.log(payload);
     try {
       const response = await axios.post(`${apiUrl}/api/orders`, payload);
       console.log('訂單提交成功:', response.data);
-      // setCartOpen(false); // 關閉購物車對話框
       setSubmitResult({
         success: true,
         title: '訂單提交成功!',
         message: '點擊下方查詢訂單明細',
       });
-    } catch {
+      getOrderDetails();
+    } catch (err) {
+      console.error(err);
       setSubmitResult({
         success: false,
         title: '訂單提交失敗!',
@@ -81,12 +92,27 @@ function CheckCartsDialog({
     } finally {
       setIsLoading(false);
       setCartOpen(false); // 關閉購物車對話框
-      setSubmitResultOpen(true); // 開啟訂單提交結果對話框
+      clearCart();
+      setTimeout(() => {
+        setSubmitResultOpen(true); // 開啟訂單提交結果對話框
+      }, 300);
     }
   };
 
   // 取得明細
-  const getOrderDetails = async () => {};
+  const getOrderDetails = async () => {
+    try {
+      const response = await axios.get(
+        `${apiUrl}/api/orders?tableToken=${tableToken}`,
+      );
+      const receiptData = response.data;
+      // 格式化訂單明細
+      const formattedData = formatReceiptData(receiptData[0]);
+      setReceipt(formattedData);
+    } catch (error) {
+      console.log('Error fetching order details:', error);
+    }
+  };
 
   return (
     <Dialog
