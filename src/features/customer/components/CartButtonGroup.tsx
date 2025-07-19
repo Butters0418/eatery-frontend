@@ -28,12 +28,16 @@ function CartButtonGroup({
 
   // +增加商品
   const addItemHandler = (product: Product) => {
+    // 如果當前商品數量大於 0 且不是當前選中的商品，則單純打開按鈕選單
+    if (quantity > 0 && currentProductId !== groupId) {
+      setCurrentProductId(groupId);
+      return;
+    }
     const newProduct = {
       ...product,
       compositeId: product.productId!,
     };
     setCurrentProductId(groupId);
-
     addToCart(newProduct, 1);
   };
 
@@ -50,6 +54,7 @@ function CartButtonGroup({
       onClick={(e) => {
         e.stopPropagation();
       }}
+      data-tag="product-button-group"
     >
       <motion.div
         className="absolute right-0 top-0 h-full w-9 rounded-full bg-white shadow-lg"

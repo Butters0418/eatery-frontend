@@ -46,10 +46,11 @@ export const useProductStore = create<ProductStore>((set) => ({
       set({
         products: newData,
       });
+      setTimeout(() => {
+        set({ isLoading: false });
+      }, 200);
     } catch (error) {
       console.error('Error fetching products:', error);
-    } finally {
-      set({ isLoading: false });
     }
   },
 }));

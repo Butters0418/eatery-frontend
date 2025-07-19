@@ -13,7 +13,6 @@ function CheckReceiptDialog({
   setReceiptOpen,
 }: CheckReceiptDialogProps) {
   const { receipt } = useReceiptStore();
-  console.log('receipt', receipt);
   return (
     <Dialog
       open={receiptOpen}
@@ -33,7 +32,9 @@ function CheckReceiptDialog({
       onClose={() => setReceiptOpen(false)}
     >
       <div className="p-3 md:p-8">
-        <div className="flex items-end justify-between border-b border-gray-200 pb-3">
+        <div
+          className={`flex items-end border-b border-gray-200 pb-3 ${receipt ? 'justify-between' : 'justify-center'}`}
+        >
           <h3 className="pl-1.5 text-center text-xl font-bold leading-none text-gray-900">
             訂單明細
             <span className="ml-2 text-[0.8em] font-normal text-grey">

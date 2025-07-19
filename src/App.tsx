@@ -35,7 +35,7 @@ const theme = createTheme({
 function App() {
   return (
     <ThemeProvider theme={theme}>
-      <div className="h-screen">
+      <div>
         <AppRoutes />
       </div>
     </ThemeProvider>
