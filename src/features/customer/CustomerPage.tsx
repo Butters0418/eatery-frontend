@@ -6,6 +6,7 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 
+import { useProductQuery } from '../../hooks/useProductQuery.ts';
 import { FaAngleRight, FaAngleLeft } from 'react-icons/fa6';
 import { HiOutlinePlusSm } from 'react-icons/hi';
 import { RiFileList3Line } from 'react-icons/ri';
@@ -27,7 +28,7 @@ import 'react-loading-skeleton/dist/skeleton.css';
 
 // 顧客點餐頁
 function CustomerPage() {
-  const { isLoading, products, fetchProducts } = useProductStore(); // 取得商品資料的 store
+  const products = useProductStore((state) => state.products); // 取得商品資料的 store
   const { cart, setTable } = useAddToCartStore(); // 取得購物車資料的 store
   const [currentProductId, setCurrentProductId] = useState<string | null>(null); // 當前選擇的商品 ID
   const [modelProduct, setModelProduct] = useState<Product | null>(null); // 當前選擇的商品區塊
@@ -35,6 +36,14 @@ function CustomerPage() {
   const [cartOpen, setCartOpen] = useState(false); // 控制購物車彈窗開關
   const [receiptOpen, setReceiptOpen] = useState(false); // 控制訂單明細彈窗開關
   const [submitResultOpen, setSubmitResultOpen] = useState(false); // 控制訂單提交彈窗開關
+  // api 送出訂單回傳結果 for 燈箱用
+  const [submitResult, seSubmitResult] = useState<{
+    success: boolean;
+    title: string;
+    message: string;
+  } | null>(null);
+
+  const { isPending, status, error } = useProductQuery();
 
   const query = useMemo(() => queryString.parse(location.search), []); // 解析 query string
 
@@ -45,14 +54,6 @@ function CustomerPage() {
     }
     return () => setTable(null, null);
   }, [query]);
-
-  // 取得商品 api
-  useEffect(() => {
-    if (!products) {
-      fetchProducts();
-    }
-    console.log('products', products);
-  }, [products]);
 
   // menuData 以 category 分組
   const groupedData = useMemo(() => {
@@ -72,13 +73,6 @@ function CustomerPage() {
   // 購物物總數量
   const totalQuantity = cart.reduce((total, item) => total + item.qty, 0) || 0;
 
-  // api 送出訂單回傳結果 for 燈箱用
-  const [submitResult, seSubmitResult] = useState<{
-    success: boolean;
-    title: string;
-    message: string;
-  } | null>(null);
-
   // 點擊其他非按商品數量群組，傳入 null
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -93,6 +87,9 @@ function CustomerPage() {
     return () => document.removeEventListener('click', handleClickOutside);
   }, []);
 
+  if (status === 'error' && error) {
+    return <span>Error: {error.message}</span>;
+  }
   return (
     <>
       <header className="border-b border-gray-200 bg-white p-4 text-center">
@@ -126,7 +123,7 @@ function CustomerPage() {
                   clickable: true,
                 }}
               >
-                {isLoading
+                {isPending
                   ? Array.from({ length: 5 }).map((_, idx) => (
                       <SwiperSlide
                         className="w-56 pb-6 md:w-[270px] md:pb-8"
@@ -214,7 +211,7 @@ function CustomerPage() {
 
           {/* 其他商品 */}
 
-          {isLoading ? (
+          {isPending ? (
             <>
               <div className="mt-3 py-2 md:mt-4">
                 <h2 className="text-2xl font-bold">
