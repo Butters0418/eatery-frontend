@@ -17,24 +17,31 @@ interface FormValues {
   qty: number;
   [key: string]: number | string;
 }
+
+// 定義 AddProductDialog 的 props 類型
 interface AddProductDialogProps {
-  product: Product;
-  productOpen: boolean;
-  setProductOpen: (open: boolean) => void;
+  modelProductInfo: {
+    targetProduct: Product | null;
+    modelOpen: boolean;
+  };
+  setModelProductInfo: (info: {
+    targetProduct: Product | null;
+    modelOpen: boolean;
+  }) => void;
 }
 
 function AddProductDialog({
-  product,
-  productOpen,
-  setProductOpen,
+  modelProductInfo,
+  setModelProductInfo,
 }: AddProductDialogProps) {
+  const { targetProduct: product, modelOpen: productOpen } = modelProductInfo;
   const { addToCart } = useAddToCartStore();
   const { control, handleSubmit, reset, watch } = useForm<FormValues>({
     defaultValues: {
       qty: 1,
       // 每個 addon 設定默認值為第一個選項
       ...Object.fromEntries(
-        (product.addons || []).map((group) => [
+        (product!.addons || []).map((group) => [
           group.group,
           group.options[0].name,
         ]),
@@ -47,10 +54,10 @@ function AddProductDialog({
   // 計算總價格 (含配料)
   const calculateTotalPrice = () => {
     // 基本價格 × 數量
-    let total = product.price * formValues.qty;
+    let total = product!.price * formValues.qty;
 
     // 加上選擇的配料價格
-    product.addons?.forEach((group) => {
+    product!.addons?.forEach((group) => {
       const selectedOption = group.options.find(
         (opt) => opt.name === formValues[group.group],
       );
@@ -66,8 +73,9 @@ function AddProductDialog({
 
   // 加入購物車
   const onSubmit = (data: FormValues) => {
+    if (!product) return;
     // 配料加上 selected 屬性
-    const addons = (product.addons || []).map((group) => ({
+    const addons = (product!.addons || []).map((group) => ({
       group: group.group,
       options: group.options.map((option) => ({
         ...option,
@@ -82,8 +90,8 @@ function AddProductDialog({
       .join('_');
 
     const compositeId = addonsPrefix
-      ? `${product.productId}_${addonsPrefix}`
-      : product.productId;
+      ? `${product!.productId}_${addonsPrefix}`
+      : product!.productId;
 
     const orderItem = {
       ...product,
@@ -101,7 +109,7 @@ function AddProductDialog({
       reset({
         qty: 1,
         ...Object.fromEntries(
-          (product.addons || []).map((group) => [
+          (product!.addons || []).map((group) => [
             group.group,
             group.options[0].name,
           ]),
@@ -126,24 +134,26 @@ function AddProductDialog({
         },
       }}
       fullWidth
-      onClose={() => setProductOpen(false)}
+      onClose={() =>
+        setModelProductInfo({ targetProduct: null, modelOpen: false })
+      }
     >
       <img
-        src={product.imageUrl}
-        alt={product.name}
+        src={product!.imageUrl}
+        alt={product!.name}
         className="h-60 object-cover md:h-96"
       />
       <div className="p-3 md:p-8">
         <h3 className="flex items-center justify-start gap-x-3 text-xl font-bold text-gray-900">
-          <span>{product.name}</span>
+          <span>{product!.name}</span>
           <span className="text-sm text-gray-400">|</span>
           <span className="text-xl font-bold text-primary">
             <small>$</small>
-            {product.price}
+            {product!.price}
           </span>
         </h3>
-        <p className="mt-1 text-gray-400">{product.description}</p>
-        {product.isPopular && (
+        <p className="mt-1 text-gray-400">{product!.description}</p>
+        {product!.isPopular && (
           <p className="mt-auto">
             <span className="-ml-1 mt-2.5 inline-block rounded-full bg-primary-light bg-opacity-20 px-2 py-0.5 text-xs font-semibold text-primary md:text-sm">
               熱門商品
@@ -156,7 +166,7 @@ function AddProductDialog({
           onSubmit={handleSubmit(onSubmit)}
         >
           {/* 額外加料 */}
-          {product.addons?.map((group) => (
+          {product!.addons?.map((group) => (
             <FormControl key={group.group} fullWidth>
               <p className="font-bold">{group.group}</p>
 
@@ -222,7 +232,7 @@ function AddProductDialog({
             sx={{ borderRadius: 2, mt: 2 }}
             fullWidth
             onClick={() => {
-              setProductOpen(false);
+              setModelProductInfo({ targetProduct: product, modelOpen: false });
             }}
           >
             <p className="text-lg">

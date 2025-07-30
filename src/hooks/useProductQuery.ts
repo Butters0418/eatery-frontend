@@ -14,14 +14,9 @@ export const useProductQuery = () => {
 
   const { data, isSuccess, error } = query;
 
-  // success
   useEffect(() => {
     if (isSuccess && data) {
-      const newData = data.map(({ _id: productId, ...rest }) => ({
-        productId,
-        ...rest,
-      }));
-      setProducts(newData);
+      setProducts(data);
     }
   }, [isSuccess, data, setProducts]);
 

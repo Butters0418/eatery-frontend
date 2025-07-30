@@ -22,20 +22,32 @@ import AddProductDialog from './components/AddProductDialog.tsx';
 import { useProductStore } from '../../stores/useProductStore.ts';
 import SubmitOrderDialog from './components/SubmitResultDialog.tsx';
 import TopNav from './components/TopNav.tsx';
+import Error from './components/Error.tsx';
+import { useReceiptStore } from '../../stores/useReceiptStore.ts';
 
 import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
 
+// 定義商品 model 資料的 interface
+interface ModelProductInfo {
+  targetProduct: Product | null;
+  modelOpen: boolean;
+}
+
 // 顧客點餐頁
 function CustomerPage() {
   const products = useProductStore((state) => state.products); // 取得商品資料的 store
-  const { cart, setTable } = useAddToCartStore(); // 取得購物車資料的 store
+  const { cart, setTable, isCartOpen, setIsCartOpen } = useAddToCartStore(); // 取得購物車資料的 store
+  const { isReceiptOpen, setIsReceiptOpen } = useReceiptStore(); // 取得訂單明細的 store
   const [currentProductId, setCurrentProductId] = useState<string | null>(null); // 當前選擇的商品 ID
-  const [modelProduct, setModelProduct] = useState<Product | null>(null); // 當前選擇的商品區塊
-  const [productOpen, setProductOpen] = useState(false); // 控制商品詳細彈窗開關
-  const [cartOpen, setCartOpen] = useState(false); // 控制購物車彈窗開關
-  const [receiptOpen, setReceiptOpen] = useState(false); // 控制訂單明細彈窗開關
-  const [submitResultOpen, setSubmitResultOpen] = useState(false); // 控制訂單提交彈窗開關
+  const [isSubmitResultOpen, setIsSubmitResultOpen] = useState(false); // 控制訂單提交結果彈窗開關
+
+  // 開啟 model 與資料
+  const [modelProductInfo, setModelProductInfo] = useState<ModelProductInfo>({
+    targetProduct: null,
+    modelOpen: false,
+  });
+
   // api 送出訂單回傳結果 for 燈箱用
   const [submitResult, seSubmitResult] = useState<{
     success: boolean;
@@ -43,17 +55,19 @@ function CustomerPage() {
     message: string;
   } | null>(null);
 
+  // 取得商品資料的 query
   const { isPending, status, error } = useProductQuery();
 
-  const query = useMemo(() => queryString.parse(location.search), []); // 解析 query string
-
-  // 當 query 變化時，設置桌號和 Token
+  // 解析 url query string
   useEffect(() => {
+    const query = queryString.parse(location.search);
     if (query.tableId && query.tableToken) {
-      setTable(query.tableId as string, query.tableToken as string);
+      setTable({
+        tableId: query.tableId as string,
+        tableToken: query.tableToken as string,
+      });
     }
-    return () => setTable(null, null);
-  }, [query]);
+  }, []);
 
   // menuData 以 category 分組
   const groupedData = useMemo(() => {
@@ -70,7 +84,7 @@ function CustomerPage() {
     );
   }, [products]);
 
-  // 購物物總數量
+  // 目前購物物總數量
   const totalQuantity = cart.reduce((total, item) => total + item.qty, 0) || 0;
 
   // 點擊其他非按商品數量群組，傳入 null
@@ -88,7 +102,7 @@ function CustomerPage() {
   }, []);
 
   if (status === 'error' && error) {
-    return <span>Error: {error.message}</span>;
+    return <Error />;
   }
   return (
     <>
@@ -159,8 +173,10 @@ function CustomerPage() {
                             <div
                               className="block cursor-pointer overflow-hidden rounded-xl bg-white shadow-lg duration-300"
                               onClick={() => {
-                                setModelProduct(popularItem);
-                                setProductOpen(true);
+                                setModelProductInfo({
+                                  targetProduct: popularItem,
+                                  modelOpen: true,
+                                });
                               }}
                             >
                               <div className="relative">
@@ -290,8 +306,10 @@ function CustomerPage() {
                           key={item.productId}
                           className="relative flex cursor-pointer justify-between rounded-lg border border-gray-200 bg-white"
                           onClick={() => {
-                            setModelProduct(item);
-                            setProductOpen(true);
+                            setModelProductInfo({
+                              targetProduct: item,
+                              modelOpen: true,
+                            });
                           }}
                         >
                           <div className="flex flex-col p-2.5 md:p-4">
@@ -349,17 +367,17 @@ function CustomerPage() {
           fontSize: { xs: '1rem', md: '1.25rem' },
           borderRadius: 2,
         }}
-        onClick={() => setCartOpen(true)}
+        onClick={() => setIsCartOpen(true)}
       >
         查看購物車{totalQuantity > 0 && `(${totalQuantity})`}
       </Button>
 
       {/* 購物車彈窗 */}
       <CheckCartsDialog
-        cartOpen={cartOpen}
-        setCartOpen={setCartOpen}
+        isCartOpen={isCartOpen}
+        setIsCartOpen={setIsCartOpen}
         setSubmitResult={seSubmitResult}
-        setSubmitResultOpen={setSubmitResultOpen}
+        setSubmitResultOpen={setIsSubmitResultOpen}
       />
 
       {/* 查看訂單明細按鈕*/}
@@ -374,30 +392,29 @@ function CustomerPage() {
           padding: { xs: 1.5, md: 2 },
           minWidth: 'auto',
         }}
-        onClick={() => setReceiptOpen(true)}
+        onClick={() => setIsReceiptOpen(true)}
       >
         <RiFileList3Line />
       </Button>
 
       {/* 訂單明細彈窗 */}
       <CheckOrdersDialog
-        receiptOpen={receiptOpen}
-        setReceiptOpen={setReceiptOpen}
+        isReceiptOpen={isReceiptOpen}
+        setIsReceiptOpen={setIsReceiptOpen}
       />
 
       {/* 商品詳細燈箱 */}
-      {modelProduct && (
+      {modelProductInfo.targetProduct && (
         <AddProductDialog
-          product={modelProduct}
-          productOpen={productOpen}
-          setProductOpen={setProductOpen}
+          modelProductInfo={modelProductInfo}
+          setModelProductInfo={setModelProductInfo}
         />
       )}
 
       <SubmitOrderDialog
-        open={submitResultOpen}
+        isSubmitResultOpen={isSubmitResultOpen}
         submitResult={submitResult}
-        setSubmitResultOpen={setSubmitResultOpen}
+        setIsSubmitResultOpen={setIsSubmitResultOpen}
       />
     </>
   );

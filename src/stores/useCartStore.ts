@@ -5,12 +5,19 @@ import {
   OrderPayload,
 } from '../types/productType';
 
-interface AddToCartStore {
+// 定義 tableInfo 類型
+interface TableInfo {
   tableId: string | null;
   tableToken: string | null;
-  setTable: (tableId: string | null, tableToken: string | null) => void;
+}
+
+// 定義購物車狀態類型
+interface AddToCartStore {
+  tableInfo: TableInfo;
   cart: ProductWithQty[];
-  currentProductId: string | null;
+  isCartOpen: boolean;
+  setIsCartOpen: (open: boolean) => void;
+  setTable: (tableInfo: TableInfo) => void;
   getTotalPrice: () => number;
   addToCart: (product: ProductWithCompositeId, num: number) => void;
   removeFromCart: (productId: string) => void;
@@ -20,17 +27,17 @@ interface AddToCartStore {
 
 const useAddToCartStore = create<AddToCartStore>((set, get) => ({
   cart: [],
-  currentProductId: null,
-  tableId: null,
-  tableToken: null,
+  tableInfo: {
+    tableId: null,
+    tableToken: null,
+  },
+  isCartOpen: false,
+
+  // 設定購物車開關狀態
+  setIsCartOpen: (open) => set({ isCartOpen: open }),
 
   // 設定桌號 & 桌號 Token
-  setTable: (tableId, tableToken) => {
-    set(() => ({
-      tableId,
-      tableToken,
-    }));
-  },
+  setTable: (tableInfo) => set({ tableInfo }),
 
   // 計算總金額的方法
   getTotalPrice: () => {
@@ -106,11 +113,11 @@ const useAddToCartStore = create<AddToCartStore>((set, get) => ({
 
   // 組出訂單的 payload
   buildOrderPayload: () => {
-    const { cart, tableId, tableToken } = get();
+    const { cart, tableInfo } = get();
     return {
       orderType: '內用',
-      tableId,
-      tableToken,
+      tableId: tableInfo.tableId,
+      tableToken: tableInfo.tableToken,
       orderList: [
         {
           item: cart.map(
@@ -129,7 +136,7 @@ const useAddToCartStore = create<AddToCartStore>((set, get) => ({
   },
 
   // 清空購物車
-  clearCart: () => set(() => ({ cart: [], currentProductId: null })),
+  clearCart: () => set(() => ({ cart: [] })),
 }));
 
 export default useAddToCartStore;

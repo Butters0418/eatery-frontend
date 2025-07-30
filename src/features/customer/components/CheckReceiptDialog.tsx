@@ -5,17 +5,17 @@ import { useReceiptStore } from '../../../stores/useReceiptStore.ts';
 import { FormattedOrderGroup } from '../../../types/productType.ts';
 
 interface CheckReceiptDialogProps {
-  receiptOpen: boolean;
-  setReceiptOpen: (open: boolean) => void;
+  isReceiptOpen: boolean;
+  setIsReceiptOpen: (open: boolean) => void;
 }
 function CheckReceiptDialog({
-  receiptOpen,
-  setReceiptOpen,
+  isReceiptOpen,
+  setIsReceiptOpen,
 }: CheckReceiptDialogProps) {
   const { receipt } = useReceiptStore();
   return (
     <Dialog
-      open={receiptOpen}
+      open={isReceiptOpen}
       autoFocus
       disableRestoreFocus
       sx={{
@@ -29,7 +29,7 @@ function CheckReceiptDialog({
         },
       }}
       fullWidth
-      onClose={() => setReceiptOpen(false)}
+      onClose={() => setIsReceiptOpen(false)}
     >
       <div className="p-3 md:p-8">
         <div
@@ -105,7 +105,7 @@ function CheckReceiptDialog({
 
         <Button
           onClick={() => {
-            setReceiptOpen(false);
+            setIsReceiptOpen(false);
           }}
           variant="outlined"
           color="secondary"

@@ -1,14 +1,14 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 // 元件說明:手機版置滑動錨點
 import useWindowScroll from '../../../utils/useWindowScroll';
-import { useProductStore } from '../../../stores/useProductStore';
+import { useProductQuery } from '../../../hooks/useProductQuery';
 
 // packages
 import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
 
 function TopNav() {
-  const { isLoading } = useProductStore();
+  const { isLoading, isSuccess } = useProductQuery();
   const [categoryContainer, setCategoryContainer] = useState<Element[]>([]);
   const [currentContainer, setCurrentContainer] = useState<string | null>(null);
   const scroll = useWindowScroll();
@@ -36,30 +36,38 @@ function TopNav() {
 
   // dom observer
   useEffect(() => {
+    if (!isSuccess) return;
+
     let observer: MutationObserver | undefined;
-    // init
-    const timerInitialUpdate = setTimeout(() => {
-      updateCategoryContainer();
+    // 資料載入成功後，執行一次更新
+    updateCategoryContainer();
+
+    // 只有在第一次找不到類別容器時才啟動 MutationObserver
+    if (categoryContainer.length === 0) {
       observer = new MutationObserver(() => {
         updateCategoryContainer();
+        // 如果已找到類別，立即停止監控
+        if (document.querySelectorAll('[data-category]').length > 0) {
+          observer?.disconnect();
+        }
       });
 
       const config = { childList: true, subtree: true };
       observer.observe(document.body, config);
 
-      // 僅監聽前 2 秒
+      // 2 秒後停止觀察
       const timerDisconnect = setTimeout(() => {
         observer?.disconnect();
-      }, 2000);
-      return () => clearTimeout(timerDisconnect);
-    }, 200);
+      }, 1000);
 
-    // 清理初始化的計時器和 observer
+      return () => clearTimeout(timerDisconnect);
+    }
+
+    // 清理函數
     return () => {
-      clearTimeout(timerInitialUpdate);
       if (observer) observer.disconnect();
     };
-  }, []);
+  }, [isSuccess, updateCategoryContainer, categoryContainer.length]);
 
   // 滾動監聽作用中的區塊
   useEffect(() => {
@@ -74,8 +82,6 @@ function TopNav() {
     if (targetCategory !== currentContainer) {
       setCurrentContainer(targetCategory);
     }
-
-    console.log('當前區塊:', targetCategory);
   }, [scroll, categoryContainer]);
 
   useEffect(() => {

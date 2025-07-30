@@ -4,26 +4,26 @@ import Dialog from '@mui/material/Dialog';
 import Button from '@mui/material/Button';
 
 interface SubmitResultDialogProps {
-  open: boolean;
+  isSubmitResultOpen: boolean;
   submitResult: {
     success: boolean;
     title: string;
     message: string;
   } | null;
-  setSubmitResultOpen: (open: boolean) => void;
+  setIsSubmitResultOpen: (open: boolean) => void;
 }
 
 function SubmitResultDialog({
-  open,
+  isSubmitResultOpen,
   submitResult,
-  setSubmitResultOpen,
+  setIsSubmitResultOpen,
 }: SubmitResultDialogProps) {
   return (
     <Dialog
-      open={open}
+      open={isSubmitResultOpen}
       maxWidth="xs"
       fullWidth
-      onClose={() => setSubmitResultOpen(false)}
+      onClose={() => setIsSubmitResultOpen(false)}
     >
       <div className="p-8 text-center">
         {submitResult?.success ? (
@@ -41,7 +41,7 @@ function SubmitResultDialog({
           variant="contained"
           color="primary"
           fullWidth
-          onClick={() => setSubmitResultOpen(false)}
+          onClick={() => setIsSubmitResultOpen(false)}
         >
           <p className="text-lg">關 閉</p>
         </Button>

@@ -11,9 +11,10 @@ import Box from '@mui/material/Box';
 import CircularProgress from '@mui/material/CircularProgress';
 import { formatReceiptData } from '../../../utils/formatReceiptData.ts';
 import { useReceiptStore } from '../../../stores/useReceiptStore.ts';
+
 interface CheckCartsDialogProps {
-  cartOpen: boolean;
-  setCartOpen: (open: boolean) => void;
+  isCartOpen: boolean;
+  setIsCartOpen: (open: boolean) => void;
   setSubmitResultOpen: (open: boolean) => void;
   setSubmitResult: (
     result: {
@@ -51,8 +52,8 @@ const priceWithAddons = (product: ProductWithQty) => {
 const apiUrl = import.meta.env.VITE_API_URL;
 
 function CheckCartsDialog({
-  cartOpen,
-  setCartOpen,
+  isCartOpen,
+  setIsCartOpen,
   setSubmitResultOpen,
   setSubmitResult,
 }: CheckCartsDialogProps) {
@@ -63,7 +64,7 @@ function CheckCartsDialog({
     getTotalPrice,
     buildOrderPayload,
     clearCart,
-    tableToken,
+    tableInfo: { tableToken },
   } = useAddToCartStore();
   const { setReceipt } = useReceiptStore();
   const [isLoading, setIsLoading] = useState(false); // api 請求狀態
@@ -91,7 +92,7 @@ function CheckCartsDialog({
       });
     } finally {
       setIsLoading(false);
-      setCartOpen(false); // 關閉購物車對話框
+      setIsCartOpen(false); // 關閉購物車對話框
       clearCart();
       setTimeout(() => {
         setSubmitResultOpen(true); // 開啟訂單提交結果對話框
@@ -116,7 +117,7 @@ function CheckCartsDialog({
 
   return (
     <Dialog
-      open={cartOpen}
+      open={isCartOpen}
       autoFocus
       disableRestoreFocus
       sx={{
@@ -130,7 +131,7 @@ function CheckCartsDialog({
         },
       }}
       fullWidth
-      onClose={() => setCartOpen(false)}
+      onClose={() => setIsCartOpen(false)}
     >
       <div className="p-3 text-center md:p-8">
         <h3 className="border-b border-gray-200 pb-3 pl-1.5 text-xl font-bold text-gray-900">
@@ -140,7 +141,7 @@ function CheckCartsDialog({
           <>
             <p className="my-6 text-lg text-gray-400">目前購物車為空!</p>
             <Button
-              onClick={() => setCartOpen(false)}
+              onClick={() => setIsCartOpen(false)}
               variant="outlined"
               color="secondary"
               sx={{ borderRadius: 2 }}
