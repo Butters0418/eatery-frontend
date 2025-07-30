@@ -14,7 +14,7 @@ import { SMainSwiper } from './style.ts';
 import { formatNumber } from '../../utils/formatNumber.ts';
 import { Product } from '../../types/productType.ts';
 import Button from '@mui/material/Button';
-import useAddToCartStore from '../../stores/useCartStore.ts';
+import useCartStore from '../../stores/useCartStore.ts';
 import CartButtonGroup from './components/CartButtonGroup.tsx';
 import CheckCartsDialog from './components/CheckCartsDialog.tsx';
 import CheckOrdersDialog from './components/CheckReceiptDialog.tsx';
@@ -27,6 +27,7 @@ import { useReceiptStore } from '../../stores/useReceiptStore.ts';
 
 import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
+import { useOrderReceiptQuery } from '../../hooks/useOrderOperations.ts';
 
 // 定義商品 model 資料的 interface
 interface ModelProductInfo {
@@ -37,7 +38,7 @@ interface ModelProductInfo {
 // 顧客點餐頁
 function CustomerPage() {
   const products = useProductStore((state) => state.products); // 取得商品資料的 store
-  const { cart, setTable, isCartOpen, setIsCartOpen } = useAddToCartStore(); // 取得購物車資料的 store
+  const { cart, setTable, isCartOpen, setIsCartOpen } = useCartStore(); // 取得購物車資料的 store
   const { isReceiptOpen, setIsReceiptOpen } = useReceiptStore(); // 取得訂單明細的 store
   const [currentProductId, setCurrentProductId] = useState<string | null>(null); // 當前選擇的商品 ID
   const [isSubmitResultOpen, setIsSubmitResultOpen] = useState(false); // 控制訂單提交結果彈窗開關
@@ -57,6 +58,9 @@ function CustomerPage() {
 
   // 取得商品資料的 query
   const { isPending, status, error } = useProductQuery();
+
+  // 取得訂單明細的 query
+  useOrderReceiptQuery();
 
   // 解析 url query string
   useEffect(() => {

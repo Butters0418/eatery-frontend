@@ -1,17 +1,16 @@
-import { useState } from 'react';
 import Dialog from '@mui/material/Dialog';
 import Button from '@mui/material/Button';
 import { HiOutlineMinusSm, HiOutlinePlusSm } from 'react-icons/hi';
 import { FaRegTrashCan } from 'react-icons/fa6';
-import useAddToCartStore from '../../../stores/useCartStore.ts';
+import useCartStore from '../../../stores/useCartStore.ts';
 import { formatNumber } from '../../../utils/formatNumber';
 import { AddonGroup, ProductWithQty } from '../../../types/productType.ts';
-import axios from 'axios';
 import Box from '@mui/material/Box';
 import CircularProgress from '@mui/material/CircularProgress';
-import { formatReceiptData } from '../../../utils/formatReceiptData.ts';
-import { useReceiptStore } from '../../../stores/useReceiptStore.ts';
+import { useSubmitOrder } from '../../../hooks/useOrderOperations.ts';
+import { useQueryClient } from '@tanstack/react-query';
 
+// 定義 props 的 interface
 interface CheckCartsDialogProps {
   isCartOpen: boolean;
   setIsCartOpen: (open: boolean) => void;
@@ -33,7 +32,7 @@ const addonsString = (addons: AddonGroup[]) => {
     .join(' / ');
 };
 
-// 統計價格(前端用)
+// 統計價格 x1 (前端購物車用)
 const priceWithAddons = (product: ProductWithQty) => {
   // 基本價格 × 數量
   let total = product.price;
@@ -48,71 +47,44 @@ const priceWithAddons = (product: ProductWithQty) => {
   return total;
 };
 
-// post api
-const apiUrl = import.meta.env.VITE_API_URL;
-
 function CheckCartsDialog({
   isCartOpen,
   setIsCartOpen,
   setSubmitResultOpen,
   setSubmitResult,
 }: CheckCartsDialogProps) {
-  const {
-    cart,
-    addToCart,
-    removeFromCart,
-    getTotalPrice,
-    buildOrderPayload,
-    clearCart,
-    tableInfo: { tableToken },
-  } = useAddToCartStore();
-  const { setReceipt } = useReceiptStore();
-  const [isLoading, setIsLoading] = useState(false); // api 請求狀態
+  const { cart, addToCart, removeFromCart, getTotalPrice, clearCart } =
+    useCartStore();
+  const { mutate: submitOrder, isPending } = useSubmitOrder();
+  const queryClient = useQueryClient();
 
-  // 送訂單
+  // submit 訂單
   const submitHandler = async () => {
-    const payload = buildOrderPayload();
-    setIsLoading(true);
-    console.log(payload);
-    try {
-      const response = await axios.post(`${apiUrl}/api/orders`, payload);
-      console.log('訂單提交成功:', response.data);
-      setSubmitResult({
-        success: true,
-        title: '訂單提交成功!',
-        message: '點擊下方查詢訂單明細',
-      });
-      getOrderDetails();
-    } catch (err) {
-      console.error(err);
-      setSubmitResult({
-        success: false,
-        title: '訂單提交失敗!',
-        message: '請重新掃描桌號 QR Code 或聯絡服務人員',
-      });
-    } finally {
-      setIsLoading(false);
-      setIsCartOpen(false); // 關閉購物車對話框
-      clearCart();
-      setTimeout(() => {
-        setSubmitResultOpen(true); // 開啟訂單提交結果對話框
-      }, 300);
-    }
-  };
-
-  // 取得明細
-  const getOrderDetails = async () => {
-    try {
-      const response = await axios.get(
-        `${apiUrl}/api/orders?tableToken=${tableToken}`,
-      );
-      const receiptData = response.data;
-      // 格式化訂單明細
-      const formattedData = formatReceiptData(receiptData[0]);
-      setReceipt(formattedData);
-    } catch (error) {
-      console.log('Error fetching order details:', error);
-    }
+    submitOrder(undefined, {
+      onSuccess: () => {
+        setSubmitResult({
+          success: true,
+          title: '訂單提交成功!',
+          message: '點擊下方查詢訂單明細',
+        });
+        queryClient.invalidateQueries({ queryKey: ['orderReceipt'] });
+      },
+      onError: (error: Error) => {
+        console.error('訂單提交失敗:', error.message);
+        setSubmitResult({
+          success: false,
+          title: '訂單提交失敗!',
+          message: '請重新掃描桌號 QR Code 或聯絡服務人員',
+        });
+      },
+      onSettled: () => {
+        setIsCartOpen(false); // 關閉購物車對話框
+        clearCart();
+        setTimeout(() => {
+          setSubmitResultOpen(true); // 開啟訂單提交結果對話框
+        }, 300);
+      },
+    });
   };
 
   return (
@@ -229,9 +201,9 @@ function CheckCartsDialog({
               color="primary"
               fullWidth
               sx={{ borderRadius: 2 }}
-              disabled={isLoading}
+              disabled={isPending}
             >
-              {isLoading ? (
+              {isPending ? (
                 <Box sx={{ display: 'flex' }}>
                   <CircularProgress size="28px" color="inherit" />
                 </Box>

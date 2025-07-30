@@ -2,7 +2,7 @@ import { HiOutlineMinusSm, HiOutlinePlusSm } from 'react-icons/hi';
 import { FaRegTrashCan } from 'react-icons/fa6';
 import { Product } from '../../../types/productType';
 import { motion, AnimatePresence } from 'framer-motion';
-import useAddToCartStore from '../../../stores/useCartStore.ts';
+import useCartStore from '../../../stores/useCartStore.ts';
 
 interface CartButtonGroupProps {
   group: string; // div 中區塊位置
@@ -17,7 +17,7 @@ function CartButtonGroup({
   currentProductId,
   setCurrentProductId,
 }: CartButtonGroupProps) {
-  const { cart, addToCart, removeFromCart } = useAddToCartStore();
+  const { cart, addToCart, removeFromCart } = useCartStore();
 
   // 當前商品在購物車中的數量
   const quantity: number =

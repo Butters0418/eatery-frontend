@@ -49,14 +49,20 @@ function CheckReceiptDialog({
           <>
             {receipt.orderList.map((order: FormattedOrderGroup) => {
               return (
-                <div className="mt-3 rounded-xl bg-grey-light p-4">
+                <div
+                  className="mt-3 rounded-xl bg-grey-light p-4"
+                  key={order.itemCode}
+                >
                   <h4 className="mb-3 font-bold text-grey-dark">
                     訂單 #{order.itemCode}
                   </h4>
                   <ul className="mb-3 space-y-2">
                     {order.item.map((item) => {
                       return (
-                        <li className="flex justify-between text-sm">
+                        <li
+                          className="flex justify-between text-sm"
+                          key={item.compositeId}
+                        >
                           <div>
                             <span className="text-grey-dark">{item.name}</span>
                             <span className="text-grey"> x {item.qty}</span>

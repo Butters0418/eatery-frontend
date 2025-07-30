@@ -10,7 +10,7 @@ import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import { Product } from '../../../types/productType';
-import useAddToCartStore from '../../../stores/useCartStore.ts';
+import useCartStore from '../../../stores/useCartStore.ts';
 
 // 表單數據類型定義
 interface FormValues {
@@ -35,7 +35,7 @@ function AddProductDialog({
   setModelProductInfo,
 }: AddProductDialogProps) {
   const { targetProduct: product, modelOpen: productOpen } = modelProductInfo;
-  const { addToCart } = useAddToCartStore();
+  const { addToCart } = useCartStore();
   const { control, handleSubmit, reset, watch } = useForm<FormValues>({
     defaultValues: {
       qty: 1,

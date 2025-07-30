@@ -25,7 +25,7 @@ interface AddToCartStore {
   clearCart: () => void;
 }
 
-const useAddToCartStore = create<AddToCartStore>((set, get) => ({
+const useCartStore = create<AddToCartStore>((set, get) => ({
   cart: [],
   tableInfo: {
     tableId: null,
@@ -111,7 +111,7 @@ const useAddToCartStore = create<AddToCartStore>((set, get) => ({
     });
   },
 
-  // 組出訂單的 payload
+  // 組出 submit 訂單的 payload
   buildOrderPayload: () => {
     const { cart, tableInfo } = get();
     return {
@@ -136,7 +136,7 @@ const useAddToCartStore = create<AddToCartStore>((set, get) => ({
   },
 
   // 清空購物車
-  clearCart: () => set(() => ({ cart: [] })),
+  clearCart: () => set({ cart: [] }),
 }));
 
-export default useAddToCartStore;
+export default useCartStore;
