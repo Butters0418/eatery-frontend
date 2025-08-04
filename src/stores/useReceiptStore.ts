@@ -1,6 +1,10 @@
+// 第三方庫
 import { create } from 'zustand';
+
+// Types
 import { FormattedReceipt } from '../types/productType';
 
+// ===== 類型定義 =====
 interface ReceiptStore {
   receipt: FormattedReceipt | null;
   isReceiptOpen: boolean;
@@ -8,9 +12,13 @@ interface ReceiptStore {
   setReceipt: (receipt: FormattedReceipt) => void;
 }
 
+// 訂單明細狀態管理 Store
 export const useReceiptStore = create<ReceiptStore>((set) => ({
+  // ===== State =====
   receipt: null,
   isReceiptOpen: false,
+
+  // ===== Actions =====
   setIsReceiptOpen: (open) => set({ isReceiptOpen: open }),
   setReceipt: (receipt: FormattedReceipt) => set({ receipt }),
 }));

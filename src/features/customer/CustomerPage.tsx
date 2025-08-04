@@ -1,33 +1,46 @@
+// React 相關
 import { useEffect, useMemo, useState } from 'react';
+
+// 第三方庫
 import queryString from 'query-string';
 import { Navigation, Pagination } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
-
-import { useProductQuery } from '../../hooks/useProductQuery.ts';
-import { FaAngleRight, FaAngleLeft } from 'react-icons/fa6';
-import { HiOutlinePlusSm } from 'react-icons/hi';
-import { RiFileList3Line } from 'react-icons/ri';
-import { SMainSwiper } from './style.ts';
-import { formatNumber } from '../../utils/formatNumber.ts';
-import { Product } from '../../types/productType.ts';
+import Skeleton from 'react-loading-skeleton';
+import 'react-loading-skeleton/dist/skeleton.css';
 import Button from '@mui/material/Button';
+
+// Hooks
+import { useProductQuery } from '../../hooks/useProductQuery.ts';
+import { useOrderReceiptQuery } from '../../hooks/useOrderOperations.ts';
+
+// Stores
 import useCartStore from '../../stores/useCartStore.ts';
+import { useProductStore } from '../../stores/useProductStore.ts';
+import { useReceiptStore } from '../../stores/useReceiptStore.ts';
+
+// Utils
+import { formatNumber } from '../../utils/formatNumber.ts';
+
+// Components
 import CartButtonGroup from './components/CartButtonGroup.tsx';
 import CheckCartsDialog from './components/CheckCartsDialog.tsx';
 import CheckOrdersDialog from './components/CheckReceiptDialog.tsx';
 import AddProductDialog from './components/AddProductDialog.tsx';
-import { useProductStore } from '../../stores/useProductStore.ts';
 import SubmitOrderDialog from './components/SubmitResultDialog.tsx';
 import TopNav from './components/TopNav.tsx';
 import Error from './components/Error.tsx';
-import { useReceiptStore } from '../../stores/useReceiptStore.ts';
 
-import Skeleton from 'react-loading-skeleton';
-import 'react-loading-skeleton/dist/skeleton.css';
-import { useOrderReceiptQuery } from '../../hooks/useOrderOperations.ts';
+// Styles & Types
+import { SMainSwiper } from './style.ts';
+import { Product } from '../../types/productType.ts';
+
+// Icons
+import { FaAngleRight, FaAngleLeft } from 'react-icons/fa6';
+import { HiOutlinePlusSm } from 'react-icons/hi';
+import { RiFileList3Line } from 'react-icons/ri';
 
 // 定義商品 model 資料的 interface
 interface ModelProductInfo {
@@ -37,43 +50,35 @@ interface ModelProductInfo {
 
 // 顧客點餐頁
 function CustomerPage() {
-  const products = useProductStore((state) => state.products); // 取得商品資料的 store
-  const { cart, setTable, isCartOpen, setIsCartOpen } = useCartStore(); // 取得購物車資料的 store
-  const { isReceiptOpen, setIsReceiptOpen } = useReceiptStore(); // 取得訂單明細的 store
-  const [currentProductId, setCurrentProductId] = useState<string | null>(null); // 當前選擇的商品 ID
-  const [isSubmitResultOpen, setIsSubmitResultOpen] = useState(false); // 控制訂單提交結果彈窗開關
+  // ===== Store Hooks =====
+  const products = useProductStore((state) => state.products);
+  const { cart, setTable, isCartOpen, setIsCartOpen } = useCartStore();
+  const { isReceiptOpen, setIsReceiptOpen } = useReceiptStore();
 
-  // 開啟 model 與資料
+  // ===== API 相關 Hooks =====
+  const { isPending, status, error } = useProductQuery();
+  useOrderReceiptQuery();
+
+  // ===== 商品選擇狀態 =====
+  const [currentProductId, setCurrentProductId] = useState<string | null>(null);
   const [modelProductInfo, setModelProductInfo] = useState<ModelProductInfo>({
     targetProduct: null,
     modelOpen: false,
   });
 
-  // api 送出訂單回傳結果 for 燈箱用
+  // ===== 訂單操作相關狀態 =====
+  const [isSubmitResultOpen, setIsSubmitResultOpen] = useState(false);
   const [submitResult, seSubmitResult] = useState<{
     success: boolean;
     title: string;
     message: string;
   } | null>(null);
 
-  // 取得商品資料的 query
-  const { isPending, status, error } = useProductQuery();
+  // ===== 購物車計算 =====
+  const totalQuantity = cart.reduce((total, item) => total + item.qty, 0) || 0;
 
-  // 取得訂單明細的 query
-  useOrderReceiptQuery();
-
-  // 解析 url query string
-  useEffect(() => {
-    const query = queryString.parse(location.search);
-    if (query.tableId && query.tableToken) {
-      setTable({
-        tableId: query.tableId as string,
-        tableToken: query.tableToken as string,
-      });
-    }
-  }, []);
-
-  // menuData 以 category 分組
+  // ===== 數據處理 =====
+  // 將商品以分類分組
   const groupedData = useMemo(() => {
     if (!products) return {};
     return products.reduce(
@@ -88,14 +93,22 @@ function CustomerPage() {
     );
   }, [products]);
 
-  // 目前購物物總數量
-  const totalQuantity = cart.reduce((total, item) => total + item.qty, 0) || 0;
+  // ===== Effects =====
+  // 解析 URL query string 取得桌號
+  useEffect(() => {
+    const query = queryString.parse(location.search);
+    if (query.tableId && query.tableToken) {
+      setTable({
+        tableId: query.tableId as string,
+        tableToken: query.tableToken as string,
+      });
+    }
+  }, []);
 
-  // 點擊其他非按商品數量群組，傳入 null
+  // 點擊非商品數量控制區域時重置當前選中商品
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
-      // 避免在商品卡或數量控制器內部點擊時關閉
       if (!target.closest('[data-tag="product-button-group"]')) {
         setCurrentProductId(null);
       }
@@ -105,9 +118,12 @@ function CustomerPage() {
     return () => document.removeEventListener('click', handleClickOutside);
   }, []);
 
+  // ===== 錯誤處理 =====
   if (status === 'error' && error) {
     return <Error />;
   }
+
+  // ===== 渲染 UI =====
   return (
     <>
       <header className="border-b border-gray-200 bg-white p-4 text-center">
@@ -423,4 +439,5 @@ function CustomerPage() {
     </>
   );
 }
+
 export default CustomerPage;

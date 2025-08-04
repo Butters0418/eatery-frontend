@@ -1,9 +1,17 @@
-import { HiOutlineMinusSm, HiOutlinePlusSm } from 'react-icons/hi';
-import { FaRegTrashCan } from 'react-icons/fa6';
-import { Product } from '../../../types/productType';
+// 第三方庫
 import { motion, AnimatePresence } from 'framer-motion';
+
+// Stores
 import useCartStore from '../../../stores/useCartStore.ts';
 
+// Types
+import { Product } from '../../../types/productType';
+
+// Icons
+import { HiOutlineMinusSm, HiOutlinePlusSm } from 'react-icons/hi';
+import { FaRegTrashCan } from 'react-icons/fa6';
+
+// ===== 類型定義 =====
 interface CartButtonGroupProps {
   group: string; // div 中區塊位置
   item: Product;
@@ -11,14 +19,17 @@ interface CartButtonGroupProps {
   setCurrentProductId: (id: string | null) => void;
 }
 
+// 購物車按鈕組
 function CartButtonGroup({
   group,
   item,
   currentProductId,
   setCurrentProductId,
 }: CartButtonGroupProps) {
+  // ===== Store Hooks =====
   const { cart, addToCart, removeFromCart } = useCartStore();
 
+  // ===== 計算數據 =====
   // 當前商品在購物車中的數量
   const quantity: number =
     cart.find((cartItem) => cartItem.productId === item.productId)?.qty || 0;
@@ -26,6 +37,7 @@ function CartButtonGroup({
   // 當前商品的 groupId (用於判斷展開使用)
   const groupId = item.productId ? `${group}_${item.productId}` : null;
 
+  // ===== 事件處理函數 =====
   // +增加商品
   const addItemHandler = (product: Product) => {
     // 如果當前商品數量大於 0 且不是當前選中的商品，則單純打開按鈕選單
@@ -48,6 +60,8 @@ function CartButtonGroup({
     }
     removeFromCart(compiledId);
   };
+
+  // ===== 渲染 UI =====
   return (
     <div
       className="text-md absolute bottom-2 right-2 h-8 w-24 md:h-9 md:w-[108px] md:text-lg"

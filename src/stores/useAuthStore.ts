@@ -1,6 +1,8 @@
+// 第三方庫
 import { create } from 'zustand';
 import axios from 'axios';
 
+// ===== 類型定義 =====
 interface AuthStore {
   account: string | null;
   role: string | null;
@@ -19,13 +21,17 @@ interface AuthStore {
   setCheckingAuth: (isCheckingAuth: boolean) => void;
 }
 
+// 認證狀態管理 Store
 const useAuthStore = create<AuthStore>((set) => ({
+  // ===== State =====
   account: null,
   role: null,
   token: '',
   hasCheckedAuth: false,
   isLoading: false,
   isCheckingAuth: true,
+
+  // ===== Actions =====
   // 設定登入狀態
   setAuth: (account, role, token, hasCheckedAuth) => {
     axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
@@ -41,6 +47,7 @@ const useAuthStore = create<AuthStore>((set) => ({
       hasCheckedAuth,
     }));
   },
+
   // 設定登出狀態
   setLogout: () => {
     delete axios.defaults.headers.common['Authorization'];
@@ -54,6 +61,7 @@ const useAuthStore = create<AuthStore>((set) => ({
       hasCheckedAuth: true,
     }));
   },
+
   // 設定載入狀態
   setLoading: (isLoading) => {
     set((state) => ({
@@ -61,6 +69,7 @@ const useAuthStore = create<AuthStore>((set) => ({
       isLoading,
     }));
   },
+
   // 是否正在判斷 token 狀態
   setCheckingAuth: (isCheckingAuth) => {
     set((state) => ({
@@ -69,4 +78,5 @@ const useAuthStore = create<AuthStore>((set) => ({
     }));
   },
 }));
+
 export default useAuthStore;

@@ -1,10 +1,14 @@
+// 第三方庫
 import { create } from 'zustand';
+
+// Types
 import {
   ProductWithCompositeId,
   ProductWithQty,
   OrderPayload,
 } from '../types/productType';
 
+// ===== 類型定義 =====
 // 定義 tableInfo 類型
 interface TableInfo {
   tableId: string | null;
@@ -25,7 +29,9 @@ interface AddToCartStore {
   clearCart: () => void;
 }
 
+// 購物車狀態管理 Store
 const useCartStore = create<AddToCartStore>((set, get) => ({
+  // ===== State =====
   cart: [],
   tableInfo: {
     tableId: null,
@@ -33,6 +39,7 @@ const useCartStore = create<AddToCartStore>((set, get) => ({
   },
   isCartOpen: false,
 
+  // ===== Actions =====
   // 設定購物車開關狀態
   setIsCartOpen: (open) => set({ isCartOpen: open }),
 

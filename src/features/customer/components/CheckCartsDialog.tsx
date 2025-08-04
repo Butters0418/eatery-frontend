@@ -1,15 +1,27 @@
+// 第三方庫
+import { useQueryClient } from '@tanstack/react-query';
 import Dialog from '@mui/material/Dialog';
 import Button from '@mui/material/Button';
-import { HiOutlineMinusSm, HiOutlinePlusSm } from 'react-icons/hi';
-import { FaRegTrashCan } from 'react-icons/fa6';
-import useCartStore from '../../../stores/useCartStore.ts';
-import { formatNumber } from '../../../utils/formatNumber';
-import { AddonGroup, ProductWithQty } from '../../../types/productType.ts';
 import Box from '@mui/material/Box';
 import CircularProgress from '@mui/material/CircularProgress';
-import { useSubmitOrder } from '../../../hooks/useOrderOperations.ts';
-import { useQueryClient } from '@tanstack/react-query';
 
+// Hooks
+import { useSubmitOrder } from '../../../hooks/useOrderOperations.ts';
+
+// Stores
+import useCartStore from '../../../stores/useCartStore.ts';
+
+// Utils
+import { formatNumber } from '../../../utils/formatNumber';
+
+// Types
+import { AddonGroup, ProductWithQty } from '../../../types/productType.ts';
+
+// Icons
+import { HiOutlineMinusSm, HiOutlinePlusSm } from 'react-icons/hi';
+import { FaRegTrashCan } from 'react-icons/fa6';
+
+// ===== 類型定義 =====
 // 定義 props 的 interface
 interface CheckCartsDialogProps {
   isCartOpen: boolean;
@@ -24,6 +36,7 @@ interface CheckCartsDialogProps {
   ) => void;
 }
 
+// ===== 工具函數 =====
 // 配料取出選擇字串
 const addonsString = (addons: AddonGroup[]) => {
   return addons
@@ -47,17 +60,22 @@ const priceWithAddons = (product: ProductWithQty) => {
   return total;
 };
 
+// 購物車對話框
 function CheckCartsDialog({
   isCartOpen,
   setIsCartOpen,
   setSubmitResultOpen,
   setSubmitResult,
 }: CheckCartsDialogProps) {
+  // ===== Store Hooks =====
   const { cart, addToCart, removeFromCart, getTotalPrice, clearCart } =
     useCartStore();
+
+  // ===== API 相關 Hooks =====
   const { mutate: submitOrder, isPending } = useSubmitOrder();
   const queryClient = useQueryClient();
 
+  // ===== 事件處理函數 =====
   // submit 訂單
   const submitHandler = async () => {
     submitOrder(undefined, {
@@ -87,6 +105,7 @@ function CheckCartsDialog({
     });
   };
 
+  // ===== 渲染 UI =====
   return (
     <Dialog
       open={isCartOpen}

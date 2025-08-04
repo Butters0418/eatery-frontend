@@ -1,8 +1,12 @@
-import { FaCheckCircle } from 'react-icons/fa';
-import { MdErrorOutline } from 'react-icons/md';
+// 第三方庫
 import Dialog from '@mui/material/Dialog';
 import Button from '@mui/material/Button';
 
+// Icons
+import { FaCheckCircle } from 'react-icons/fa';
+import { MdErrorOutline } from 'react-icons/md';
+
+// ===== 類型定義 =====
 interface SubmitResultDialogProps {
   isSubmitResultOpen: boolean;
   submitResult: {
@@ -13,11 +17,13 @@ interface SubmitResultDialogProps {
   setIsSubmitResultOpen: (open: boolean) => void;
 }
 
+// 訂單提交結果對話框
 function SubmitResultDialog({
   isSubmitResultOpen,
   submitResult,
   setIsSubmitResultOpen,
 }: SubmitResultDialogProps) {
+  // ===== 渲染 UI =====
   return (
     <Dialog
       open={isSubmitResultOpen}

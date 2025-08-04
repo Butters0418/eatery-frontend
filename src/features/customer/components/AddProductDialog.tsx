@@ -1,6 +1,8 @@
+// React 相關
 import { useEffect } from 'react';
-import { useForm, Controller } from 'react-hook-form';
 
+// 第三方庫
+import { useForm, Controller } from 'react-hook-form';
 import Dialog from '@mui/material/Dialog';
 import Button from '@mui/material/Button';
 import Radio from '@mui/material/Radio';
@@ -9,9 +11,14 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
-import { Product } from '../../../types/productType';
+
+// Stores
 import useCartStore from '../../../stores/useCartStore.ts';
 
+// Types
+import { Product } from '../../../types/productType';
+
+// ===== 類型定義 =====
 // 表單數據類型定義
 interface FormValues {
   qty: number;
@@ -30,12 +37,18 @@ interface AddProductDialogProps {
   }) => void;
 }
 
+// 商品詳細資訊對話框
 function AddProductDialog({
   modelProductInfo,
   setModelProductInfo,
 }: AddProductDialogProps) {
+  // ===== 解構 Props =====
   const { targetProduct: product, modelOpen: productOpen } = modelProductInfo;
+
+  // ===== Store Hooks =====
   const { addToCart } = useCartStore();
+
+  // ===== Form Hooks =====
   const { control, handleSubmit, reset, watch } = useForm<FormValues>({
     defaultValues: {
       qty: 1,
@@ -49,8 +62,10 @@ function AddProductDialog({
     },
   });
 
+  // ===== Form Values =====
   const formValues = watch();
 
+  // ===== 計算函數 =====
   // 計算總價格 (含配料)
   const calculateTotalPrice = () => {
     // 基本價格 × 數量
@@ -68,9 +83,11 @@ function AddProductDialog({
     return total;
   };
 
+  // ===== 計算數據 =====
   // 計算總價
   const totalPrice = calculateTotalPrice();
 
+  // ===== 事件處理函數 =====
   // 加入購物車
   const onSubmit = (data: FormValues) => {
     if (!product) return;
@@ -103,6 +120,7 @@ function AddProductDialog({
     addToCart(orderItem, data.qty);
   };
 
+  // ===== Effects =====
   useEffect(() => {
     if (productOpen) {
       // 當對話框開啟時，重置表單值為新的默認值
@@ -118,6 +136,7 @@ function AddProductDialog({
     }
   }, [product, productOpen, reset]);
 
+  // ===== 渲染 UI =====
   return (
     <Dialog
       open={productOpen}

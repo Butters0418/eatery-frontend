@@ -1,20 +1,32 @@
+// React 相關
 import { useEffect, useState, useCallback, useRef } from 'react';
-// 元件說明:手機版置滑動錨點
-import useWindowScroll from '../../../utils/useWindowScroll';
-import { useProductQuery } from '../../../hooks/useProductQuery';
 
-// packages
+// 第三方庫
 import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
 
+// Hooks
+import { useProductQuery } from '../../../hooks/useProductQuery';
+
+// Utils
+import useWindowScroll from '../../../utils/useWindowScroll';
+
+// 頂部導航組件 (手機版置頂滑動錨點)
 function TopNav() {
+  // ===== API 相關 Hooks =====
   const { isLoading, isSuccess } = useProductQuery();
+
+  // ===== State =====
   const [categoryContainer, setCategoryContainer] = useState<Element[]>([]);
   const [currentContainer, setCurrentContainer] = useState<string | null>(null);
+
+  // ===== Custom Hooks =====
   const scroll = useWindowScroll();
 
+  // ===== Refs =====
   const nav = useRef<HTMLDivElement>(null);
 
+  // ===== 回調函數 =====
   const updateCategoryContainer = useCallback(() => {
     const allContainer = Array.from(
       document.querySelectorAll('[data-category]'),
@@ -22,6 +34,7 @@ function TopNav() {
     if (allContainer.length !== 0) setCategoryContainer(allContainer);
   }, []);
 
+  // ===== 事件處理函數 =====
   // 滑動到錨點區塊
   const scrollToElement = (target: string) => {
     const scroll = window.scrollY;
@@ -34,6 +47,7 @@ function TopNav() {
     }
   };
 
+  // ===== Effects =====
   // dom observer
   useEffect(() => {
     if (!isSuccess) return;
@@ -82,7 +96,7 @@ function TopNav() {
     if (targetCategory !== currentContainer) {
       setCurrentContainer(targetCategory);
     }
-  }, [scroll, categoryContainer]);
+  }, [scroll, categoryContainer, currentContainer]);
 
   useEffect(() => {
     const currentNav = [...document.querySelectorAll('[data-nav]')].find(
@@ -98,6 +112,7 @@ function TopNav() {
     }
   }, [currentContainer]);
 
+  // ===== 渲染 UI =====
   return (
     <div className="sticky top-0 z-50 bg-white px-2 shadow-sm">
       <div
@@ -141,4 +156,5 @@ function TopNav() {
     </div>
   );
 }
+
 export default TopNav;

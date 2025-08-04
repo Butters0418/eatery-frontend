@@ -1,18 +1,31 @@
+// 第三方庫
 import Dialog from '@mui/material/Dialog';
 import Button from '@mui/material/Button';
-import { formatNumber } from '../../../utils/formatNumber';
+
+// Stores
 import { useReceiptStore } from '../../../stores/useReceiptStore.ts';
+
+// Utils
+import { formatNumber } from '../../../utils/formatNumber';
+
+// Types
 import { FormattedOrderGroup } from '../../../types/productType.ts';
 
+// ===== 類型定義 =====
 interface CheckReceiptDialogProps {
   isReceiptOpen: boolean;
   setIsReceiptOpen: (open: boolean) => void;
 }
+
+// 訂單明細對話框
 function CheckReceiptDialog({
   isReceiptOpen,
   setIsReceiptOpen,
 }: CheckReceiptDialogProps) {
+  // ===== Store Hooks =====
   const { receipt } = useReceiptStore();
+
+  // ===== 渲染 UI =====
   return (
     <Dialog
       open={isReceiptOpen}
