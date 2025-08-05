@@ -18,6 +18,24 @@ body {
   position: relative;
 }
 
+@media (min-width: 768px) {
+  body {
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
 .outline * {
   outline: 1px solid #666;
+}
+
+/* 不顯示滾動條 */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
 }

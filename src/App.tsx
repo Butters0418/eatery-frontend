@@ -28,14 +28,14 @@ const theme = createTheme({
     },
   },
   shape: {
-    borderRadius: 16, // 預設圓角（看你是否想對應 xl 或 2xl）
+    borderRadius: 16,
   },
 });
 
 function App() {
   return (
     <ThemeProvider theme={theme}>
-      <div className="h-screen">
+      <div>
         <AppRoutes />
       </div>
     </ThemeProvider>
