@@ -13,9 +13,10 @@ import useCartStore from '../../../stores/useCartStore.ts';
 
 // Utils
 import { formatNumber } from '../../../utils/formatNumber';
+import { calculatePriceFromCart } from '../../../utils/calculateItemPrice.ts';
 
 // Types
-import { AddonGroup, ProductWithQty } from '../../../types/productType.ts';
+import { AddonGroup } from '../../../types/productType.ts';
 
 // Icons
 import { HiOutlineMinusSm, HiOutlinePlusSm } from 'react-icons/hi';
@@ -43,21 +44,6 @@ const addonsString = (addons: AddonGroup[]) => {
     .map((group) => group.options.find((opt) => opt.selected)?.name)
     .filter(Boolean)
     .join(' / ');
-};
-
-// 統計價格 x1 (前端購物車用)
-const priceWithAddons = (product: ProductWithQty) => {
-  // 基本價格 × 數量
-  let total = product.price;
-
-  // 加上選擇的配料價格
-  product.addons?.forEach((group) => {
-    const selectedOption = group.options.find((opt) => opt.selected);
-    if (selectedOption) {
-      total += selectedOption.price;
-    }
-  });
-  return total;
 };
 
 // 購物車對話框
@@ -169,7 +155,7 @@ function CheckCartsDialog({
 
                         <p className="mt-auto text-sm font-semibold text-primary md:text-lg">
                           <small>$</small>
-                          {priceWithAddons(item)}
+                          {calculatePriceFromCart(item, false)}
                         </p>
                       </div>
 

@@ -18,6 +18,9 @@ import useCartStore from '../../../stores/useCartStore.ts';
 // Types
 import { Product } from '../../../types/productType';
 
+// utils
+import { calculatePriceFromForm } from '../../../utils/calculateItemPrice.ts';
+
 // ===== 類型定義 =====
 // 表單數據類型定義
 interface FormValues {
@@ -54,7 +57,7 @@ function AddProductDialog({
       qty: 1,
       // 每個 addon 設定默認值為第一個選項
       ...Object.fromEntries(
-        (product!.addons || []).map((group) => [
+        (product?.addons || []).map((group) => [
           group.group,
           group.options[0].name,
         ]),
@@ -65,50 +68,37 @@ function AddProductDialog({
   // ===== Form Values =====
   const formValues = watch();
 
-  // ===== 計算函數 =====
-  // 計算總價格 (含配料)
-  const calculateTotalPrice = () => {
-    // 基本價格 × 數量
-    let total = product!.price * formValues.qty;
-
-    // 加上選擇的配料價格
-    product!.addons?.forEach((group) => {
-      const selectedOption = group.options.find(
-        (opt) => opt.name === formValues[group.group],
-      );
-      if (selectedOption) {
-        total += selectedOption.price * formValues.qty;
-      }
-    });
-    return total;
-  };
-
-  // ===== 計算數據 =====
-  // 計算總價
-  const totalPrice = calculateTotalPrice();
+  // ===== 計算總價 =====
+  const totalPrice = calculatePriceFromForm(product!, formValues);
 
   // ===== 事件處理函數 =====
+
   // 加入購物車
   const onSubmit = (data: FormValues) => {
     if (!product) return;
     // 配料加上 selected 屬性
-    const addons = (product!.addons || []).map((group) => ({
-      group: group.group,
-      options: group.options.map((option) => ({
-        ...option,
-        selected: data[group.group] === option.name,
-      })),
-    }));
+    const addons = product!.addons
+      ? product!.addons.map((group) => ({
+          group: group.group,
+          options: group.options.map((option) => ({
+            ...option,
+            selected: data[group.group] === option.name,
+          })),
+        }))
+      : null;
 
     // 建立配料前綴 id (辨別同商品不同配料的情況)
-    const addonsPrefix = addons
-      .map((group) => group.options.find((opt) => opt.selected)?.name)
-      .filter(Boolean)
-      .join('_');
+    const addonsPrefix =
+      addons !== null
+        ? addons
+            .map((group) => group.options.find((opt) => opt.selected)?.name)
+            .filter(Boolean)
+            .join('_')
+        : null;
 
     const compositeId = addonsPrefix
-      ? `${product!.productId}_${addonsPrefix}`
-      : product!.productId;
+      ? `${product.productId}_${addonsPrefix}`
+      : product.productId;
 
     const orderItem = {
       ...product,
@@ -122,12 +112,12 @@ function AddProductDialog({
 
   // ===== Effects =====
   useEffect(() => {
-    if (productOpen) {
+    if (productOpen && product) {
       // 當對話框開啟時，重置表單值為新的默認值
       reset({
         qty: 1,
         ...Object.fromEntries(
-          (product!.addons || []).map((group) => [
+          (product.addons || []).map((group) => [
             group.group,
             group.options[0].name,
           ]),

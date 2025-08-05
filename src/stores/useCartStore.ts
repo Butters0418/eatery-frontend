@@ -1,6 +1,8 @@
 // 第三方庫
 import { create } from 'zustand';
 
+import { calculatePriceFromCart } from '../utils/calculateItemPrice';
+
 // Types
 import {
   ProductWithCompositeId,
@@ -50,21 +52,7 @@ const useCartStore = create<AddToCartStore>((set, get) => ({
   getTotalPrice: () => {
     const { cart } = get();
     return cart.reduce((total, item) => {
-      // 基本價格
-      let itemTotal = item.price * item.qty;
-
-      // 加料選項價格
-      if (item.addons) {
-        item.addons.forEach((group) => {
-          group.options.forEach((option) => {
-            if (option.selected) {
-              itemTotal += option.price * item.qty;
-            }
-          });
-        });
-      }
-
-      return total + itemTotal;
+      return total + calculatePriceFromCart(item, true);
     }, 0);
   },
 

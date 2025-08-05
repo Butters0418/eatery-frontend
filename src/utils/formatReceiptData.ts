@@ -6,9 +6,9 @@ dayjs.locale('zh-tw');
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
+import { calculatePriceFromCart } from '../utils/calculateItemPrice.ts'; // 假設這個函數已經存在於 utils 中
+
 import {
-  AddonGroup,
-  AddonOption,
   OrderItem,
   OrderGroup,
   OrderReceipt,
@@ -17,6 +17,7 @@ import {
 
 // 訂單明轉為前端使用資料
 export const formatReceiptData = (order: OrderReceipt): FormattedReceipt => {
+  console.log('formatReceiptData', order);
   return {
     createdAt: dayjs(order.createdAt)
       .tz('Asia/Taipei')
@@ -31,18 +32,8 @@ export const formatReceiptData = (order: OrderReceipt): FormattedReceipt => {
       const item = group.item.map((i: OrderItem) => {
         // 取出選擇的配料名稱
         const selectedOptions: string[] = [];
-        let addonPrice = 0;
-        // 計算配料價格
-        i.addons?.forEach((addonGroup: AddonGroup) => {
-          addonGroup.options.forEach((opt: AddonOption) => {
-            if (opt.selected) {
-              selectedOptions.push(opt.name);
-              addonPrice += opt.price;
-            }
-          });
-        });
 
-        const uniPriceWithAddons = i.price + addonPrice;
+        const uniPriceWithAddons = calculatePriceFromCart(i, false);
 
         subTotal += uniPriceWithAddons * i.qty;
         return {
