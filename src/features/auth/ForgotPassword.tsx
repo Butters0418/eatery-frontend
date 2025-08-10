@@ -1,20 +1,19 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { useNavigate, NavLink } from 'react-router-dom';
-import axios from 'axios';
 import { yupResolver } from '@hookform/resolvers/yup';
 
 // 自定義 hooks/stores
 import useAuthStore from '../../stores/useAuthStore';
-import useRedirectIfLoggedIn from '../../utils/useRedirectIfLoggedIn';
 import { forgotPasswordSchema } from './loginSchema';
 import ConfirmDialog from './ConfirmDialog';
+import { useResendVerificationCodeMutation } from '../../hooks/useUserOperations';
+import useClearErrorMessage from '../../hooks/useClearAuthErrorMessage';
 
 // Material UI 元件
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
-import LinearProgress from '@mui/material/LinearProgress';
 import TextField from '@mui/material/TextField';
 
 interface FormValues {
@@ -22,13 +21,23 @@ interface FormValues {
 }
 
 function ForgotPassword() {
-  const { isLoading, isCheckingAuth, setAuth, setLoading } = useAuthStore();
-  const [errorMsg, setErrorMsg] = useState<string>('');
+  const { mutate: resendVerificationCode, isPending } =
+    useResendVerificationCodeMutation();
+  const { role, errorMessage } = useAuthStore();
   const [open, setOpen] = useState<boolean>(false);
   const navigate = useNavigate();
 
+  // 清空錯誤訊息
+  useClearErrorMessage();
+
   // 判斷是否已經登入
-  useRedirectIfLoggedIn();
+  useEffect(() => {
+    if (role === 'admin') {
+      navigate('/admin');
+    } else if (role === 'staff') {
+      navigate('/internal-dashboard');
+    }
+  }, [role, navigate]);
 
   // react-hooks-form 設定
   const {
@@ -44,45 +53,19 @@ function ForgotPassword() {
 
   // 表單 submit 事件
   const onSubmit = async (data: FormValues) => {
-    setErrorMsg('');
-    setLoading(true);
-    try {
-      await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/resend-verification-code`,
-        data,
-      );
-      const account = data.account;
-      setAuth(account, null, '', false);
-      setOpen(true);
-    } catch (err) {
-      if (axios.isAxiosError(err)) {
-        switch (err.response?.status) {
-          case 400:
-            setErrorMsg(err.response.data.message);
-            break;
-          default:
-            setErrorMsg('發生錯誤，請稍後再試');
-            break;
-        }
-      } else {
-        setErrorMsg('發生錯誤，請稍後再試');
-      }
-    } finally {
-      setLoading(false);
-    }
+    resendVerificationCode(data.account, {
+      onSuccess: () => {
+        setOpen(true);
+      },
+    });
   };
 
   // dialog 關閉導至 Verify 頁
   const handleDialogClose = () => {
-    console.log('導航到驗證頁面');
     setOpen(false);
     navigate('/verify-code', { replace: true });
   };
 
-  // 如果正在檢查認證狀態，顯示進度條
-  if (isCheckingAuth) {
-    return <LinearProgress color="primary" />;
-  }
   return (
     <>
       <div className="flex min-h-screen flex-col items-center justify-center bg-grey-light p-4 md:p-8">
@@ -113,9 +96,9 @@ function ForgotPassword() {
             />
 
             <div className="relative mt-6">
-              {errorMsg && (
+              {errorMessage && (
                 <p className="absolute -top-7 left-0 mb-2 ml-2 text-sm text-error">
-                  {errorMsg}
+                  {errorMessage}
                 </p>
               )}
               <Button
@@ -123,10 +106,10 @@ function ForgotPassword() {
                 type="submit"
                 color="primary"
                 fullWidth
-                className={isLoading ? 'pointer-event-none' : ''}
-                disabled={isLoading}
+                className={isPending ? 'pointer-event-none' : ''}
+                disabled={isPending}
               >
-                {isLoading ? (
+                {isPending ? (
                   <Box sx={{ display: 'flex' }}>
                     <CircularProgress size="28px" color="inherit" />
                   </Box>

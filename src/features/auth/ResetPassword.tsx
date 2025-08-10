@@ -1,20 +1,19 @@
 import { useState, useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import { yupResolver } from '@hookform/resolvers/yup';
 
 // 自定義 hooks/stores
 import useAuthStore from '../../stores/useAuthStore';
-import useRedirectIfLoggedIn from '../../utils/useRedirectIfLoggedIn';
+import { useResetPasswordMutation } from '../../hooks/useUserOperations';
 import { resetPasswordSchema } from './loginSchema';
 import ConfirmDialog from './ConfirmDialog';
+import useClearErrorMessage from '../../hooks/useClearAuthErrorMessage';
 
 // Material UI 元件
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
-import LinearProgress from '@mui/material/LinearProgress';
 import TextField from '@mui/material/TextField';
 
 interface FormValues {
@@ -23,19 +22,24 @@ interface FormValues {
 }
 
 function ResetPassword() {
-  const { isLoading, account, isCheckingAuth, setLoading } = useAuthStore();
-  const [errorMsg, setErrorMsg] = useState<string>('');
+  const { mutate: resetPassword, isPending } = useResetPasswordMutation();
+  const { account, role, errorMessage } = useAuthStore();
   const [open, setOpen] = useState<boolean>(false);
   const navigate = useNavigate();
 
-  useRedirectIfLoggedIn();
+  // 清空錯誤訊息
+  useClearErrorMessage();
 
-  // 如果 account 為空 (可能用戶重整)，則跳轉到忘記密碼頁面
+  // 判斷是否已經登入
   useEffect(() => {
-    if (!localStorage.getItem('account')) {
+    if (role === 'admin') {
+      navigate('/admin');
+    } else if (role === 'staff') {
+      navigate('/internal-dashboard');
+    } else if (!account) {
       navigate('/forgot-password', { replace: true });
     }
-  }, [account]);
+  }, [role, account, navigate]);
 
   // react-hooks-form 設定
   const {
@@ -50,42 +54,15 @@ function ResetPassword() {
     resolver: yupResolver(resetPasswordSchema),
   });
 
-  const onSubmit = async (value: FormValues) => {
-    setErrorMsg('');
-    setLoading(true);
-    const data = {
-      account: localStorage.getItem('account'),
-      newPassword: value.confirmPassword,
-    };
-
-    try {
-      await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/reset-password`,
-        data,
-      );
-      setOpen(true);
-    } catch (err) {
-      if (axios.isAxiosError(err)) {
-        switch (err.response?.status) {
-          case 400:
-            setErrorMsg(err.response.data.message);
-            break;
-          case 403:
-            setErrorMsg(err.response.data.message);
-            break;
-          case 404:
-            setErrorMsg(err.response.data.message);
-            break;
-          default:
-            setErrorMsg('發生錯誤，請稍後再試');
-            break;
-        }
-      } else {
-        setErrorMsg('發生錯誤，請稍後再試');
-      }
-    } finally {
-      setLoading(false);
-    }
+  const onSubmit = async (data: FormValues) => {
+    resetPassword(
+      { account: account!, newPassword: data.confirmPassword },
+      {
+        onSuccess: () => {
+          setOpen(true);
+        },
+      },
+    );
   };
 
   // dialog 關閉導至 login 頁
@@ -93,11 +70,6 @@ function ResetPassword() {
     setOpen(false);
     navigate('/login', { replace: true });
   };
-
-  // 如果正在檢查認證狀態，顯示進度條
-  if (isCheckingAuth) {
-    return <LinearProgress color="primary" />;
-  }
 
   return (
     <>
@@ -159,9 +131,9 @@ function ResetPassword() {
             />
 
             <div className="relative mt-8">
-              {errorMsg && (
+              {errorMessage && (
                 <p className="absolute -top-7 left-0 mb-2 ml-2 text-sm text-error">
-                  {errorMsg}
+                  {errorMessage}
                 </p>
               )}
               <Button
@@ -169,10 +141,10 @@ function ResetPassword() {
                 type="submit"
                 color="primary"
                 fullWidth
-                className={isLoading ? 'pointer-event-none' : ''}
-                disabled={isLoading}
+                className={isPending ? 'pointer-event-none' : ''}
+                disabled={isPending}
               >
-                {isLoading ? (
+                {isPending ? (
                   <Box sx={{ display: 'flex' }}>
                     <CircularProgress size="28px" color="inherit" />
                   </Box>

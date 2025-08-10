@@ -1,33 +1,32 @@
 // 管理者後台 (僅 admin 可造訪)
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import useAuthStore from '../../stores/useAuthStore';
 import { useNavigate } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import LinearProgress from '@mui/material/LinearProgress';
-
+import { useCheckMeQuery } from '../../hooks/useUserOperations';
+// custom hooks
 function AdminPage() {
+  const { isFetching } = useCheckMeQuery();
   const { account, token, role, setLogout } = useAuthStore();
-  const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!token || role !== 'admin') {
+    if (!token && role !== 'admin') {
       setLogout();
       navigate('/login', { replace: true });
-    } else {
-      setIsLoading(false);
     }
   }, [token, role, setLogout, navigate]);
   return (
     <>
-      {isLoading ? (
+      {isFetching ? (
         <Box sx={{ width: '100%' }}>
           <LinearProgress />
         </Box>
       ) : (
         <div>
           <header className="flex items-center gap-4 bg-orange-400 p-2">
-            <h1 className="mr-auto text-xl">xxx點餐頁</h1>
+            <h1 className="mr-auto text-xl">管理頁</h1>
             <p> {account} 您好</p>
             <button onClick={setLogout}>登出</button>
           </header>

@@ -1,26 +1,24 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import useAuthStore from '../../stores/useAuthStore';
 import { useNavigate } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import LinearProgress from '@mui/material/LinearProgress';
-
+import { useCheckMeQuery } from '../../hooks/useUserOperations';
 // 員工點餐頁 (staff 及 admin 可造訪)
 function InternalDashboard() {
+  const { isFetching } = useCheckMeQuery();
   const { account, token, role, setLogout } = useAuthStore();
-  const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
     if (!token || (role !== 'staff' && role !== 'admin')) {
       setLogout();
       navigate('/login', { replace: true });
-    } else {
-      setIsLoading(false);
     }
   }, [token, role, setLogout, navigate]);
   return (
     <>
-      {isLoading ? (
+      {isFetching ? (
         <Box sx={{ width: '100%' }}>
           <LinearProgress />
         </Box>
