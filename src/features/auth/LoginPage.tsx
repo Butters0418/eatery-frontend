@@ -1,40 +1,43 @@
-import { useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { useNavigate, NavLink } from 'react-router-dom';
-import axios from 'axios';
 import { yupResolver } from '@hookform/resolvers/yup';
 
 // 自定義 hooks/stores
 import useAuthStore from '../../stores/useAuthStore';
-import useRedirectIfLoggedIn from '../../utils/useRedirectIfLoggedIn';
 import { loginSchema } from './loginSchema';
+import { useLoginMutation } from '../../hooks/useUserOperations';
+import useClearErrorMessage from '../../hooks/useClearAuthErrorMessage';
 
 // Material UI 元件
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
-import LinearProgress from '@mui/material/LinearProgress';
 import TextField from '@mui/material/TextField';
 
-interface FormValues {
-  account: string;
-  password: string;
-}
+// type
+import { LoginInfo } from '../../types/userType';
 
 function LoginPage() {
-  const { isLoading, isCheckingAuth, setLoading, setAuth } = useAuthStore();
-  const [errorMsg, setErrorMsg] = useState<string>('');
+  const { errorMessage, role } = useAuthStore();
   const navigate = useNavigate();
+  const { mutate: login, isPending } = useLoginMutation();
+
+  // 清空錯誤訊息
+  useClearErrorMessage();
 
   // 判斷是否已經登入
-  useRedirectIfLoggedIn();
+  if (role === 'admin') {
+    navigate('/admin');
+  } else if (role === 'staff') {
+    navigate('/internal-dashboard');
+  }
 
   // react-hooks-form 設定
   const {
     control,
     handleSubmit,
     formState: { errors },
-  } = useForm<FormValues>({
+  } = useForm<LoginInfo>({
     defaultValues: {
       account: '',
       password: '',
@@ -43,51 +46,18 @@ function LoginPage() {
   });
 
   // 表單 submit 事件
-  const onSubmit = async (data: FormValues) => {
-    setErrorMsg('');
-    setLoading(true);
-    try {
-      const res = await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/login`,
-        data,
-      );
-      const {
-        token,
-        user: { account, role },
-      } = res.data;
-      // 設定認證狀態
-      setAuth(account, role, token, true);
-      // 根據角色導向不同頁面
-      if (role === 'admin') {
-        navigate('/admin');
-      } else {
-        navigate('/internal-dashboard');
-      }
-    } catch (err) {
-      if (axios.isAxiosError(err)) {
-        switch (err.response?.status) {
-          case 401:
-            setErrorMsg(err.response.data.message);
-            break;
-          case 403:
-            setErrorMsg(err.response.data.message);
-            break;
-          default:
-            setErrorMsg('登入失敗，請稍後再試');
-            break;
+  const onSubmit = (data: LoginInfo) => {
+    login(data, {
+      onSuccess: () => {
+        const currentRole = useAuthStore.getState().role;
+        if (currentRole === 'admin') {
+          navigate('/admin');
+        } else if (currentRole === 'staff') {
+          navigate('/internal-dashboard');
         }
-      } else {
-        setErrorMsg('登入失敗，請稍後再試');
-      }
-    } finally {
-      setLoading(false);
-    }
+      },
+    });
   };
-
-  // 如果正在檢查認證狀態，顯示進度條
-  if (isCheckingAuth) {
-    return <LinearProgress color="primary" />;
-  }
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-grey-light p-4 md:p-8">
@@ -143,9 +113,9 @@ function LoginPage() {
             </NavLink>
           </div>
           <div className="relative">
-            {errorMsg && (
+            {errorMessage && (
               <p className="absolute -top-7 left-0 mb-2 ml-2 text-sm text-error">
-                {errorMsg}
+                {errorMessage}
               </p>
             )}
             <Button
@@ -153,10 +123,10 @@ function LoginPage() {
               type="submit"
               color="primary"
               fullWidth
-              className={isLoading ? 'pointer-event-none' : ''}
-              disabled={isLoading}
+              className={isPending ? 'pointer-event-none' : ''}
+              disabled={isPending}
             >
-              {isLoading ? (
+              {isPending ? (
                 <Box sx={{ display: 'flex' }}>
                   <CircularProgress size="28px" color="inherit" />
                 </Box>

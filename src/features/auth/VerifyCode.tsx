@@ -1,20 +1,22 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import { yupResolver } from '@hookform/resolvers/yup';
 
 // 自定義 hooks/stores
 import useAuthStore from '../../stores/useAuthStore';
-import useRedirectIfLoggedIn from '../../utils/useRedirectIfLoggedIn';
 import { verifyCodeSchema } from './loginSchema';
 import ConfirmDialog from './ConfirmDialog';
+import {
+  useResendVerificationCodeMutation,
+  useVerifyCodeMutation,
+} from '../../hooks/useUserOperations';
+import useClearErrorMessage from '../../hooks/useClearAuthErrorMessage';
 
 // Material UI 元件
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
-import LinearProgress from '@mui/material/LinearProgress';
 import TextField from '@mui/material/TextField';
 
 interface FormValues {
@@ -22,22 +24,26 @@ interface FormValues {
 }
 
 function VerifyCode() {
-  const { account, isCheckingAuth, isLoading, setLoading } = useAuthStore();
-  const [errorMsg, setErrorMsg] = useState<string>('');
+  const { account, role, errorMessage } = useAuthStore();
+  const { mutate: verifyCode, isPending } = useVerifyCodeMutation();
+  const { mutate: resendVerificationCode } =
+    useResendVerificationCodeMutation();
   const [countdown, setCountdown] = useState<number>(0);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [open, setOpen] = useState<boolean>(false);
   const navigate = useNavigate();
-  console.log('VerifyCode render', account);
-  // 判斷是否已經登入
-  useRedirectIfLoggedIn();
 
-  // 如果 account 為空 (可能用戶重整)，則跳轉到忘記密碼頁面
-  useEffect(() => {
-    if (!localStorage.getItem('account')) {
-      navigate('/forgot-password', { replace: true });
-    }
-  }, [account]);
+  // 清空錯誤訊息
+  useClearErrorMessage();
+
+  // 判斷是否已經登入
+  if (role === 'admin') {
+    navigate('/admin');
+  } else if (role === 'staff') {
+    navigate('/internal-dashboard');
+  } else if (!account) {
+    navigate('/forgot-password', { replace: true });
+  }
 
   // react-hooks-form 設定
   const {
@@ -50,11 +56,7 @@ function VerifyCode() {
   });
 
   // 重新發送驗證碼
-  const resendVerificationCode = async () => {
-    const data = {
-      account: account,
-    };
-    setErrorMsg('');
+  const resentCodeHandler = async () => {
     // 重置倒數
     setCountdown(10);
 
@@ -72,26 +74,13 @@ function VerifyCode() {
         return prev - 1;
       });
     }, 1000);
-    try {
-      await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/resend-verification-code`,
-        data,
-      );
-      setOpen(true);
-    } catch (err) {
-      if (axios.isAxiosError(err)) {
-        switch (err.response?.status) {
-          case 400:
-            setErrorMsg(err.response.data.message);
-            break;
-          default:
-            setErrorMsg('發生錯誤，請稍後再試');
-            break;
-        }
-      } else {
-        setErrorMsg('發生錯誤，請稍後再試');
-      }
-    }
+
+    // 重新發送驗證碼
+    resendVerificationCode(account!, {
+      onSuccess: () => {
+        setOpen(true);
+      },
+    });
   };
 
   // 關閉再次送出燈箱
@@ -100,41 +89,17 @@ function VerifyCode() {
   };
 
   // 表單 submit 事件
-  const onSubmit = async (value: FormValues) => {
-    setErrorMsg('');
-    setLoading(true);
-    const data = {
-      code: value.otp,
-      account: localStorage.getItem('account'),
-    };
-    try {
-      await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/verify-reset-code`,
-        data,
-      );
-      navigate('/reset-password');
-    } catch (err) {
-      if (axios.isAxiosError(err)) {
-        switch (err.response?.status) {
-          case 400:
-            setErrorMsg(err.response.data.message);
-            break;
-          default:
-            setErrorMsg('發生錯誤，請稍後再試');
-            break;
-        }
-      } else {
-        setErrorMsg('發生錯誤，請稍後再試');
-      }
-    } finally {
-      setLoading(false);
-    }
+  const onSubmit = async (data: FormValues) => {
+    verifyCode(
+      { code: data.otp, account: account! },
+      {
+        onSuccess: () => {
+          navigate('/reset-password', { replace: true });
+        },
+      },
+    );
   };
 
-  // 如果正在檢查認證狀態，顯示進度條
-  if (isCheckingAuth) {
-    return <LinearProgress color="primary" />;
-  }
   return (
     <>
       <div className="flex min-h-screen flex-col items-center justify-center bg-grey-light p-4 md:p-8">
@@ -176,16 +141,16 @@ function VerifyCode() {
                 aria-label="重新發送驗證碼"
                 type="button"
                 className={`text-sm font-medium text-primary transition-all hover:text-primary-dark ${countdown > 0 && 'pointer-events-none text-primary-light'}`}
-                onClick={resendVerificationCode}
+                onClick={resentCodeHandler}
               >
                 重新發送驗證碼 {countdown > 0 ? `(${countdown}s)` : ''}
               </button>
             </div>
 
             <div className="relative mt-2">
-              {errorMsg && (
+              {errorMessage && (
                 <p className="absolute -top-7 left-0 mb-2 ml-2 text-sm text-error">
-                  {errorMsg}
+                  {errorMessage}
                 </p>
               )}
               <Button
@@ -193,10 +158,10 @@ function VerifyCode() {
                 type="submit"
                 color="primary"
                 fullWidth
-                className={isLoading ? 'pointer-event-none' : ''}
-                disabled={isLoading}
+                className={isPending ? 'pointer-event-none' : ''}
+                disabled={isPending}
               >
-                {isLoading ? (
+                {isPending ? (
                   <Box sx={{ display: 'flex' }}>
                     <CircularProgress size="28px" color="inherit" />
                   </Box>
