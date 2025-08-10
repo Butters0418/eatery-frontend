@@ -32,7 +32,6 @@ const useAuthStore = create<AuthStore>()(
 
       // 設定登入狀態
       setAuth: (account, role, token) => {
-        console.log('store 寫入成功');
         set({ account, role, token });
       },
 

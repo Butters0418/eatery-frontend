@@ -1,26 +1,25 @@
 // 管理者後台 (僅 admin 可造訪)
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import useAuthStore from '../../stores/useAuthStore';
 import { useNavigate } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import LinearProgress from '@mui/material/LinearProgress';
+import { useCheckMeQuery } from '../../hooks/useUserOperations';
 // custom hooks
 function AdminPage() {
+  const { isFetching } = useCheckMeQuery();
   const { account, token, role, setLogout } = useAuthStore();
-  const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!token || role !== 'admin') {
+    if (!token && role !== 'admin') {
       setLogout();
       navigate('/login', { replace: true });
-    } else {
-      setIsLoading(false);
     }
   }, [token, role, setLogout, navigate]);
   return (
     <>
-      {isLoading ? (
+      {isFetching ? (
         <Box sx={{ width: '100%' }}>
           <LinearProgress />
         </Box>

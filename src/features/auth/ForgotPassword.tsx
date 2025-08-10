@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { useNavigate, NavLink } from 'react-router-dom';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -31,11 +31,13 @@ function ForgotPassword() {
   useClearErrorMessage();
 
   // 判斷是否已經登入
-  if (role === 'admin') {
-    navigate('/admin');
-  } else if (role === 'staff') {
-    navigate('/internal-dashboard');
-  }
+  useEffect(() => {
+    if (role === 'admin') {
+      navigate('/admin');
+    } else if (role === 'staff') {
+      navigate('/internal-dashboard');
+    }
+  }, [role, navigate]);
 
   // react-hooks-form 設定
   const {

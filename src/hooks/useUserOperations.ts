@@ -33,7 +33,6 @@ export const useLoginMutation = () => {
         token,
         user: { account, role },
       } = data;
-      console.log('query 登入成功');
       setAuth(account, role, token);
       setIsFromLoginPage(true);
     },
@@ -65,6 +64,9 @@ export const useCheckMeQuery = () => {
     queryKey: ['checkMe', token],
     queryFn: () => getUserProfile(token!),
     enabled: !!token && !isFromLoginPage,
+    refetchInterval: 12 * 60 * 60 * 1000, // 12小時自動重新查詢一次
+    refetchIntervalInBackground: true, // 視窗不在焦點也觸發
+    staleTime: 12 * 60 * 60 * 1000,
   });
 
   const { data, isSuccess, error } = query;
@@ -97,9 +99,6 @@ export const useResendVerificationCodeMutation = () => {
       setAuth(account, null, null);
       const response = await resendVerificationCode(account);
       return response;
-    },
-    onSuccess: () => {
-      console.log('驗證碼已重新發送');
     },
     onError: (err) => {
       setLogout();
