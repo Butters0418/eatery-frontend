@@ -35,7 +35,7 @@ function ForgotPassword() {
     if (role === 'admin') {
       navigate('/admin');
     } else if (role === 'staff') {
-      navigate('/internal-dashboard');
+      navigate('/order-page');
     }
   }, [role, navigate]);
 

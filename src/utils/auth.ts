@@ -42,6 +42,6 @@ const navigateByRole = (role: string, navigate: NavigateFunction) => {
   if (role === 'admin') {
     navigate('/admin', { replace: true });
   } else if (role === 'staff') {
-    navigate('/internal-dashboard', { replace: true });
+    navigate('/order-page', { replace: true });
   }
 };

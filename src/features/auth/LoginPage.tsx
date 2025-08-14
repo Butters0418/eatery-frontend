@@ -31,7 +31,7 @@ function LoginPage() {
     if (role === 'admin') {
       navigate('/admin');
     } else if (role === 'staff') {
-      navigate('/internal-dashboard');
+      navigate('/order-page');
     }
   }, [role, navigate]);
 
@@ -56,7 +56,7 @@ function LoginPage() {
         if (currentRole === 'admin') {
           navigate('/admin');
         } else if (currentRole === 'staff') {
-          navigate('/internal-dashboard');
+          navigate('/order-page');
         }
       },
     });
