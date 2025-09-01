@@ -18,12 +18,12 @@ export default function AppRoutes() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<CustomerPage />}></Route>
+        {/* auth pages */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/verify-code" element={<VerifyCode />} />
         <Route path="/reset-password" element={<ResetPassword />} />
-
-        {/* 新的後台路由結構，使用嵌套路由 */}
+        {/* order pages */}
         <Route
           path="/order-page"
           element={

@@ -39,3 +39,11 @@ body {
   scrollbar-width: none;
   /* Firefox */
 }
+
+/* MUI Date Picker 硬改*/
+.MuiPickersDay-root.Mui-selected {
+  background-color: #38b2ac !important;
+}
+.MuiYearCalendar-button.Mui-selected {
+  background-color: #38b2ac !important;
+}

@@ -1,4 +1,4 @@
 function TakeoutManagement() {
-  return <div>TakeoutManagement</div>;
+  return <div></div>;
 }
 export default TakeoutManagement;
