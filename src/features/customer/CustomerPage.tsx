@@ -31,7 +31,7 @@ import CheckOrdersDialog from './components/CheckReceiptDialog.tsx';
 import AddProductDialog from './components/AddProductDialog.tsx';
 import SubmitOrderDialog from './components/SubmitResultDialog.tsx';
 import TopNav from './components/TopNav.tsx';
-import Error from './components/Error.tsx';
+import Error from '../../components/Error.tsx';
 
 // Styles & Types
 import { SMainSwiper } from './style.ts';

@@ -5,11 +5,13 @@ import { useEffect } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 
 // APIs
-import { postOrder, getOrderReceipt } from '../apis/orderApi';
+import { postOrder, getOrderReceipt, getOrders } from '../apis/orderApi';
 
 // Stores
 import useCartStore from '../stores/useCartStore';
 import { useReceiptStore } from '../stores/useReceiptStore';
+import { useOrdersStore } from '../stores/useOrdersStore';
+import useAuthStore from '../stores/useAuthStore';
 
 // ===== 訂單操作相關 Hooks =====
 
@@ -28,7 +30,7 @@ export const useSubmitOrder = () => {
   });
 };
 
-// 取得訂單明細的 hook
+// 取得訂單明細的 hook(顧客)
 export const useOrderReceiptQuery = () => {
   // ===== Store Hooks =====
   const { tableToken } = useCartStore((state) => state.tableInfo);
@@ -61,6 +63,46 @@ export const useOrderReceiptQuery = () => {
   useEffect(() => {
     if (error) {
       console.error('訂單明細獲取失敗:', error.message);
+    }
+  }, [error]);
+
+  return query;
+};
+
+// 取得所有訂單的 hook
+export const useAllOrdersQuery = () => {
+  // ===== Store Hooks =====
+  const { token } = useAuthStore();
+  const { setOrders } = useOrdersStore();
+
+  // ===== API 查詢 =====
+  const query = useQuery({
+    queryKey: ['allOrders'],
+    queryFn: async () => {
+      if (!token) {
+        throw new Error('使用者 token 是必需的');
+      }
+
+      const orders = await getOrders(token);
+      return orders;
+    },
+    refetchOnWindowFocus: false, // 禁止切回頁籤時 refetch
+  });
+
+  // ===== 解構查詢結果 =====
+  const { data, isSuccess, error } = query;
+
+  // ===== Effects =====
+  useEffect(() => {
+    if (isSuccess && data) {
+      console.log('取得訂單成功:', data);
+      setOrders(data);
+    }
+  }, [isSuccess, data, setOrders]);
+
+  useEffect(() => {
+    if (error) {
+      console.error('取得訂單失敗:', error.message);
     }
   }, [error]);
 

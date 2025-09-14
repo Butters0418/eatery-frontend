@@ -1,11 +1,21 @@
 import { useState, useMemo, useEffect } from 'react';
+
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import dayjs, { Dayjs } from 'dayjs';
 import 'dayjs/locale/zh-tw';
+import OrderCard from '../components/OrderCard';
+import { BiSolidError } from 'react-icons/bi';
+import { MdErrorOutline } from 'react-icons/md';
 
+import { Orders } from '../../../types/orderType';
 import { OrderType, OrderStatus } from '../../../types/orderType';
+import Skeleton from 'react-loading-skeleton';
+import 'react-loading-skeleton/dist/skeleton.css';
+
+import { useAllOrdersQuery } from '../../../hooks/useOrderOperations';
+import { useOrdersStore } from '../../../stores/useOrdersStore';
 
 // 初始化 dayjs 中文語言包
 dayjs.locale('zh-tw');
@@ -26,28 +36,20 @@ const statusStyleMap = [
     text: '#EC9E68',
     label: '處理中',
     status: OrderStatus.PENDING,
-    type: OrderType.DINE_IN,
+    type: OrderType.ALL,
   },
   {
     bg: '#EAF8F7',
     border: '#3CAAA5',
     text: '#3CAAA5',
-    label: '未結帳',
+    label: '待結帳',
     status: OrderStatus.SERVED_UNPAID,
     type: OrderType.DINE_IN,
   },
   {
-    bg: '#F0F4F8',
-    border: '#607D8B',
-    text: '#607D8B',
-    label: '已結帳待出餐',
-    status: OrderStatus.PAID_PENDING,
-    type: OrderType.TAKEOUT,
-  },
-  {
-    bg: '#FFF2E0',
-    border: '#C97D42',
-    text: '#C97D42',
+    bg: '#e0f8ff',
+    border: '#4285c9',
+    text: '#4295c9',
     label: '待確認完成',
     status: OrderStatus.SERVED_PAID,
     type: OrderType.ALL,
@@ -77,6 +79,9 @@ function OrderManagement() {
   );
   const [datePickerValue, setDatePickerValue] = useState<Dayjs | null>(dayjs());
 
+  // 取得 訂單 api
+  const { ordersData } = useOrdersStore();
+  const { isError, isPending } = useAllOrdersQuery();
   // 根據 orderType 過濾 statusStyleMap
   const filteredStatusStyles = useMemo(() => {
     if (orderType === OrderType.ALL) {
@@ -97,6 +102,7 @@ function OrderManagement() {
       setActiveStatus(OrderStatus.ALL);
     }
   }, [filteredStatusStyles, activeStatus]);
+
   return (
     <div className="space-y-4 md:space-y-6">
       {/* header */}
@@ -106,6 +112,7 @@ function OrderManagement() {
         </h1>
         <p className="mt-1 text-sm text-gray-600 md:text-base">共 10 筆訂單</p>
       </div>
+
       {/* 分類查詢 */}
       <div className="space-y-4 rounded-xl bg-white p-2 shadow-custom md:p-4">
         <div className="space-y-4">
@@ -174,6 +181,81 @@ function OrderManagement() {
               );
             })}
           </div>
+        </div>
+      </div>
+      {/* 分隔線 */}
+      <hr className="border-t border-gray-200" />
+      {/* 訂單列表 */}
+      <div className="space-y-4">
+        <div className="md:gird-cols-2 grid grid-cols-1 gap-4 lg:grid-cols-3">
+          {/* loading 骨架 */}
+          {isPending ? (
+            [1, 2, 3].map((index) => (
+              <div
+                key={index}
+                className="relative flex flex-col gap-y-2 rounded-xl bg-white p-4 shadow-custom"
+              >
+                <div className="flex justify-between">
+                  <div className="flex items-center space-x-2">
+                    <Skeleton width={16} height={16} />
+                    <Skeleton width={120} height={16} />
+                  </div>
+                </div>
+
+                <hr className="border-gray-200" />
+
+                {/* 訂餐明細骨架 */}
+                <div className="space-y-3">
+                  <div className="rounded-xl bg-gray-100 p-4">
+                    <div className="mb-3">
+                      <Skeleton width={100} height={16} />
+                    </div>
+                    <div className="space-y-2">
+                      <div className="flex justify-between">
+                        <div className="space-y-1">
+                          <Skeleton width={120} height={12} />
+                          <Skeleton width={80} height={12} />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 總金額骨架 */}
+                <div className="flex justify-between px-3">
+                  <Skeleton width={60} height={20} />
+                </div>
+
+                <hr className="border-gray-200" />
+
+                {/* 底部操作區骨架 */}
+                <div className="mt-2 flex items-center justify-between">
+                  <div className="flex space-x-4">
+                    <Skeleton width={90} height={32} />
+                    <Skeleton width={90} height={32} className="ml-auto" />
+                  </div>
+                </div>
+              </div>
+            ))
+          ) : isError ? (
+            <div className="col-span-3 flex flex-col items-center justify-center">
+              <BiSolidError className="text-[50px] text-error md:text-[100px]" />
+              <p className="text-lg text-grey-dark md:text-2xl">
+                係統錯誤，請稍後再試 !
+              </p>
+            </div>
+          ) : !ordersData || ordersData.length === 0 ? (
+            <div className="flex items-center justify-start text-lg text-grey">
+              <MdErrorOutline />
+              <p className="ml-1">查無相關訂單 !</p>
+            </div>
+          ) : (
+            <>
+              {ordersData.map((order: Orders) => (
+                <OrderCard key={order._id} order={order} />
+              ))}
+            </>
+          )}
         </div>
       </div>
     </div>

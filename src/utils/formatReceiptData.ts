@@ -6,17 +6,15 @@ dayjs.locale('zh-tw');
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
-import { calculatePriceFromCart } from '../utils/calculateItemPrice.ts'; // 假設這個函數已經存在於 utils 中
+import { calculatePriceFromCart } from '../utils/calculateItemPrice.ts';
+import { addonsToString } from '../utils/addonsToString.ts';
 
-import {
-  OrderItem,
-  OrderGroup,
-  OrderReceipt,
-  FormattedReceipt,
-} from '../types/productType';
+import { OrderItem, OrderGroup } from '../types/productType';
+
+import { Orders, FormattedReceipt } from '../types/orderType';
 
 // 訂單明轉為前端使用資料
-export const formatReceiptData = (order: OrderReceipt): FormattedReceipt => {
+export const formatReceiptData = (order: Orders): FormattedReceipt => {
   console.log('formatReceiptData', order);
   return {
     createdAt: dayjs(order.createdAt)
@@ -24,14 +22,16 @@ export const formatReceiptData = (order: OrderReceipt): FormattedReceipt => {
       .format('YYYY年M月D日 A hh:mm'),
     orderId: order._id,
     orderType: order.orderType,
-    tableNumber: order.tableId.tableNumber,
+    ...(order.orderType === '內用' &&
+      order.tableId?.tableNumber && {
+        tableNumber: order.tableId.tableNumber,
+      }),
     totalPrice: order.totalPrice,
     orderList: order.orderList.map((group: OrderGroup) => {
       let subTotal = 0;
 
       const item = group.item.map((i: OrderItem) => {
         // 取出選擇的配料名稱
-        const selectedOptions: string[] = [];
 
         const uniPriceWithAddons = calculatePriceFromCart(i, false);
 
@@ -41,8 +41,7 @@ export const formatReceiptData = (order: OrderReceipt): FormattedReceipt => {
           name: i.name,
           uniPriceWithAddons,
           qty: i.qty,
-          addonsText:
-            selectedOptions.length > 0 ? selectedOptions.join(' / ') : null,
+          addonsText: i.addons ? addonsToString(i.addons, ' / ') : null,
           compositeId: i.compositeId ?? '',
         };
       });

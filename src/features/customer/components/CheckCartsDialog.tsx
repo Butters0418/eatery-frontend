@@ -14,9 +14,7 @@ import useCartStore from '../../../stores/useCartStore.ts';
 // Utils
 import { formatNumber } from '../../../utils/formatNumber';
 import { calculatePriceFromCart } from '../../../utils/calculateItemPrice.ts';
-
-// Types
-import { AddonGroup } from '../../../types/productType.ts';
+import { addonsToString } from '../../../utils/addonsToString.ts';
 
 // Icons
 import { HiOutlineMinusSm, HiOutlinePlusSm } from 'react-icons/hi';
@@ -36,15 +34,6 @@ interface CheckCartsDialogProps {
     } | null,
   ) => void;
 }
-
-// ===== 工具函數 =====
-// 配料取出選擇字串
-const addonsString = (addons: AddonGroup[]) => {
-  return addons
-    .map((group) => group.options.find((opt) => opt.selected)?.name)
-    .filter(Boolean)
-    .join(' / ');
-};
 
 // 購物車對話框
 function CheckCartsDialog({
@@ -149,7 +138,7 @@ function CheckCartsDialog({
                         </h3>
                         {item.addons && (
                           <p className="text-xs text-gray-400 md:text-sm">
-                            {addonsString(item.addons)}
+                            {addonsToString(item.addons, ' / ')}
                           </p>
                         )}
 

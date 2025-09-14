@@ -2,7 +2,7 @@
 import { create } from 'zustand';
 
 // Types
-import { FormattedReceipt } from '../types/productType';
+import { FormattedReceipt } from '../types/orderType';
 
 // ===== 類型定義 =====
 interface ReceiptStore {
