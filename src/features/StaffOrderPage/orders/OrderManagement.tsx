@@ -113,79 +113,162 @@ function OrderManagement() {
   const filteredOrdersData = useMemo(() => {
     if (!ordersData) return [];
 
-    return ordersData.filter((order) => {
-      // 1. 根據 orderType 篩選
-      let orderTypeMatch = true;
-      if (orderType !== OrderType.ALL) {
-        if (orderType === OrderType.DINE_IN) {
-          orderTypeMatch = order.orderType === '內用';
-        } else if (orderType === OrderType.TAKEOUT) {
-          orderTypeMatch = order.orderType === '外帶';
+    return ordersData
+      .filter((order) => {
+        // 1. 根據 orderType 篩選
+        let orderTypeMatch = true;
+        if (orderType !== OrderType.ALL) {
+          if (orderType === OrderType.DINE_IN) {
+            orderTypeMatch = order.orderType === '內用';
+          } else if (orderType === OrderType.TAKEOUT) {
+            orderTypeMatch = order.orderType === '外帶';
+          }
         }
-      }
 
-      // 2. 根據 activeStatus 篩選
-      let statusMatch = true;
-      if (activeStatus !== OrderStatus.ALL) {
-        switch (activeStatus) {
-          case OrderStatus.PENDING:
-            // 處理中：根據訂單類型有不同邏輯，且不包含已刪除
-            if (order.orderType === '內用') {
-              // 內用：未送餐且未結帳，且未被刪除
+        // 2. 根據 activeStatus 篩選
+        let statusMatch = true;
+        if (activeStatus !== OrderStatus.ALL) {
+          switch (activeStatus) {
+            case OrderStatus.PENDING:
+              // 處理中：根據訂單類型有不同邏輯，且不包含已刪除
+              if (order.orderType === '內用') {
+                // 內用：未送餐且未結帳，且未被刪除
+                statusMatch =
+                  !order.isAllServed && !order.isPaid && !order.isDeleted;
+              } else if (order.orderType === '外帶') {
+                // 外帶：未送餐但已結帳（外帶訂單成立時必須先結帳），且未被刪除
+                statusMatch =
+                  !order.isAllServed && order.isPaid && !order.isDeleted;
+              }
+              break;
+            case OrderStatus.SERVED_UNPAID:
+              // 待結帳：已送餐完畢但未結帳（僅限內用），且未被刪除
               statusMatch =
-                !order.isAllServed && !order.isPaid && !order.isDeleted;
-            } else if (order.orderType === '外帶') {
-              // 外帶：未送餐但已結帳（外帶訂單成立時必須先結帳），且未被刪除
+                order.isAllServed &&
+                !order.isPaid &&
+                order.orderType === '內用' &&
+                !order.isDeleted;
+              break;
+            case OrderStatus.SERVED_PAID:
+              // 待確認完成：已結帳已送餐，但訂單狀態不是已完成，且未被刪除
               statusMatch =
-                !order.isAllServed && order.isPaid && !order.isDeleted;
-            }
-            break;
-          case OrderStatus.SERVED_UNPAID:
-            // 待結帳：已送餐完畢但未結帳（僅限內用），且未被刪除
-            statusMatch =
-              order.isAllServed &&
-              !order.isPaid &&
-              order.orderType === '內用' &&
-              !order.isDeleted;
-            break;
-          case OrderStatus.SERVED_PAID:
-            // 待確認完成：已結帳已送餐，但訂單狀態不是已完成，且未被刪除
-            statusMatch =
-              order.isPaid &&
-              order.isAllServed &&
-              !order.isComplete &&
-              !order.isDeleted;
-            break;
-          case OrderStatus.COMPLETED:
-            // 已完成，且未被刪除
-            statusMatch = order.isComplete && !order.isDeleted;
-            break;
-          case OrderStatus.DELETED:
-            // 已刪除
-            statusMatch = order.isDeleted;
-            break;
-          default:
-            statusMatch = true;
+                order.isPaid &&
+                order.isAllServed &&
+                !order.isComplete &&
+                !order.isDeleted;
+              break;
+            case OrderStatus.COMPLETED:
+              // 已完成，且未被刪除
+              statusMatch = order.isComplete && !order.isDeleted;
+              break;
+            case OrderStatus.DELETED:
+              // 已刪除
+              statusMatch = order.isDeleted;
+              break;
+            default:
+              statusMatch = true;
+          }
+        } else {
+          // 當選擇「全部狀態」時，排除已刪除的訂單
+          statusMatch = !order.isDeleted;
         }
-      } else {
-        // 當選擇「全部狀態」時，排除已刪除的訂單
-        statusMatch = !order.isDeleted;
-      }
 
-      return orderTypeMatch && statusMatch;
-    });
+        return orderTypeMatch && statusMatch;
+      })
+      .sort((a, b) => {
+        // 按創建時間排序，時間越早的排越前面
+        const dateA = new Date(a.createdAt).getTime();
+        const dateB = new Date(b.createdAt).getTime();
+        return dateA - dateB;
+      });
   }, [ordersData, orderType, activeStatus]);
 
-  // 根據 orderType 過濾 statusStyleMap
+  // 計算各狀態的訂單數量
+  const getStatusCounts = useMemo(() => {
+    if (!ordersData) return {};
+
+    const counts: Record<string, number> = {};
+
+    // 先根據當前選擇的 orderType 過濾訂單
+    const typeFilteredOrders = ordersData.filter((order) => {
+      if (orderType === OrderType.ALL) return true;
+      if (orderType === OrderType.DINE_IN) return order.orderType === '內用';
+      if (orderType === OrderType.TAKEOUT) return order.orderType === '外帶';
+      return true;
+    });
+
+    // 計算各狀態的數量
+    typeFilteredOrders.forEach((order) => {
+      // 全部狀態（排除已刪除）
+      if (!order.isDeleted) {
+        counts[OrderStatus.ALL] = (counts[OrderStatus.ALL] || 0) + 1;
+      }
+
+      // 處理中
+      if (order.orderType === '內用') {
+        // 內用：未送餐且未結帳，且未被刪除
+        if (!order.isAllServed && !order.isPaid && !order.isDeleted) {
+          counts[OrderStatus.PENDING] = (counts[OrderStatus.PENDING] || 0) + 1;
+        }
+      } else if (order.orderType === '外帶') {
+        // 外帶：未送餐但已結帳，且未被刪除
+        if (!order.isAllServed && order.isPaid && !order.isDeleted) {
+          counts[OrderStatus.PENDING] = (counts[OrderStatus.PENDING] || 0) + 1;
+        }
+      }
+
+      // 待結帳（僅限內用）
+      if (
+        order.isAllServed &&
+        !order.isPaid &&
+        order.orderType === '內用' &&
+        !order.isDeleted
+      ) {
+        counts[OrderStatus.SERVED_UNPAID] =
+          (counts[OrderStatus.SERVED_UNPAID] || 0) + 1;
+      }
+
+      // 待確認完成
+      if (
+        order.isPaid &&
+        order.isAllServed &&
+        !order.isComplete &&
+        !order.isDeleted
+      ) {
+        counts[OrderStatus.SERVED_PAID] =
+          (counts[OrderStatus.SERVED_PAID] || 0) + 1;
+      }
+
+      // 已完成
+      if (order.isComplete && !order.isDeleted) {
+        counts[OrderStatus.COMPLETED] =
+          (counts[OrderStatus.COMPLETED] || 0) + 1;
+      }
+
+      // 已刪除
+      if (order.isDeleted) {
+        counts[OrderStatus.DELETED] = (counts[OrderStatus.DELETED] || 0) + 1;
+      }
+    });
+
+    return counts;
+  }, [ordersData, orderType]);
+
+  // 根據 orderType 過濾 statusStyleMap，並加入數量
   const filteredStatusStyles = useMemo(() => {
-    if (orderType === OrderType.ALL) {
-      return statusStyleMap;
-    } else {
-      return statusStyleMap.filter(
-        (style) => style.type === orderType || style.type === OrderType.ALL,
-      );
-    }
-  }, [orderType]);
+    const filtered =
+      orderType === OrderType.ALL
+        ? statusStyleMap
+        : statusStyleMap.filter(
+            (style) => style.type === orderType || style.type === OrderType.ALL,
+          );
+
+    // 為每個狀態添加數量資訊
+    return filtered.map((style) => ({
+      ...style,
+      count: getStatusCounts[style.status] || 0,
+    }));
+  }, [orderType, getStatusCounts]);
 
   // 若 activeStatus 不在 filteredStatusStyles 中，重設為 ALL
   useEffect(() => {
@@ -205,9 +288,9 @@ function OrderManagement() {
           <h1 className="text-2xl font-bold text-gray-900 md:text-3xl">
             訂單管理
           </h1>
-          <p className="mt-1 text-sm text-gray-600 md:text-base">
+          {/* <p className="mt-1 text-sm text-gray-600 md:text-base">
             共 10 筆訂單
-          </p>
+          </p> */}
         </div>
 
         {/* 分類查詢 */}
@@ -273,7 +356,7 @@ function OrderManagement() {
                         backgroundColor: isActive ? style.border : '#ccc',
                       }}
                     />
-                    {style.label}
+                    {style.label}({style.count})
                   </button>
                 );
               })}

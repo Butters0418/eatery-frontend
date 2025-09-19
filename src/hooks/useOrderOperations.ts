@@ -12,6 +12,9 @@ import {
   getOrders,
   deleteOrderItem,
   deleteOrder,
+  updateItemServeStatus,
+  updateOrderPaymentStatus,
+  completeOrder,
 } from '../apis/orderApi';
 
 // Stores
@@ -162,6 +165,7 @@ export const useDeleteOrderItem = () => {
     },
   });
 };
+
 // 刪除整張訂單的 hook
 export const useDeleteOrder = () => {
   // ===== Store Hooks =====
@@ -185,6 +189,156 @@ export const useDeleteOrder = () => {
       });
 
       console.log('訂單刪除成功，正在重新獲取訂單列表...');
+    },
+    onError: (err) => {
+      if (axios.isAxiosError(err)) {
+        switch (err.response?.status) {
+          case 400:
+            console.error(err.response.data.message);
+            break;
+          case 403:
+            console.error(err.response.data.message);
+            break;
+          case 404:
+            console.error(err.response.data.message);
+            break;
+          default:
+            console.error('發生錯誤，請稍後再試');
+            break;
+        }
+      } else {
+        console.error('發生錯誤，請稍後再試');
+      }
+    },
+  });
+};
+
+// 更新餐點送餐狀態的 hook
+export const useUpdateItemServeStatus = () => {
+  // ===== Store Hooks =====
+  const { token } = useAuthStore();
+  const queryClient = useQueryClient();
+
+  // ===== Mutation =====
+  return useMutation({
+    mutationFn: async (params: {
+      orderId: string;
+      itemCode: string;
+      isServed: boolean;
+    }) => {
+      if (!token) {
+        throw new Error('使用者 token 是必需的');
+      }
+      const { orderId, itemCode, isServed } = params;
+      const updateRes = await updateItemServeStatus(
+        token,
+        orderId,
+        itemCode,
+        isServed,
+      );
+      return updateRes;
+    },
+    onSuccess: () => {
+      // 更新送餐狀態後，重新獲取訂單列表
+      queryClient.invalidateQueries({
+        queryKey: ['allOrders'],
+      });
+
+      console.log('送餐狀態更新成功，正在重新獲取訂單列表...');
+    },
+    onError: (err) => {
+      if (axios.isAxiosError(err)) {
+        switch (err.response?.status) {
+          case 400:
+            console.error(err.response.data.message);
+            break;
+          case 403:
+            console.error(err.response.data.message);
+            break;
+          case 404:
+            console.error(err.response.data.message);
+            break;
+          default:
+            console.error('發生錯誤，請稍後再試');
+            break;
+        }
+      } else {
+        console.error('發生錯誤，請稍後再試');
+      }
+    },
+  });
+};
+
+// 更新訂單結帳狀態的 hook
+export const useUpdateOrderPaymentStatus = () => {
+  // ===== Store Hooks =====
+  const { token } = useAuthStore();
+  const queryClient = useQueryClient();
+
+  // ===== Mutation =====
+  return useMutation({
+    mutationFn: async (params: { orderId: string; isPaid: boolean }) => {
+      if (!token) {
+        throw new Error('使用者 token 是必需的');
+      }
+      const { orderId, isPaid } = params;
+      const updateRes = await updateOrderPaymentStatus(token, orderId, isPaid);
+      return updateRes;
+    },
+    onSuccess: () => {
+      // 更新結帳狀態後，重新獲取訂單列表
+      queryClient.invalidateQueries({
+        queryKey: ['allOrders'],
+      });
+
+      console.log('結帳狀態更新成功，正在重新獲取訂單列表...');
+    },
+    onError: (err) => {
+      if (axios.isAxiosError(err)) {
+        switch (err.response?.status) {
+          case 400:
+            console.error(err.response.data.message);
+            break;
+          case 403:
+            console.error(err.response.data.message);
+            break;
+          case 404:
+            console.error(err.response.data.message);
+            break;
+          default:
+            console.error('發生錯誤，請稍後再試');
+            break;
+        }
+      } else {
+        console.error('發生錯誤，請稍後再試');
+      }
+    },
+  });
+};
+
+// 更新訂單完成狀態的 hook
+export const useUpdateOrderCompletionStatus = () => {
+  // ===== Store Hooks =====
+  const { token } = useAuthStore();
+  const queryClient = useQueryClient();
+
+  // ===== Mutation =====
+  return useMutation({
+    mutationFn: async (params: { orderId: string }) => {
+      if (!token) {
+        throw new Error('使用者 token 是必需的');
+      }
+      const { orderId } = params;
+      const updateRes = await completeOrder(token, orderId);
+      return updateRes;
+    },
+    onSuccess: () => {
+      // 更新訂單完成狀態後，重新獲取訂單列表
+      queryClient.invalidateQueries({
+        queryKey: ['allOrders'],
+      });
+
+      console.log('訂單完成狀態更新成功，正在重新獲取訂單列表...');
     },
     onError: (err) => {
       if (axios.isAxiosError(err)) {

@@ -16,6 +16,7 @@ import { IoMdTime } from 'react-icons/io';
 import { MdEdit } from 'react-icons/md';
 import { FaTrash } from 'react-icons/fa6';
 import { BiDish } from 'react-icons/bi';
+import { FaCheck } from 'react-icons/fa';
 
 // 類型定義
 import { Orders } from '../../../types/orderType';
@@ -32,23 +33,26 @@ import OrderConfirmDialog from './OrderConfirmDialog';
 import {
   useDeleteOrderItem,
   useDeleteOrder,
+  useUpdateItemServeStatus,
+  useUpdateOrderPaymentStatus,
+  useUpdateOrderCompletionStatus,
 } from '../../../hooks/useOrderOperations';
 
 // ===== 類型定義 =====
 interface OrderCardProps {
   order: Orders;
-  onShowSnackbar: (message: string) => void; // 新增這個 prop
+  onShowSnackbar: (message: string) => void;
 }
 
 function OrderCard({ order, onShowSnackbar }: OrderCardProps) {
   // ===== 狀態管理 =====
-  const [isPaidStatus, setIsPaidStatus] = useState(order.isPaid); // 結帳狀態切換
+  // const [isPaidStatus, setIsPaidStatus] = useState(order.isPaid); // 結帳狀態切換
   const [openMenuId, setOpenMenuId] = useState<string | null>(null); // 當前開啟的選單 ID
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] =
     useState<boolean>(false); // 確認對話框開啟狀態
   const [selectedItemCode, setSelectedItemCode] = useState<string | null>(null); // 選中的子訂單
   const [confirmDialogType, setConfirmDialogType] = useState<
-    'deleteItem' | 'deleteOrder' | null
+    'deleteItem' | 'deleteOrder' | 'completeOrder' | null
   >(null); // 判斷確認對話框類型
 
   // ===== 自訂 hooks =====
@@ -58,13 +62,23 @@ function OrderCard({ order, onShowSnackbar }: OrderCardProps) {
   const { mutate: deleteOrderMutation, isPending: isDeleteOrderPending } =
     useDeleteOrder();
 
+  const { mutate: updateItemServeStatusMutation } = useUpdateItemServeStatus();
+
+  const { mutate: updateOrderPaymentStatusMutation } =
+    useUpdateOrderPaymentStatus();
+
+  const {
+    mutate: updateOrderCompletionStatusMutation,
+    isPending: isCompleteOrderPending,
+  } = useUpdateOrderCompletionStatus();
+
   // ===== 事件處理函式 =====
   // 結帳狀態切換
-  const handlePaidStatusChange = (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    setIsPaidStatus(event.target.checked);
-  };
+  // const handlePaidStatusChange = (
+  //   event: React.ChangeEvent<HTMLInputElement>,
+  // ) => {
+  //   setIsPaidStatus(event.target.checked);
+  // };
 
   // 處理(...)選單開啟/關閉傳入 itemCode
   const handleActionMenuToggle = (itemCode: string) => {
@@ -137,6 +151,51 @@ function OrderCard({ order, onShowSnackbar }: OrderCardProps) {
     );
   };
 
+  // 送餐狀態切換
+  const handleServeStatusChange = (itemCode: string, isServed: boolean) => {
+    updateItemServeStatusMutation(
+      { orderId: order._id, itemCode, isServed },
+      {
+        onSuccess: () => {
+          handleActionMenuClose();
+          console.log('更新送餐狀態成功');
+        },
+      },
+    );
+  };
+
+  // 結帳狀態更新
+  const handleUpdatePaymentStatus = (isPaid: boolean) => {
+    updateOrderPaymentStatusMutation(
+      { orderId: order._id, isPaid },
+      {
+        onSuccess: () => {
+          console.log('更新結帳狀態成功');
+        },
+      },
+    );
+  };
+
+  // 完成訂單
+  const handleCompleteOrder = () => {
+    setConfirmDialogType('completeOrder');
+    setIsConfirmDialogOpen(true);
+  };
+
+  // 確認完成訂單
+  const handleConfirmCompleteOrder = () => {
+    updateOrderCompletionStatusMutation(
+      { orderId: order._id },
+      {
+        onSuccess: () => {
+          handleConfirmDialogClose();
+          onShowSnackbar('訂單已完成！');
+          console.log('訂單已完成');
+        },
+      },
+    );
+  };
+
   // ===== 其他變數與函式 =====
   // 根據訂單類型決定圖示
   const OrderIcon =
@@ -160,6 +219,14 @@ function OrderCard({ order, onShowSnackbar }: OrderCardProps) {
       isPending: isDeleteOrderPending,
       onConfirm: handleConfirmDeleteOrder,
       snackbarMessage: '訂單已刪除！',
+    },
+    completeOrder: {
+      title: '完成訂單',
+      message: `確認要將訂單 ${order.orderCode} 設為完成嗎？`,
+      buttonText: '確定完成',
+      isPending: isCompleteOrderPending,
+      onConfirm: handleConfirmCompleteOrder,
+      snackbarMessage: '訂單已完成！',
     },
   };
 
@@ -206,7 +273,7 @@ function OrderCard({ order, onShowSnackbar }: OrderCardProps) {
 
             return (
               <div
-                className="mt-3 rounded-xl bg-grey-light p-4"
+                className={`mt-3 rounded-xl p-4 transition duration-150 ${itemList.isServed ? 'bg-secondary-light' : 'bg-grey-light'}`}
                 key={order._id + itemList.itemCode}
               >
                 {/* 單次點餐標題與操作選單 */}
@@ -251,22 +318,31 @@ function OrderCard({ order, onShowSnackbar }: OrderCardProps) {
                     }}
                   >
                     <MenuItem
-                      onClick={() => handleEditItem(itemList.itemCode || '')}
+                      onClick={() =>
+                        handleServeStatusChange(
+                          itemList.itemCode || '',
+                          !itemList.isServed,
+                        )
+                      }
                     >
                       <BiDish className="mr-3 text-grey-dark" />
-                      <p className="text-grey-dark">送餐</p>
+                      <p className="text-grey-dark">
+                        {itemList.isServed ? '取消送餐' : '確認送餐'}
+                      </p>
                     </MenuItem>
                     <MenuItem
                       onClick={() => handleEditItem(itemList.itemCode || '')}
+                      disabled={itemList.isServed}
                     >
                       <MdEdit className="mr-3 text-grey-dark" />
-                      <p className="text-grey-dark">編輯</p>
+                      <p className="text-grey-dark">編輯訂單</p>
                     </MenuItem>
                     <MenuItem
                       onClick={() => handleDeleteItem(itemList.itemCode || '')}
+                      disabled={itemList.isServed}
                     >
                       <FaTrash className="mr-3 text-error" />
-                      <p className="text-grey-dark">刪除</p>
+                      <p className="text-grey-dark">刪除訂單</p>
                     </MenuItem>
                   </Menu>
                 </h4>
@@ -323,14 +399,19 @@ function OrderCard({ order, onShowSnackbar }: OrderCardProps) {
 
           {/* 結帳狀態 */}
           <FormControlLabel
-            disabled={!order.isAllServed ? true : false}
+            disabled={
+              (!order.isAllServed ? true : false) ||
+              order.orderType === '外帶' ||
+              order.isDeleted ||
+              order.isComplete
+            }
             control={
               <Switch
-                checked={isPaidStatus}
-                onChange={handlePaidStatusChange}
+                checked={order.isPaid}
+                onChange={() => handleUpdatePaymentStatus(!order.isPaid)}
               />
             }
-            label={isPaidStatus ? '已結帳' : '待結帳'}
+            label={order.isPaid ? '已結帳' : '待結帳'}
           />
 
           {/* 完成訂單按鈕 */}
@@ -343,8 +424,17 @@ function OrderCard({ order, onShowSnackbar }: OrderCardProps) {
               order.isPaid === false ||
               order.isAllServed === false
             }
+            onClick={handleCompleteOrder}
           >
-            完成訂單
+            {}
+            {order.isComplete ? (
+              <>
+                <FaCheck className="mr-1" />
+                訂單已完成
+              </>
+            ) : (
+              '完成訂單'
+            )}
           </Button>
         </div>
       </div>

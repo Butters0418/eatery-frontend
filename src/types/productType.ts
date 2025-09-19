@@ -47,6 +47,7 @@ export interface OrderPayload {
 export interface OrderGroup {
   itemCode?: string; // 由 api 回傳生成
   item: OrderItem[];
+  isServed?: boolean; // 是否已出餐
 }
 
 // 購物車中的訂單資料 - 單次點餐商品
