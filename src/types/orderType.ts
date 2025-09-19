@@ -5,12 +5,12 @@ export enum OrderType {
 }
 
 export enum OrderStatus {
-  ALL = 'all', // 所有狀態
+  ALL = 'all', // 所有狀態 (內用/外帶)
   PENDING = 'pending', // 處理中 (內用:未結帳未出餐 ; 外帶 : 已結帳待出餐)
   SERVED_UNPAID = 'servedUnpaid', // 待結帳 (內用:已出餐未結帳)
   SERVED_PAID = 'servedPaid', // 待確認完成 (內用/外帶)
-  COMPLETED = 'completed', // 已完成
-  DELETED = 'deleted', // 已刪除
+  COMPLETED = 'completed', // 已完成 (內用/外帶)
+  DELETED = 'deleted', // 已刪除 (內用/外帶)
 }
 
 // 需要從 productType 引入的相關介面
@@ -27,6 +27,8 @@ export interface Orders {
   createdAt: string;
   isAllServed: boolean;
   isPaid: boolean;
+  isComplete: boolean;
+  isDeleted: boolean;
 }
 
 // 訂單查詢 api 回傳資料 - 格式化後前端使用

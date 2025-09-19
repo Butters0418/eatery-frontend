@@ -18,11 +18,49 @@ export const getOrderReceipt = async (tableToken: string) => {
 };
 
 // get all orders  api
-export const getOrders = async (token: string) => {
-  const res = await axios.get(apiUrl, {
+export const getOrders = async (token: string, date?: string) => {
+  let url = apiUrl;
+
+  // 如果有日期參數，添加到 query string
+  if (date) {
+    url += `?date=${date}`;
+  }
+  const res = await axios.get(url, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
   });
+  return res.data;
+};
+
+// delete order api
+export const deleteOrder = async (token: string, orderId: string) => {
+  const res = await axios.patch(
+    `${apiUrl}/${orderId}/delete`,
+    {}, // request body
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  );
+  return res.data;
+};
+
+// delete single item from order api
+export const deleteOrderItem = async (
+  token: string,
+  orderId: string,
+  itemCode: string,
+) => {
+  const res = await axios.patch(
+    `${apiUrl}/${orderId}/item/${itemCode}/delete`,
+    {}, // request body
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  );
   return res.data;
 };

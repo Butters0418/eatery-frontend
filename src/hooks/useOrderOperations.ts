@@ -2,10 +2,17 @@
 import { useEffect } from 'react';
 
 // 第三方庫
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import axios from 'axios';
 
 // APIs
-import { postOrder, getOrderReceipt, getOrders } from '../apis/orderApi';
+import {
+  postOrder,
+  getOrderReceipt,
+  getOrders,
+  deleteOrderItem,
+  deleteOrder,
+} from '../apis/orderApi';
 
 // Stores
 import useCartStore from '../stores/useCartStore';
@@ -70,20 +77,20 @@ export const useOrderReceiptQuery = () => {
 };
 
 // 取得所有訂單的 hook
-export const useAllOrdersQuery = () => {
+export const useAllOrdersQuery = (selectedDate?: string) => {
   // ===== Store Hooks =====
   const { token } = useAuthStore();
   const { setOrders } = useOrdersStore();
 
   // ===== API 查詢 =====
   const query = useQuery({
-    queryKey: ['allOrders'],
+    queryKey: ['allOrders', selectedDate],
     queryFn: async () => {
       if (!token) {
         throw new Error('使用者 token 是必需的');
       }
 
-      const orders = await getOrders(token);
+      const orders = await getOrders(token, selectedDate);
       return orders;
     },
     refetchOnWindowFocus: false, // 禁止切回頁籤時 refetch
@@ -107,4 +114,97 @@ export const useAllOrdersQuery = () => {
   }, [error]);
 
   return query;
+};
+
+// 刪除單一餐點的 hook
+export const useDeleteOrderItem = () => {
+  // ===== Store Hooks =====
+  const { token } = useAuthStore();
+  const queryClient = useQueryClient();
+
+  // ===== Mutation =====
+  return useMutation({
+    mutationFn: async (params: { orderId: string; itemCode: string }) => {
+      if (!token) {
+        throw new Error('使用者 token 是必需的');
+      }
+      const { orderId, itemCode } = params;
+      const deleteRes = await deleteOrderItem(token, orderId, itemCode);
+      return deleteRes;
+    },
+    onSuccess: () => {
+      // 刪除整張訂單後，重新獲取訂單列表
+      queryClient.invalidateQueries({
+        queryKey: ['allOrders'],
+      });
+
+      console.log('訂單刪除成功，正在重新獲取訂單列表...');
+    },
+    onError: (err) => {
+      if (axios.isAxiosError(err)) {
+        switch (err.response?.status) {
+          case 400:
+            console.error(err.response.data.message);
+            break;
+          case 403:
+            console.error(err.response.data.message);
+            break;
+          case 404:
+            console.error(err.response.data.message);
+            break;
+          default:
+            console.error('發生錯誤，請稍後再試');
+            break;
+        }
+      } else {
+        console.error('發生錯誤，請稍後再試');
+      }
+    },
+  });
+};
+// 刪除整張訂單的 hook
+export const useDeleteOrder = () => {
+  // ===== Store Hooks =====
+  const { token } = useAuthStore();
+  const queryClient = useQueryClient();
+
+  // ===== Mutation =====
+  return useMutation({
+    mutationFn: async (params: { orderId: string }) => {
+      if (!token) {
+        throw new Error('使用者 token 是必需的');
+      }
+      const { orderId } = params;
+      const deleteRes = await deleteOrder(token, orderId);
+      return deleteRes;
+    },
+    onSuccess: () => {
+      // 刪除整張訂單後，重新獲取訂單列表
+      queryClient.invalidateQueries({
+        queryKey: ['allOrders'],
+      });
+
+      console.log('訂單刪除成功，正在重新獲取訂單列表...');
+    },
+    onError: (err) => {
+      if (axios.isAxiosError(err)) {
+        switch (err.response?.status) {
+          case 400:
+            console.error(err.response.data.message);
+            break;
+          case 403:
+            console.error(err.response.data.message);
+            break;
+          case 404:
+            console.error(err.response.data.message);
+            break;
+          default:
+            console.error('發生錯誤，請稍後再試');
+            break;
+        }
+      } else {
+        console.error('發生錯誤，請稍後再試');
+      }
+    },
+  });
 };
