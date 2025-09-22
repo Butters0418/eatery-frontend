@@ -82,6 +82,7 @@ function OrderManagement() {
   const [datePickerValue, setDatePickerValue] = useState<Dayjs | null>(dayjs());
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [now, setNow] = useState(dayjs());
 
   // 將日期轉換為 API 需要的格式
   const selectedDate = datePickerValue
@@ -270,6 +271,40 @@ function OrderManagement() {
     }));
   }, [orderType, getStatusCounts]);
 
+  // 計算等待時間的函數
+  const calculateWaiting = (createdAt: string) => {
+    const orderTime = dayjs(createdAt);
+    const diffInMinutes = now.diff(orderTime, 'minute');
+
+    if (diffInMinutes < 60) {
+      return {
+        diffInText: diffInMinutes > 0 ? `${diffInMinutes} 分鐘` : '剛剛',
+        diffInMinutes: diffInMinutes,
+      };
+    } else {
+      const hours = Math.floor(diffInMinutes / 60);
+      const minutes = diffInMinutes % 60;
+      return {
+        diffInText:
+          minutes > 0 ? `${hours} 小時 ${minutes} 分鐘` : `${hours} 小時`,
+        diffInMinutes: diffInMinutes,
+      };
+    }
+  };
+
+  // 判斷是否為處理中的訂單
+  const isPendingOrder = (order: Orders) => {
+    if (order.isDeleted || order.isComplete) return false;
+
+    if (order.orderType === '內用') {
+      return !order.isAllServed && !order.isPaid;
+    } else if (order.orderType === '外帶') {
+      return !order.isAllServed && order.isPaid;
+    }
+
+    return false;
+  };
+
   // 若 activeStatus 不在 filteredStatusStyles 中，重設為 ALL
   useEffect(() => {
     if (
@@ -280,6 +315,12 @@ function OrderManagement() {
     }
   }, [filteredStatusStyles, activeStatus]);
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setNow(dayjs());
+    }, 60000);
+    return () => clearInterval(interval);
+  }, []);
   return (
     <>
       <div className="space-y-4 md:space-y-6">
@@ -431,13 +472,19 @@ function OrderManagement() {
               </div>
             ) : (
               <>
-                {filteredOrdersData.map((order: Orders) => (
-                  <OrderCard
-                    key={order._id}
-                    order={order}
-                    onShowSnackbar={handleShowSnackbar}
-                  />
-                ))}
+                {filteredOrdersData.map((order: Orders) => {
+                  const waitingTimeObj = isPendingOrder(order)
+                    ? calculateWaiting(order.createdAt)
+                    : null;
+                  return (
+                    <OrderCard
+                      key={order._id}
+                      order={order}
+                      onShowSnackbar={handleShowSnackbar}
+                      waitingTimeObj={waitingTimeObj}
+                    />
+                  );
+                })}
               </>
             )}
           </div>

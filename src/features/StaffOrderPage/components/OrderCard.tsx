@@ -42,9 +42,10 @@ import {
 interface OrderCardProps {
   order: Orders;
   onShowSnackbar: (message: string) => void;
+  waitingTimeObj?: { diffInText: string; diffInMinutes: number } | null;
 }
 
-function OrderCard({ order, onShowSnackbar }: OrderCardProps) {
+function OrderCard({ order, onShowSnackbar, waitingTimeObj }: OrderCardProps) {
   // ===== 狀態管理 =====
   // const [isPaidStatus, setIsPaidStatus] = useState(order.isPaid); // 結帳狀態切換
   const [openMenuId, setOpenMenuId] = useState<string | null>(null); // 當前開啟的選單 ID
@@ -258,10 +259,15 @@ function OrderCard({ order, onShowSnackbar }: OrderCardProps) {
             {isDineIn && ` (${order?.tableId?.tableNumber} 桌) `}:{' '}
             {order.orderCode}
           </p>
-          <p className="mr-3 flex items-center text-grey">
-            <IoMdTime className="mr-1.5" />
-            15 分鐘
-          </p>
+
+          {waitingTimeObj && (
+            <p
+              className={`mr-3 flex items-center ${waitingTimeObj.diffInMinutes >= 30 ? 'text-error' : 'text-grey'}`}
+            >
+              <IoMdTime className="mr-1.5" />
+              {waitingTimeObj.diffInText}
+            </p>
+          )}
         </h3>
 
         <hr />
@@ -389,7 +395,7 @@ function OrderCard({ order, onShowSnackbar }: OrderCardProps) {
         <hr />
 
         {/* 操作控制區 */}
-        <div className="mt-2 flex items-center">
+        <div className="mt-auto flex items-center">
           {/* 送餐狀態 */}
           <FormControlLabel
             disabled
