@@ -41,7 +41,7 @@ function VerifyCode() {
     if (role === 'admin') {
       navigate('/admin');
     } else if (role === 'staff') {
-      navigate('/internal-dashboard');
+      navigate('/order-page');
     } else if (!account) {
       navigate('/forgot-password', { replace: true });
     }

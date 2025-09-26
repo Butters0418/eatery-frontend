@@ -67,10 +67,10 @@ export const useCheckMeQuery = () => {
     refetchInterval: 12 * 60 * 60 * 1000, // 12小時自動重新查詢一次
     refetchIntervalInBackground: true, // 視窗不在焦點也觸發
     staleTime: 12 * 60 * 60 * 1000,
+    retry: false,
   });
 
   const { data, isSuccess, error } = query;
-
   // success
   useEffect(() => {
     if (isSuccess && data) {
@@ -82,7 +82,6 @@ export const useCheckMeQuery = () => {
   // error
   useEffect(() => {
     if (error) {
-      console.error('token 驗証失敗:', error.message);
       setLogout();
     }
   }, [error, setLogout]);

@@ -1,9 +1,8 @@
 import { Product } from '../types/productType';
-import { v4 as uuidv4 } from 'uuid';
 
 export const menuData: Product[] = [
   {
-    productId: '687217ff5f3ae3892f5d82cd',
+    _id: '6877539be77f9e8571d63a05',
     name: '牛肉麵',
     description: '濃郁紅燒湯頭，搭配軟嫩牛肉與彈牙麵條！',
     price: 140,
@@ -46,7 +45,7 @@ export const menuData: Product[] = [
     ],
   },
   {
-    productId: uuidv4(),
+    _id: '687753c9e77f9e8571d63a07',
     name: '餛飩麵',
     description: '皮薄餡多的餛飩，搭配Q彈細麵，清爽不油膩。',
     price: 70,
@@ -89,7 +88,7 @@ export const menuData: Product[] = [
     ],
   },
   {
-    productId: uuidv4(),
+    _id: '687753dae77f9e8571d63a09',
     name: '乾意麵',
     description: '香肉燥拌勻手工意麵。',
     price: 55,
@@ -131,9 +130,8 @@ export const menuData: Product[] = [
       },
     ],
   },
-
   {
-    productId: uuidv4(),
+    _id: '687753e6e77f9e8571d63a0b',
     name: '水餃 (10顆)',
     description: '手工豬肉高麗菜水餃。',
     price: 60,
@@ -145,7 +143,7 @@ export const menuData: Product[] = [
     addons: null,
   },
   {
-    productId: uuidv4(),
+    _id: '687753f1e77f9e8571d63a0d',
     name: '高麗菜',
     description: '-',
     price: 35,
@@ -157,7 +155,7 @@ export const menuData: Product[] = [
     addons: null,
   },
   {
-    productId: uuidv4(),
+    _id: '687753fce77f9e8571d63a0f',
     name: '魯蛋 (1顆)',
     description: '-',
     price: 15,
@@ -169,7 +167,7 @@ export const menuData: Product[] = [
     addons: null,
   },
   {
-    productId: uuidv4(),
+    _id: '68775405e77f9e8571d63a11',
     name: '豆干 (3份)',
     description: '-',
     price: 30,
@@ -181,7 +179,7 @@ export const menuData: Product[] = [
     addons: null,
   },
   {
-    productId: uuidv4(),
+    _id: '6877540ee77f9e8571d63a13',
     name: '海帶',
     description: '-',
     price: 20,
@@ -193,7 +191,7 @@ export const menuData: Product[] = [
     addons: null,
   },
   {
-    productId: uuidv4(),
+    _id: '68775418e77f9e8571d63a15',
     name: '地瓜葉',
     description: '-',
     price: 35,
@@ -205,19 +203,7 @@ export const menuData: Product[] = [
     addons: null,
   },
   {
-    productId: uuidv4(),
-    name: '豬耳朵',
-    description: '-',
-    price: 35,
-    category: '滷味',
-    imageUrl:
-      'https://storage.googleapis.com/eatery-mvp.firebasestorage.app/products/1752647766187-pig-ear.png',
-    isAvailable: true,
-    isPopular: false,
-    addons: null,
-  },
-  {
-    productId: '68721c30fa9e459299e4fe89',
+    _id: '68775423e77f9e8571d63a17',
     name: '蛋花湯',
     description: '金黃蛋絲搭配清爽湯頭。',
     price: 30,
@@ -229,7 +215,7 @@ export const menuData: Product[] = [
     addons: null,
   },
   {
-    productId: uuidv4(),
+    _id: '6877542fe77f9e8571d63a19',
     name: '貢丸湯',
     description: 'Q 彈扎實的手工貢丸，湯頭清甜回甘。',
     price: 35,
@@ -241,7 +227,7 @@ export const menuData: Product[] = [
     addons: null,
   },
   {
-    productId: uuidv4(),
+    _id: '68775439e77f9e8571d63a1b',
     name: '古早味紅茶',
     description: '古早味紅茶香濃甘醇，微甜不膩。',
     price: 20,
@@ -284,7 +270,7 @@ export const menuData: Product[] = [
     ],
   },
   {
-    productId: uuidv4(),
+    _id: '68775442e77f9e8571d63a1d',
     name: '冬瓜茶',
     description: '清涼解渴的冬瓜茶，甘甜順口。',
     price: 25,

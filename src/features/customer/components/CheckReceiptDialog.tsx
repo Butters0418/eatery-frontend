@@ -9,7 +9,7 @@ import { useReceiptStore } from '../../../stores/useReceiptStore.ts';
 import { formatNumber } from '../../../utils/formatNumber';
 
 // Types
-import { FormattedOrderGroup } from '../../../types/productType.ts';
+import { FormattedOrderGroup } from '../../../types/orderType.ts';
 
 // ===== 類型定義 =====
 interface CheckReceiptDialogProps {
@@ -80,9 +80,10 @@ function CheckReceiptDialog({
                             <span className="text-grey-dark">{item.name}</span>
                             <span className="text-grey"> x {item.qty}</span>
                             {item.addonsText && (
-                              <p className="text-xs text-grey">
-                                {item.addonsText}
-                              </p>
+                              <span className="text-xs text-grey">
+                                {' '}
+                                ({item.addonsText})
+                              </span>
                             )}
                           </div>
                           <span className="text-grey-dark">

@@ -11,7 +11,7 @@ interface FormValue {
   [key: string]: string | number;
 }
 
-// 用戶表單中的商品價格計算
+// 用戶表單中的商品價格計算 (價格+配料) x 數量
 export const calculatePriceFromForm = (
   item: Product,
   formValues: FormValue,

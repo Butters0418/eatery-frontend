@@ -33,9 +33,9 @@ function ForgotPassword() {
   // 判斷是否已經登入
   useEffect(() => {
     if (role === 'admin') {
-      navigate('/admin');
+      navigate('/order-page'); // 暫時合為一個頁面
     } else if (role === 'staff') {
-      navigate('/internal-dashboard');
+      navigate('/order-page');
     }
   }, [role, navigate]);
 

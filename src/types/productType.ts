@@ -42,10 +42,12 @@ export interface OrderPayload {
   tableToken: string | null;
   orderList: OrderGroup[];
 }
+
 // 購物車中的訂單資料 - 單次點餐
 export interface OrderGroup {
   itemCode?: string; // 由 api 回傳生成
   item: OrderItem[];
+  isServed?: boolean; // 是否已出餐
 }
 
 // 購物車中的訂單資料 - 單次點餐商品
@@ -54,44 +56,6 @@ export interface OrderItem {
   name: string;
   price: number;
   qty: number;
-  compositeId: string | null;
+  compositeId?: string | null;
   addons: AddonGroup[] | null;
-}
-
-// 訂單查詢 api 回傳資料
-export interface OrderReceipt {
-  _id: string;
-  orderType: string;
-  orderCode: string;
-  tableId: { _id: string; tableNumber: number };
-  orderList: OrderGroup[];
-  totalPrice: number;
-  createdAt: string;
-}
-
-// 訂單查詢 api 回傳資料 - 格式化後前端使用
-export interface FormattedReceipt {
-  createdAt: string;
-  orderId: string;
-  orderType: string;
-  tableNumber: number;
-  totalPrice: number;
-  orderList: FormattedOrderGroup[];
-}
-
-// 訂單查詢 api 回傳資料 - 格式化後前端使用 - 單次點餐
-export interface FormattedOrderGroup {
-  itemCode: string;
-  item: FormattedOrderItem[];
-  subTotal: number;
-}
-
-// 訂單查詢 api 回傳資料 - 商品
-export interface FormattedOrderItem {
-  productId: string;
-  name: string;
-  uniPriceWithAddons: number;
-  qty: number;
-  addonsText: string | null;
-  compositeId: string;
 }
