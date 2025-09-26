@@ -15,6 +15,7 @@ import {
   updateItemServeStatus,
   updateOrderPaymentStatus,
   completeOrder,
+  updateOrderItem,
 } from '../apis/orderApi';
 
 // Stores
@@ -22,6 +23,9 @@ import useCartStore from '../stores/useCartStore';
 import { useReceiptStore } from '../stores/useReceiptStore';
 import { useOrdersStore } from '../stores/useOrdersStore';
 import useAuthStore from '../stores/useAuthStore';
+
+// Types
+import { OrderItem } from '../types/productType';
 
 // ===== 訂單操作相關 Hooks =====
 
@@ -339,6 +343,62 @@ export const useUpdateOrderCompletionStatus = () => {
       });
 
       console.log('訂單完成狀態更新成功，正在重新獲取訂單列表...');
+    },
+    onError: (err) => {
+      if (axios.isAxiosError(err)) {
+        switch (err.response?.status) {
+          case 400:
+            console.error(err.response.data.message);
+            break;
+          case 403:
+            console.error(err.response.data.message);
+            break;
+          case 404:
+            console.error(err.response.data.message);
+            break;
+          default:
+            console.error('發生錯誤，請稍後再試');
+            break;
+        }
+      } else {
+        console.error('發生錯誤，請稍後再試');
+      }
+    },
+  });
+};
+
+// 編輯子訂單項目的 hook
+export const useUpdateOrderItem = () => {
+  // ===== Store Hooks =====
+  const { token } = useAuthStore();
+  const queryClient = useQueryClient();
+
+  // ===== Mutation =====
+  return useMutation({
+    mutationFn: async (params: {
+      orderId: string;
+      itemCode: string;
+      updatedItems: OrderItem[];
+    }) => {
+      if (!token) {
+        throw new Error('使用者 token 是必需的');
+      }
+      const { orderId, updatedItems, itemCode } = params;
+      const updateRes = await updateOrderItem(
+        token,
+        orderId,
+        itemCode,
+        updatedItems,
+      );
+      return updateRes;
+    },
+    onSuccess: () => {
+      // 更新子訂單內容後，重新獲取訂單列表
+      queryClient.invalidateQueries({
+        queryKey: ['allOrders'],
+      });
+
+      console.log('子訂單內容更新成功，正在重新獲取訂單列表...');
     },
     onError: (err) => {
       if (axios.isAxiosError(err)) {

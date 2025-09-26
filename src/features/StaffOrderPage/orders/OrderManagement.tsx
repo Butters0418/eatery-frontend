@@ -3,6 +3,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { useMediaQuery } from '@mui/material';
 import dayjs, { Dayjs } from 'dayjs';
 import 'dayjs/locale/zh-tw';
 import OrderCard from '../components/OrderCard';
@@ -83,6 +84,7 @@ function OrderManagement() {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [now, setNow] = useState(dayjs());
+  const isLargeScreen = useMediaQuery('(min-width: 1536px)');
 
   // 將日期轉換為 API 需要的格式
   const selectedDate = datePickerValue
@@ -323,24 +325,21 @@ function OrderManagement() {
   }, []);
   return (
     <>
-      <div className="space-y-4 md:space-y-6">
+      <div className="space-y-4 2xl:space-y-6">
         {/* header */}
-        <div className="flex flex-col space-y-4 md:space-y-2">
-          <h1 className="text-2xl font-bold text-gray-900 md:text-3xl">
+        <div className="flex flex-col space-y-2 2xl:space-y-2">
+          <h1 className="text-xl font-bold text-gray-900 2xl:text-3xl">
             訂單管理
           </h1>
-          {/* <p className="mt-1 text-sm text-gray-600 md:text-base">
-            共 10 筆訂單
-          </p> */}
         </div>
 
         {/* 分類查詢 */}
-        <div className="space-y-4 rounded-xl bg-white p-2 shadow-custom md:p-4">
-          <div className="space-y-4">
-            <label className="mb-2 block text-sm font-medium text-gray-700">
+        <div className="space-y-3 rounded-xl bg-white p-3 shadow-custom 2xl:space-y-4 2xl:p-4">
+          <div className="space-y-2 2xl:space-y-4">
+            <label className="block text-sm font-medium text-gray-700 2xl:mb-2">
               訂單類型 {orderType}
             </label>
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-3 2xl:space-x-4">
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <DatePicker
                   // readOnly
@@ -348,11 +347,14 @@ function OrderManagement() {
                   value={datePickerValue}
                   onChange={(newValue) => setDatePickerValue(newValue)}
                   slotProps={{
-                    textField: { color: 'secondary' },
+                    textField: {
+                      color: 'secondary',
+                      size: isLargeScreen ? 'medium' : 'small',
+                    },
                   }}
                 />
               </LocalizationProvider>
-              <div className="flex w-fit rounded-xl bg-gray-100 p-1 md:p-1.5">
+              <div className="flex w-fit rounded-xl bg-gray-100 p-1 2xl:p-1.5">
                 {[
                   { key: 'all', label: '全部' },
                   { key: 'dineIn', label: '內用' },
@@ -360,7 +362,7 @@ function OrderManagement() {
                 ].map((item) => (
                   <button
                     key={item.key}
-                    className={`min-h-[44px] touch-manipulation rounded-lg px-4 py-2 text-sm font-medium md:px-6 md:py-2.5 md:text-base ${orderType === item.key && 'bg-white text-secondary shadow-custom'}`}
+                    className={`touch-manipulation rounded-lg px-4 py-2 text-sm font-medium 2xl:min-h-[44px] 2xl:px-6 2xl:py-2.5 2xl:text-base ${orderType === item.key && 'bg-white text-secondary shadow-custom'}`}
                     type="button"
                     onClick={() => setOrderType(item.key as OrderType)}
                   >
@@ -371,11 +373,11 @@ function OrderManagement() {
             </div>
           </div>
 
-          <div className="space-y-4">
-            <label className="mb-2 block text-sm font-medium text-gray-700">
+          <div className="space-y-2 2xl:space-y-4">
+            <label className="block text-sm font-medium text-gray-700">
               訂單分類
             </label>
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-3 2xl:space-x-4">
               {filteredStatusStyles.map((style) => {
                 const isActive = activeStatus === style.status;
                 return (
@@ -383,7 +385,7 @@ function OrderManagement() {
                     key={style.status}
                     type="button"
                     onClick={() => setActiveStatus(style.status)}
-                    className="text-md flex items-center gap-2 rounded-lg border px-3 py-1.5 font-medium"
+                    className="flex items-center gap-2 rounded-lg border px-3 py-1.5 text-sm font-medium 2xl:text-base"
                     style={{
                       backgroundColor: isActive ? style.bg : '#ffffff',
                       borderColor: isActive ? style.border : '#ccc',
@@ -404,11 +406,13 @@ function OrderManagement() {
             </div>
           </div>
         </div>
+
         {/* 分隔線 */}
         <hr className="border-t border-gray-200" />
+
         {/* 訂單列表 */}
         <div className="space-y-4">
-          <div className="md:gird-cols-2 grid grid-cols-1 gap-4 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-3">
             {/* loading 骨架 */}
             {isPending ? (
               [1, 2, 3].map((index) => (
@@ -460,8 +464,8 @@ function OrderManagement() {
               ))
             ) : isError ? (
               <div className="col-span-3 flex flex-col items-center justify-center">
-                <BiSolidError className="text-[50px] text-error md:text-[100px]" />
-                <p className="text-lg text-grey-dark md:text-2xl">
+                <BiSolidError className="text-[50px] text-error 2xl:text-[100px]" />
+                <p className="text-lg text-grey-dark 2xl:text-2xl">
                   係統錯誤，請稍後再試 !
                 </p>
               </div>

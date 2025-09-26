@@ -12,7 +12,7 @@ function StaffOrderLayout() {
         <SideBar />
         {/* 主內容區 */}
         <main className="flex-1 transition-all duration-300 ease-in-out">
-          <div className="p-4 md:p-6 lg:p-8">
+          <div className="p-4 md:p-6 2xl:p-8">
             <Outlet />
           </div>
         </main>

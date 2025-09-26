@@ -7,6 +7,7 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import Button from '@mui/material/Button';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
+import { useMediaQuery } from '@mui/material';
 
 // 第三方庫 - React Icons
 import { PiBowlFoodFill } from 'react-icons/pi';
@@ -20,6 +21,7 @@ import { FaCheck } from 'react-icons/fa';
 
 // 類型定義
 import { Orders } from '../../../types/orderType';
+import { OrderGroup } from '../../../types/productType';
 
 // 工具函式
 import { formatNumber } from '../../../utils/formatNumber';
@@ -28,6 +30,7 @@ import { addonsToString } from '../../../utils/addonsToString';
 
 // Component
 import OrderConfirmDialog from './OrderConfirmDialog';
+import EditOrderItemDialog from './EditOrderItemDialog';
 
 // 自訂 hooks
 import {
@@ -47,7 +50,6 @@ interface OrderCardProps {
 
 function OrderCard({ order, onShowSnackbar, waitingTimeObj }: OrderCardProps) {
   // ===== 狀態管理 =====
-  // const [isPaidStatus, setIsPaidStatus] = useState(order.isPaid); // 結帳狀態切換
   const [openMenuId, setOpenMenuId] = useState<string | null>(null); // 當前開啟的選單 ID
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] =
     useState<boolean>(false); // 確認對話框開啟狀態
@@ -55,6 +57,13 @@ function OrderCard({ order, onShowSnackbar, waitingTimeObj }: OrderCardProps) {
   const [confirmDialogType, setConfirmDialogType] = useState<
     'deleteItem' | 'deleteOrder' | 'completeOrder' | null
   >(null); // 判斷確認對話框類型
+
+  // 新增編輯對話框狀態
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [selectedItemList, setSelectedItemList] = useState<OrderGroup | null>(
+    null,
+  );
+  const isLargeScreen = useMediaQuery('(min-width: 1536px)');
 
   // ===== 自訂 hooks =====
   const { mutate: deleteOrderItemMutation, isPending: isDeleteItemPending } =
@@ -74,12 +83,6 @@ function OrderCard({ order, onShowSnackbar, waitingTimeObj }: OrderCardProps) {
   } = useUpdateOrderCompletionStatus();
 
   // ===== 事件處理函式 =====
-  // 結帳狀態切換
-  // const handlePaidStatusChange = (
-  //   event: React.ChangeEvent<HTMLInputElement>,
-  // ) => {
-  //   setIsPaidStatus(event.target.checked);
-  // };
 
   // 處理(...)選單開啟/關閉傳入 itemCode
   const handleActionMenuToggle = (itemCode: string) => {
@@ -102,10 +105,23 @@ function OrderCard({ order, onShowSnackbar, waitingTimeObj }: OrderCardProps) {
 
   // 處理編輯項目
   const handleEditItem = (itemCode: string) => {
-    setSelectedItemCode(itemCode);
+    const itemList = order.orderList.find((item) => item.itemCode === itemCode);
+    if (itemList) {
+      setSelectedItemList(itemList);
+      setIsEditDialogOpen(true);
+    }
     handleActionMenuClose();
-    // TODO: 實作編輯邏輯
-    console.log('編輯項目:', itemCode);
+  };
+
+  // 關閉編輯對話框
+  const handleEditDialogClose = () => {
+    setIsEditDialogOpen(false);
+    setSelectedItemList(null);
+  };
+
+  // 編輯成功
+  const handleEditSuccess = (message: string) => {
+    onShowSnackbar(message);
   };
 
   // 刪除子訂單
@@ -238,7 +254,7 @@ function OrderCard({ order, onShowSnackbar, waitingTimeObj }: OrderCardProps) {
   return (
     <>
       <div
-        className={`relative flex flex-col gap-y-2 rounded-xl bg-white p-4 shadow-custom ${
+        className={`relative flex flex-col gap-y-2 rounded-xl bg-white p-3 shadow-custom 2xl:p-4 ${
           !order.isDeleted && !order.isComplete ? '' : 'pointer-events-none'
         } `}
       >
@@ -247,12 +263,12 @@ function OrderCard({ order, onShowSnackbar, waitingTimeObj }: OrderCardProps) {
             className="absolute -right-2.5 -top-2.5 overflow-hidden rounded-full shadow-custom"
             onClick={handleDeleteOrder}
           >
-            <IoCloseSharp className="bg-white p-1.5 text-4xl text-error-light" />
+            <IoCloseSharp className="bg-white p-1.5 text-3xl text-error-light 2xl:text-4xl" />
           </button>
         )}
 
         {/* 訂單標題 */}
-        <h3 className="flex justify-between">
+        <h3 className="flex justify-between text-base">
           <p className="flex items-center font-bold">
             <OrderIcon className="mr-1.5" />
             {order.orderType}
@@ -262,7 +278,7 @@ function OrderCard({ order, onShowSnackbar, waitingTimeObj }: OrderCardProps) {
 
           {waitingTimeObj && (
             <p
-              className={`mr-3 flex items-center ${waitingTimeObj.diffInMinutes >= 30 ? 'text-error' : 'text-grey'}`}
+              className={`mr-2 flex items-center 2xl:mr-3 ${waitingTimeObj.diffInMinutes >= 30 ? 'text-error' : 'text-grey'}`}
             >
               <IoMdTime className="mr-1.5" />
               {waitingTimeObj.diffInText}
@@ -279,11 +295,11 @@ function OrderCard({ order, onShowSnackbar, waitingTimeObj }: OrderCardProps) {
 
             return (
               <div
-                className={`mt-3 rounded-xl p-4 transition duration-150 ${itemList.isServed ? 'bg-secondary-light' : 'bg-grey-light'}`}
+                className={`mt-2 rounded-xl p-3 transition duration-150 2xl:mt-3 2xl:p-4 ${itemList.isServed ? 'bg-secondary-light' : 'bg-grey-light'}`}
                 key={order._id + itemList.itemCode}
               >
                 {/* 單次點餐標題與操作選單 */}
-                <h4 className="mb-3 flex items-center justify-between font-bold text-grey-dark">
+                <h4 className="mb-2 flex h-7 items-center justify-between font-bold text-grey-dark 2xl:mb-3">
                   <p>訂單 #{itemList.itemCode}</p>
 
                   {/* 操作選單按鈕 */}
@@ -384,7 +400,7 @@ function OrderCard({ order, onShowSnackbar, waitingTimeObj }: OrderCardProps) {
         </div>
 
         {/* 總金額 */}
-        <h3 className="flex justify-between px-3 text-lg font-bold md:text-xl">
+        <h3 className="flex justify-between px-2 text-lg font-bold 2xl:px-3 2xl:text-xl">
           <span>總金額 :</span>
           <span>
             <small>$</small>
@@ -395,12 +411,17 @@ function OrderCard({ order, onShowSnackbar, waitingTimeObj }: OrderCardProps) {
         <hr />
 
         {/* 操作控制區 */}
-        <div className="mt-auto flex items-center">
+        <div className="mt-auto flex items-center px-1 py-1">
           {/* 送餐狀態 */}
           <FormControlLabel
             disabled
-            control={<Switch checked={order.isAllServed} />}
-            label={order.isAllServed ? '送餐完畢' : '待送餐'}
+            control={
+              <Switch
+                checked={order.isAllServed}
+                size={isLargeScreen ? 'medium' : 'small'}
+              />
+            }
+            label={order.isAllServed ? '已送餐' : '待送餐'}
           />
 
           {/* 結帳狀態 */}
@@ -415,6 +436,7 @@ function OrderCard({ order, onShowSnackbar, waitingTimeObj }: OrderCardProps) {
               <Switch
                 checked={order.isPaid}
                 onChange={() => handleUpdatePaymentStatus(!order.isPaid)}
+                size={isLargeScreen ? 'medium' : 'small'}
               />
             }
             label={order.isPaid ? '已結帳' : '待結帳'}
@@ -432,14 +454,13 @@ function OrderCard({ order, onShowSnackbar, waitingTimeObj }: OrderCardProps) {
             }
             onClick={handleCompleteOrder}
           >
-            {}
             {order.isComplete ? (
-              <>
+              <p className="flex items-center justify-center text-sm 2xl:text-base">
                 <FaCheck className="mr-1" />
                 訂單已完成
-              </>
+              </p>
             ) : (
-              '完成訂單'
+              <p className="text-sm 2xl:text-base">完成訂單</p>
             )}
           </Button>
         </div>
@@ -454,6 +475,16 @@ function OrderCard({ order, onShowSnackbar, waitingTimeObj }: OrderCardProps) {
         onClose={handleConfirmDialogClose}
         isPending={currentDialogConfig?.isPending || false}
         onConfirm={currentDialogConfig?.onConfirm || (() => {})}
+      />
+
+      {/* 編輯訂單對話框 */}
+      <EditOrderItemDialog
+        open={isEditDialogOpen}
+        orderId={order._id}
+        itemList={selectedItemList}
+        onClose={handleEditDialogClose}
+        onShowSnackbar={onShowSnackbar}
+        onSuccess={handleEditSuccess}
       />
     </>
   );

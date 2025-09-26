@@ -2,6 +2,7 @@ import axios from 'axios';
 import { API } from '../constants/api';
 import { OrderPayload } from '../types/productType';
 import { formatReceiptData } from '../utils/formatReceiptData';
+import { OrderItem } from '../types/productType';
 const apiUrl = API.orders;
 
 // 新增訂單 (顧客)
@@ -115,4 +116,24 @@ export const completeOrder = async (token: string, orderId: string) => {
   );
   return res.data;
 };
-// 取消完成訂單
+
+// 編輯子訂單內容
+export const updateOrderItem = async (
+  token: string,
+  orderId: string,
+  itemCode: string,
+  updatedItem: OrderItem[],
+) => {
+  const res = await axios.patch(
+    `${apiUrl}/${orderId}/item/${itemCode}`,
+    {
+      item: updatedItem,
+    }, // request body
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  );
+  return res.data;
+};

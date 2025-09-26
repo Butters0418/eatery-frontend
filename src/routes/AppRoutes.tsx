@@ -6,6 +6,7 @@ import ForgotPassword from '../features/auth/ForgotPassword';
 import VerifyCode from '../features/auth/VerifyCode';
 import ResetPassword from '../features/auth/ResetPassword';
 
+import NotFound from '../features/notfound/NotFound';
 // Dashboard components
 import AuthGuard from '../components/AuthGuard';
 import StaffOrderLayout from '../features/StaffOrderPage/StaffOrderLayout';
@@ -37,6 +38,8 @@ export default function AppRoutes() {
           <Route path="dine-in" element={<DineInManagement />} />
           <Route path="takeout" element={<TakeoutManagement />} />
         </Route>
+        {/* 404 錯誤頁面 - 必須放在最後 */}
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
   );

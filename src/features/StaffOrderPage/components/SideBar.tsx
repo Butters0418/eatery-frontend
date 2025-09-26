@@ -46,12 +46,12 @@ function SideBar() {
   ];
 
   return (
-    <aside className="w-64 border-r border-gray-200 bg-white shadow-custom md:w-72">
-      <div className="sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto md:top-20 md:h-[calc(100vh-5rem)]">
-        <nav className="p-4 md:p-6">
+    <aside className="w-52 border-r border-gray-200 bg-white shadow-custom 2xl:w-72">
+      <div className="sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto 2xl:top-20 2xl:h-[calc(100vh-5rem)]">
+        <nav className="p-4 2xl:p-6">
           {/* header */}
-          <div className="mb-6 md:mb-8">
-            <h2 className="mb-2 text-lg font-semibold text-grey-dark md:text-xl">
+          <div className="mb-6 2xl:mb-8">
+            <h2 className="mb-2 text-lg font-semibold text-grey-dark 2xl:text-xl">
               功能選單
             </h2>
             <div className="h-0.5 w-12 rounded-full bg-gradient-to-r from-primary-light to-primary" />
@@ -67,7 +67,7 @@ function SideBar() {
                 <li key={item.index}>
                   <button
                     onClick={() => handleListItemClick(item.index, item.path)}
-                    className={`flex min-h-[44px] w-full touch-manipulation items-center gap-3 rounded-2xl border px-4 py-3 text-left md:min-h-[48px] md:py-4 ${
+                    className={`flex min-h-[44px] w-full touch-manipulation items-center gap-3 rounded-2xl border px-4 py-3 text-left 2xl:min-h-[48px] 2xl:py-4 ${
                       isActive
                         ? 'border-primary-light bg-gradient-to-r from-primary/10 to-primary-light/10 text-primary-dark shadow-custom'
                         : 'border-opacity-0 text-grey-dark hover:bg-grey-light hover:text-grey-dark'
@@ -80,9 +80,9 @@ function SideBar() {
                           : 'bg-grey-light text-grey'
                       } `}
                     >
-                      <IconComponent className="h-4 w-4 md:h-5 md:w-5" />
+                      <IconComponent className="h-4 w-4 2xl:h-5 2xl:w-5" />
                     </div>
-                    <span className="text-sm font-medium md:text-base">
+                    <span className="text-sm font-medium 2xl:text-base">
                       {item.label}
                     </span>
                     {isActive && (
