@@ -39,7 +39,7 @@ function VerifyCode() {
   // 判斷是否已經登入
   useEffect(() => {
     if (role === 'admin') {
-      navigate('/admin');
+      navigate('/order-page');
     } else if (role === 'staff') {
       navigate('/order-page');
     } else if (!account) {

@@ -12,7 +12,7 @@ const useRedirectIfLoggedIn = () => {
 
     const navigateByRole = (role: string) => {
       if (role === 'admin') {
-        navigate('/admin', { replace: true });
+        navigate('/order-page', { replace: true });
       } else if (role === 'staff') {
         navigate('/order-page', { replace: true });
       }
