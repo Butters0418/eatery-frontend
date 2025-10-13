@@ -38,6 +38,7 @@ export const useSubmitOrder = () => {
   return useMutation({
     mutationFn: async () => {
       const payload = buildOrderPayload();
+      console.log(payload);
       const postRes = await postOrder(payload);
       return postRes;
     },

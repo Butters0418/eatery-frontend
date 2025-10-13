@@ -9,6 +9,7 @@ import { fetchProducts } from '../apis/productApi';
 
 // Stores
 import { useProductStore } from '../stores/useProductStore';
+import useAuthStore from '../stores/useAuthStore';
 
 // Types
 import { Product } from '../types/productType';
@@ -17,11 +18,15 @@ import { Product } from '../types/productType';
 export const useProductQuery = () => {
   // ===== Store Hooks =====
   const setProducts = useProductStore((state) => state.setProducts);
+  const { token, role } = useAuthStore();
 
   // ===== API 查詢 =====
   const query = useQuery<Product[], Error>({
     queryKey: ['products'],
-    queryFn: fetchProducts,
+    queryFn: () => {
+      const shouldUseToken = role === 'staff' || role === 'admin';
+      return fetchProducts(shouldUseToken ? token || undefined : undefined);
+    },
   });
 
   // ===== 解構查詢結果 =====

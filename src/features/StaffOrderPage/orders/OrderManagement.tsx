@@ -19,7 +19,7 @@ import { FaRegCheckCircle } from 'react-icons/fa';
 
 import { useAllOrdersQuery } from '../../../hooks/useOrderOperations';
 import { useOrdersStore } from '../../../stores/useOrdersStore';
-
+import useAuthStore from '../../../stores/useAuthStore';
 // 初始化 dayjs 中文語言包
 dayjs.locale('zh-tw');
 
@@ -84,6 +84,7 @@ function OrderManagement() {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [now, setNow] = useState(dayjs());
+  const role = useAuthStore((state) => state.role);
   const isLargeScreen = useMediaQuery('(min-width: 1536px)');
 
   // 將日期轉換為 API 需要的格式
@@ -342,7 +343,7 @@ function OrderManagement() {
             <div className="flex items-center space-x-3 2xl:space-x-4">
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <DatePicker
-                  // readOnly
+                  readOnly={role !== 'admin'}
                   // label="選擇日期"
                   value={datePickerValue}
                   onChange={(newValue) => setDatePickerValue(newValue)}

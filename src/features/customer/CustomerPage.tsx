@@ -29,7 +29,7 @@ import CartButtonGroup from './components/CartButtonGroup.tsx';
 import CheckCartsDialog from './components/CheckCartsDialog.tsx';
 import CheckOrdersDialog from './components/CheckReceiptDialog.tsx';
 import AddProductDialog from './components/AddProductDialog.tsx';
-import SubmitOrderDialog from './components/SubmitResultDialog.tsx';
+import SubmitResultDialog from './components/SubmitResultDialog.tsx';
 import TopNav from './components/TopNav.tsx';
 import Error from '../../components/Error.tsx';
 
@@ -431,7 +431,7 @@ function CustomerPage() {
         />
       )}
 
-      <SubmitOrderDialog
+      <SubmitResultDialog
         isSubmitResultOpen={isSubmitResultOpen}
         submitResult={submitResult}
         setIsSubmitResultOpen={setIsSubmitResultOpen}

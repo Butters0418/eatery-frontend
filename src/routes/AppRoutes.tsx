@@ -9,14 +9,14 @@ import ResetPassword from '../features/auth/ResetPassword';
 import NotFound from '../features/notfound/NotFound';
 // Dashboard components
 import ProtectedRoute from '../components/ProtectedRoute';
-import StaffOrderLayout from '../features/StaffOrderPage/StaffOrderLayout';
-import OrderManagement from '../features/StaffOrderPage/orders/OrderManagement';
-import OrderCreationManagement from '../features/StaffOrderPage/orderCreation/OrderCreationManagement';
-import TableStatusManagement from '../features/StaffOrderPage/tablesStatus/TableStatusManagement';
+import StaffOrderLayout from '../features/staffOrderPage/StaffOrderLayout';
+import OrderManagement from '../features/staffOrderPage/orders/OrderManagement';
+import OrderCreationManagement from '../features/staffOrderPage/orderCreation/OrderCreationManagement';
+import TableStatusManagement from '../features/staffOrderPage/tablesStatus/TableStatusManagement';
 // Admin components
-import MenuManagement from '../features/StaffOrderPage/admin/MenuManagement';
-import TableSettingsManagement from '../features/StaffOrderPage/admin/TableSettingsManagement';
-import AccountManagement from '../features/StaffOrderPage/admin/AccountManagement';
+import MenuManagement from '../features/staffOrderPage/admin/MenuManagement';
+import TableSettingsManagement from '../features/staffOrderPage/admin/TableSettingsManagement';
+import AccountManagement from '../features/staffOrderPage/admin/AccountManagement';
 
 export default function AppRoutes() {
   return (
