@@ -6,10 +6,10 @@ import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
 
 // Hooks
-import { useProductQuery } from '../../../hooks/useProductQuery';
+import { useProductQuery } from '../../../hooks/useProductOperations';
 
 // Utils
-import useWindowScroll from '../../../utils/useWindowScroll';
+import useWindowScroll from '../../../hooks/useWindowScroll';
 
 // 頂部導航組件 (手機版置頂滑動錨點)
 function TopNav() {

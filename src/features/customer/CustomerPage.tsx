@@ -13,7 +13,7 @@ import 'react-loading-skeleton/dist/skeleton.css';
 import Button from '@mui/material/Button';
 
 // Hooks
-import { useProductQuery } from '../../hooks/useProductQuery.ts';
+import { useProductQuery } from '../../hooks/useProductOperations';
 import { useOrderReceiptQuery } from '../../hooks/useOrderOperations.ts';
 
 // Stores

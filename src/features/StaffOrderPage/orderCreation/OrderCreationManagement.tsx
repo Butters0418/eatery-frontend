@@ -17,9 +17,9 @@ import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
 
 // Hooks
-import { useProductQuery } from '../../../hooks/useProductQuery';
+import { useProductQuery } from '../../../hooks/useProductOperations';
 import { useSubmitOrder } from '../../../hooks/useOrderOperations';
-import { useTableQuery } from '../../../hooks/useTableQuery';
+import { useTableQuery } from '../../../hooks/useTableOperations';
 
 // Stores
 import useProductStore from '../../../stores/useProductStore';

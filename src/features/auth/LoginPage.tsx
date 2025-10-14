@@ -7,7 +7,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import useAuthStore from '../../stores/useAuthStore';
 import { loginSchema } from './loginSchema';
 import { useLoginMutation } from '../../hooks/useUserOperations';
-import useClearErrorMessage from '../../hooks/useClearAuthErrorMessage';
+import useClearErrorMessage from '../../hooks/useAuthError';
 
 // Material UI 元件
 import Box from '@mui/material/Box';
