@@ -8,7 +8,7 @@ import useAuthStore from '../../stores/useAuthStore';
 import { forgotPasswordSchema } from './loginSchema';
 import ConfirmDialog from './ConfirmDialog';
 import { useResendVerificationCodeMutation } from '../../hooks/useUserOperations';
-import useClearErrorMessage from '../../hooks/useClearAuthErrorMessage';
+import useClearErrorMessage from '../../hooks/useAuthError';
 
 // Material UI 元件
 import Box from '@mui/material/Box';

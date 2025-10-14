@@ -7,7 +7,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import useAuthStore from '../../stores/useAuthStore';
 import { loginSchema } from './loginSchema';
 import { useLoginMutation } from '../../hooks/useUserOperations';
-import useClearErrorMessage from '../../hooks/useClearAuthErrorMessage';
+import useClearErrorMessage from '../../hooks/useAuthError';
 
 // Material UI 元件
 import Box from '@mui/material/Box';
@@ -19,21 +19,21 @@ import TextField from '@mui/material/TextField';
 import { LoginInfo } from '../../types/userType';
 
 function LoginPage() {
-  const { errorMessage, role } = useAuthStore();
+  const { errorMessage, role, token } = useAuthStore();
   const navigate = useNavigate();
   const { mutate: login, isPending } = useLoginMutation();
 
   // 清空錯誤訊息
   useClearErrorMessage();
 
-  // 判斷是否已經登入
+  // 判斷是否已經登入 - 只有在有 token 的情況下才重導向
   useEffect(() => {
-    if (role === 'admin') {
-      navigate('/admin');
-    } else if (role === 'staff') {
+    if (token && role === 'admin') {
+      navigate('/order-page');
+    } else if (token && role === 'staff') {
       navigate('/order-page');
     }
-  }, [role, navigate]);
+  }, [role, token, navigate]);
 
   // react-hooks-form 設定
   const {
@@ -54,7 +54,7 @@ function LoginPage() {
       onSuccess: () => {
         const currentRole = useAuthStore.getState().role;
         if (currentRole === 'admin') {
-          navigate('/admin');
+          navigate('/order-page');
         } else if (currentRole === 'staff') {
           navigate('/order-page');
         }

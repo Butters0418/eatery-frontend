@@ -13,7 +13,7 @@ interface ReceiptStore {
 }
 
 // 訂單明細狀態管理 Store
-export const useReceiptStore = create<ReceiptStore>((set) => ({
+const useReceiptStore = create<ReceiptStore>((set) => ({
   // ===== State =====
   receipt: null,
   isReceiptOpen: false,
@@ -22,3 +22,5 @@ export const useReceiptStore = create<ReceiptStore>((set) => ({
   setIsReceiptOpen: (open) => set({ isReceiptOpen: open }),
   setReceipt: (receipt: FormattedReceipt) => set({ receipt }),
 }));
+
+export default useReceiptStore;

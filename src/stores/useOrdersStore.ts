@@ -11,10 +11,12 @@ interface OrdersStore {
 }
 
 // 訂單狀態管理 Store
-export const useOrdersStore = create<OrdersStore>((set) => ({
+const useOrdersStore = create<OrdersStore>((set) => ({
   // ===== State =====
   ordersData: null,
 
   // ===== Actions =====
   setOrders: (orders: Orders[]) => set({ ordersData: orders }),
 }));
+
+export default useOrdersStore;

@@ -5,9 +5,17 @@ import { formatReceiptData } from '../utils/formatReceiptData';
 import { OrderItem } from '../types/productType';
 const apiUrl = API.orders;
 
-// 新增訂單 (顧客)
-export const postOrder = async (payload: OrderPayload) => {
-  const res = await axios.post(apiUrl, payload);
+// 新增訂單 (顧客/員工)
+export const postOrder = async (payload: OrderPayload, token?: string) => {
+  const config = token
+    ? {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    : {};
+
+  const res = await axios.post(apiUrl, payload, config);
   return res.data;
 };
 

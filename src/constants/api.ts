@@ -8,7 +8,7 @@ export const API = {
   verifyResetCode: `${BASE_API_URL}/api/verify-reset-code`, // admin 輸入驗証碼 API
   resendVerifyCode: `${BASE_API_URL}/api/resend-verification-code`, // 重寄驗証碼 API
   resetPassword: `${BASE_API_URL}/api/reset-password`, // 重設密碼 API
-
+  tables: `${BASE_API_URL}/api/tables`, // 桌號 API
   products: `${BASE_API_URL}/api/products`, // 商品 API
   orders: `${BASE_API_URL}/api/orders`, // 訂單 API
 };

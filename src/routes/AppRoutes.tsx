@@ -8,11 +8,15 @@ import ResetPassword from '../features/auth/ResetPassword';
 
 import NotFound from '../features/notfound/NotFound';
 // Dashboard components
-import AuthGuard from '../components/AuthGuard';
-import StaffOrderLayout from '../features/StaffOrderPage/StaffOrderLayout';
-import DineInManagement from '../features/StaffOrderPage/dineIn/DineInManagement';
-import OrderManagement from '../features/StaffOrderPage/orders/OrderManagement';
-import TakeoutManagement from '../features/StaffOrderPage/takeout/TakeoutManagement';
+import ProtectedRoute from '../components/ProtectedRoute';
+import StaffOrderLayout from '../features/staffOrderPage/StaffOrderLayout';
+import OrderManagement from '../features/staffOrderPage/orders/OrderManagement';
+import OrderCreationManagement from '../features/staffOrderPage/orderCreation/OrderCreationManagement';
+import TableStatusManagement from '../features/staffOrderPage/tablesStatus/TableStatusManagement';
+// Admin components
+import MenuManagement from '../features/staffOrderPage/admin/MenuManagement';
+import TableSettingsManagement from '../features/staffOrderPage/admin/TableSettingsManagement';
+import AccountManagement from '../features/staffOrderPage/admin/AccountManagement';
 
 export default function AppRoutes() {
   return (
@@ -28,15 +32,42 @@ export default function AppRoutes() {
         <Route
           path="/order-page"
           element={
-            <AuthGuard>
+            <ProtectedRoute>
               <StaffOrderLayout />
-            </AuthGuard>
+            </ProtectedRoute>
           }
         >
           <Route index element={<OrderManagement />} />
-          <Route path="orders" element={<OrderManagement />} />
-          <Route path="dine-in" element={<DineInManagement />} />
-          <Route path="takeout" element={<TakeoutManagement />} />
+          <Route path="order-creation" element={<OrderCreationManagement />} />
+          <Route path="tables-status" element={<TableStatusManagement />} />
+
+          {/* 限 Admin  */}
+          <Route path="admin">
+            <Route
+              path="menu"
+              element={
+                <ProtectedRoute requireAdmin>
+                  <MenuManagement />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="table-settings"
+              element={
+                <ProtectedRoute requireAdmin>
+                  <TableSettingsManagement />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="accounts"
+              element={
+                <ProtectedRoute requireAdmin>
+                  <AccountManagement />
+                </ProtectedRoute>
+              }
+            />
+          </Route>
         </Route>
         {/* 404 錯誤頁面 - 必須放在最後 */}
         <Route path="*" element={<NotFound />} />

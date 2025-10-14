@@ -346,7 +346,7 @@ function EditOrderItemDialog({
               fullWidth
               disabled={isUpdateOrderPending || isDeleteOrderItemPending}
             >
-              {isUpdateOrderPending || isUpdateOrderPending ? (
+              {isUpdateOrderPending || isDeleteOrderItemPending ? (
                 <Box sx={{ display: 'flex' }}>
                   <CircularProgress size="28px" color="inherit" />
                 </Box>

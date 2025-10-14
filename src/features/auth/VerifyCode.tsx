@@ -11,7 +11,7 @@ import {
   useResendVerificationCodeMutation,
   useVerifyCodeMutation,
 } from '../../hooks/useUserOperations';
-import useClearErrorMessage from '../../hooks/useClearAuthErrorMessage';
+import useClearErrorMessage from '../../hooks/useAuthError';
 
 // Material UI 元件
 import Box from '@mui/material/Box';
@@ -39,7 +39,7 @@ function VerifyCode() {
   // 判斷是否已經登入
   useEffect(() => {
     if (role === 'admin') {
-      navigate('/admin');
+      navigate('/order-page');
     } else if (role === 'staff') {
       navigate('/order-page');
     } else if (!account) {

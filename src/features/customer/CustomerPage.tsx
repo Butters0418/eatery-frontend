@@ -13,13 +13,13 @@ import 'react-loading-skeleton/dist/skeleton.css';
 import Button from '@mui/material/Button';
 
 // Hooks
-import { useProductQuery } from '../../hooks/useProductQuery.ts';
+import { useProductQuery } from '../../hooks/useProductOperations';
 import { useOrderReceiptQuery } from '../../hooks/useOrderOperations.ts';
 
 // Stores
 import useCartStore from '../../stores/useCartStore.ts';
-import { useProductStore } from '../../stores/useProductStore.ts';
-import { useReceiptStore } from '../../stores/useReceiptStore.ts';
+import useProductStore from '../../stores/useProductStore.ts';
+import useReceiptStore from '../../stores/useReceiptStore.ts';
 
 // Utils
 import { formatNumber } from '../../utils/formatNumber.ts';
@@ -29,7 +29,7 @@ import CartButtonGroup from './components/CartButtonGroup.tsx';
 import CheckCartsDialog from './components/CheckCartsDialog.tsx';
 import CheckOrdersDialog from './components/CheckReceiptDialog.tsx';
 import AddProductDialog from './components/AddProductDialog.tsx';
-import SubmitOrderDialog from './components/SubmitResultDialog.tsx';
+import SubmitResultDialog from './components/SubmitResultDialog.tsx';
 import TopNav from './components/TopNav.tsx';
 import Error from '../../components/Error.tsx';
 
@@ -431,7 +431,7 @@ function CustomerPage() {
         />
       )}
 
-      <SubmitOrderDialog
+      <SubmitResultDialog
         isSubmitResultOpen={isSubmitResultOpen}
         submitResult={submitResult}
         setIsSubmitResultOpen={setIsSubmitResultOpen}
