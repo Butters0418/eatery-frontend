@@ -13,7 +13,6 @@ export const fetchProducts = async (token?: string): Promise<Product[]> => {
         },
       }
     : {};
-  console.log(config);
   const response = await axios.get(apiUrl, config);
   return response.data.map(({ _id: productId, ...rest }: Product) => ({
     productId,

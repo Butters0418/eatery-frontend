@@ -91,7 +91,6 @@ function OrderCreationManagement() {
     message: string;
   } | null>(null);
 
-  console.log(tables);
   // ===== 響應式 =====
   const isLargeScreen = useMediaQuery('(min-width: 1536px)');
 
