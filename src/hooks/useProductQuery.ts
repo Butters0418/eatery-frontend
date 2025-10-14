@@ -8,7 +8,7 @@ import { useQuery } from '@tanstack/react-query';
 import { fetchProducts } from '../apis/productApi';
 
 // Stores
-import { useProductStore } from '../stores/useProductStore';
+import useProductStore from '../stores/useProductStore';
 import useAuthStore from '../stores/useAuthStore';
 
 // Types

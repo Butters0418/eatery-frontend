@@ -20,8 +20,8 @@ import {
 
 // Stores
 import useCartStore from '../stores/useCartStore';
-import { useReceiptStore } from '../stores/useReceiptStore';
-import { useOrdersStore } from '../stores/useOrdersStore';
+import useReceiptStore from '../stores/useReceiptStore';
+import useOrdersStore from '../stores/useOrdersStore';
 import useAuthStore from '../stores/useAuthStore';
 
 // Types
@@ -33,12 +33,22 @@ import { OrderItem } from '../types/productType';
 export const useSubmitOrder = () => {
   // ===== Store Hooks =====
   const { buildOrderPayload } = useCartStore();
+  const { token, role } = useAuthStore();
 
   // ===== Mutation =====
   return useMutation({
     mutationFn: async () => {
       const payload = buildOrderPayload();
-      console.log(payload);
+      const shouldUseToken = role === 'staff' || role === 'admin';
+      // 如果是員工或管理者，帶上 token
+      if (shouldUseToken && !token) {
+        throw new Error('使用者 token 是必需的');
+      }
+      if (shouldUseToken && token) {
+        const postRes = await postOrder(payload, token);
+        return postRes;
+      }
+      // 如果是顧客，不帶 token
       const postRes = await postOrder(payload);
       return postRes;
     },
@@ -101,7 +111,10 @@ export const useAllOrdersQuery = (selectedDate?: string) => {
       const orders = await getOrders(token, selectedDate);
       return orders;
     },
-    refetchOnWindowFocus: false, // 禁止切回頁籤時 refetch
+    // 暫時移除 refetchOnWindowFocus: false，讓 React Query 可以自動同步
+    // refetchOnWindowFocus: false,
+    staleTime: 5 * 1000, // 5 秒內認為資料是新的，減少請求
+    // refetchInterval: 60 * 1000, // 每60秒自動重新取得
   });
 
   // ===== 解構查詢結果 =====

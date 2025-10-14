@@ -17,13 +17,20 @@ interface TableInfo {
   tableToken: string | null;
 }
 
+enum OrderType {
+  DINE_IN = 'dineIn',
+  TAKEOUT = 'takeout',
+}
+
 // 定義購物車狀態類型
 interface AddToCartStore {
+  orderType: OrderType;
   tableInfo: TableInfo;
   cart: ProductWithQty[];
   isCartOpen: boolean;
   setIsCartOpen: (open: boolean) => void;
   setTable: (tableInfo: TableInfo) => void;
+  setOrderType: (orderType: OrderType) => void;
   getTotalPrice: () => number;
   addToCart: (product: ProductWithCompositeId, num: number) => void;
   removeFromCart: (productId: string) => void;
@@ -34,6 +41,7 @@ interface AddToCartStore {
 // 購物車狀態管理 Store
 const useCartStore = create<AddToCartStore>((set, get) => ({
   // ===== State =====
+  orderType: OrderType.DINE_IN,
   cart: [],
   tableInfo: {
     tableId: null,
@@ -47,6 +55,9 @@ const useCartStore = create<AddToCartStore>((set, get) => ({
 
   // 設定桌號 & 桌號 Token
   setTable: (tableInfo) => set({ tableInfo }),
+
+  // 設定訂單類型
+  setOrderType: (orderType: OrderType) => set({ orderType }),
 
   // 計算總金額的方法
   getTotalPrice: () => {
@@ -108,11 +119,13 @@ const useCartStore = create<AddToCartStore>((set, get) => ({
 
   // 組出 submit 訂單的 payload
   buildOrderPayload: () => {
-    const { cart, tableInfo } = get();
+    const { cart, tableInfo, orderType } = get();
     return {
-      orderType: '內用',
-      tableId: tableInfo.tableId,
-      tableToken: tableInfo.tableToken,
+      orderType: orderType === 'dineIn' ? '內用' : '外帶',
+      ...(orderType === OrderType.DINE_IN && {
+        tableId: tableInfo.tableId as string | null,
+        tableToken: tableInfo.tableToken as string | null,
+      }),
       orderList: [
         {
           item: cart.map(

@@ -38,8 +38,8 @@ export interface ProductWithQty extends ProductWithCompositeId {
 // 購物車中的訂單資料
 export interface OrderPayload {
   orderType: '內用' | '外帶';
-  tableId: string | null;
-  tableToken: string | null;
+  tableId?: string | null;
+  tableToken?: string | null;
   orderList: OrderGroup[];
 }
 

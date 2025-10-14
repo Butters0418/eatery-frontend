@@ -1,25 +1,35 @@
+// React 相關
 import { useState, useMemo, useEffect } from 'react';
 
+// 第三方庫
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { useMediaQuery } from '@mui/material';
 import dayjs, { Dayjs } from 'dayjs';
 import 'dayjs/locale/zh-tw';
-import OrderCard from '../components/OrderCard';
-import { BiSolidError } from 'react-icons/bi';
-import { MdErrorOutline } from 'react-icons/md';
-
-import { Orders } from '../../../types/orderType';
-import { OrderType, OrderStatus } from '../../../types/orderType';
 import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
 import Snackbar, { SnackbarCloseReason } from '@mui/material/Snackbar';
-import { FaRegCheckCircle } from 'react-icons/fa';
 
+// Hooks
 import { useAllOrdersQuery } from '../../../hooks/useOrderOperations';
-import { useOrdersStore } from '../../../stores/useOrdersStore';
+
+// Stores
+import useOrdersStore from '../../../stores/useOrdersStore';
 import useAuthStore from '../../../stores/useAuthStore';
+
+// Components
+import OrderCard from '../components/OrderCard';
+
+// Types
+import { Orders } from '../../../types/orderType';
+import { OrderType, OrderStatus } from '../../../types/orderType';
+
+// Icons
+import { BiSolidError } from 'react-icons/bi';
+import { MdErrorOutline } from 'react-icons/md';
+import { FaRegCheckCircle } from 'react-icons/fa';
 // 初始化 dayjs 中文語言包
 dayjs.locale('zh-tw');
 
@@ -75,7 +85,13 @@ const statusStyleMap = [
   },
 ];
 
+// 訂單管理頁
 function OrderManagement() {
+  // ===== Store Hooks =====
+  const { ordersData } = useOrdersStore();
+  const role = useAuthStore((state) => state.role);
+
+  // ===== 狀態管理 =====
   const [orderType, setOrderType] = useState<OrderType>(OrderType.ALL);
   const [activeStatus, setActiveStatus] = useState<OrderStatus>(
     OrderStatus.ALL,
@@ -84,18 +100,20 @@ function OrderManagement() {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [now, setNow] = useState(dayjs());
-  const role = useAuthStore((state) => state.role);
+
+  // ===== 響應式 =====
   const isLargeScreen = useMediaQuery('(min-width: 1536px)');
 
+  // ===== 數據處理 =====
   // 將日期轉換為 API 需要的格式
   const selectedDate = datePickerValue
     ? datePickerValue.format('YYYY-MM-DD')
     : undefined;
 
-  // 取得 訂單 api
-  const { ordersData } = useOrdersStore();
+  // ===== API 相關 Hooks =====
   const { isError, isPending } = useAllOrdersQuery(selectedDate);
 
+  // ===== 事件處理函數 =====
   // 顯示 Snackbar 並設定訊息
   const handleShowSnackbar = (message: string) => {
     setSnackbarMessage(message);
@@ -104,7 +122,7 @@ function OrderManagement() {
 
   // 關閉 Snackbar
   const handleSnackbarClose = (
-    event: React.SyntheticEvent | Event,
+    _event: React.SyntheticEvent | Event,
     reason?: SnackbarCloseReason,
   ) => {
     if (reason === 'clickaway') {
@@ -113,6 +131,7 @@ function OrderManagement() {
     setSnackbarOpen(false);
   };
 
+  // ===== 數據處理與計算 =====
   // 根據 orderType 和 activeStatus 過濾訂單
   const filteredOrdersData = useMemo(() => {
     if (!ordersData) return [];
@@ -308,6 +327,7 @@ function OrderManagement() {
     return false;
   };
 
+  // ===== Effects =====
   // 若 activeStatus 不在 filteredStatusStyles 中，重設為 ALL
   useEffect(() => {
     if (
@@ -318,12 +338,15 @@ function OrderManagement() {
     }
   }, [filteredStatusStyles, activeStatus]);
 
+  // 每分鐘更新當前時間
   useEffect(() => {
     const interval = setInterval(() => {
       setNow(dayjs());
     }, 60000);
     return () => clearInterval(interval);
   }, []);
+
+  // ===== 渲染 UI =====
   return (
     <>
       <div className="space-y-4 2xl:space-y-6">

@@ -4,7 +4,7 @@ import { API } from '../constants/api';
 
 const apiUrl = API.products;
 
-// get products api
+// 取得所有商品資料 api
 export const fetchProducts = async (token?: string): Promise<Product[]> => {
   const config = token
     ? {

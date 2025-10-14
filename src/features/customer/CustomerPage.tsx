@@ -18,8 +18,8 @@ import { useOrderReceiptQuery } from '../../hooks/useOrderOperations.ts';
 
 // Stores
 import useCartStore from '../../stores/useCartStore.ts';
-import { useProductStore } from '../../stores/useProductStore.ts';
-import { useReceiptStore } from '../../stores/useReceiptStore.ts';
+import useProductStore from '../../stores/useProductStore.ts';
+import useReceiptStore from '../../stores/useReceiptStore.ts';
 
 // Utils
 import { formatNumber } from '../../utils/formatNumber.ts';

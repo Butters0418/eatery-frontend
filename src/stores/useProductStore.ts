@@ -11,10 +11,12 @@ interface ProductStore {
 }
 
 // 商品狀態管理 Store
-export const useProductStore = create<ProductStore>((set) => ({
+const useProductStore = create<ProductStore>((set) => ({
   // ===== State =====
   products: null,
 
   // ===== Actions =====
   setProducts: (products: Product[]) => set({ products }),
 }));
+
+export default useProductStore;

@@ -3,7 +3,7 @@ import Dialog from '@mui/material/Dialog';
 import Button from '@mui/material/Button';
 
 // Stores
-import { useReceiptStore } from '../../../stores/useReceiptStore.ts';
+import useReceiptStore from '../../../stores/useReceiptStore.ts';
 
 // Utils
 import { formatNumber } from '../../../utils/formatNumber';

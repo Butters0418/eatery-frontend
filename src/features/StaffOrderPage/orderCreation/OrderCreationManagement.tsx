@@ -19,10 +19,12 @@ import 'react-loading-skeleton/dist/skeleton.css';
 // Hooks
 import { useProductQuery } from '../../../hooks/useProductQuery';
 import { useSubmitOrder } from '../../../hooks/useOrderOperations';
+import { useTableQuery } from '../../../hooks/useTableQuery';
 
 // Stores
-import { useProductStore } from '../../../stores/useProductStore';
+import useProductStore from '../../../stores/useProductStore';
 import useCartStore from '../../../stores/useCartStore';
+import useTableStore from '../../../stores/useTableStore';
 
 // Utils
 import { formatNumber } from '../../../utils/formatNumber';
@@ -55,19 +57,29 @@ interface ModelProductInfo {
 function OrderCreationManagement() {
   // ===== Store Hooks =====
   const products = useProductStore((state) => state.products);
-  const { cart, addToCart, removeFromCart, getTotalPrice, clearCart } =
-    useCartStore();
+  const tables = useTableStore((state) => state.tables);
+  const {
+    cart,
+    addToCart,
+    removeFromCart,
+    getTotalPrice,
+    clearCart,
+    setTable,
+    orderType,
+    setOrderType,
+  } = useCartStore();
 
   // ===== API 相關 Hooks =====
   const queryClient = useQueryClient();
   const { isPending: isFetchProductPending } = useProductQuery();
   const { mutate: submitOrder, isPending: isSubmitOrderPending } =
     useSubmitOrder();
+  useTableQuery();
 
   // ===== 狀態管理 =====
-  const [orderType, setOrderType] = useState<OrderType>(OrderType.DINE_IN);
   const [tableNumber, setTableNumber] = useState<string>('');
   const [tabView, setTabView] = useState('所有商品');
+  const [tableNumberError, setTableNumberError] = useState<boolean>(false);
   const [modelProductInfo, setModelProductInfo] = useState<ModelProductInfo>({
     targetProduct: null,
     modelOpen: false,
@@ -79,6 +91,7 @@ function OrderCreationManagement() {
     message: string;
   } | null>(null);
 
+  console.log(tables);
   // ===== 響應式 =====
   const isLargeScreen = useMediaQuery('(min-width: 1536px)');
 
@@ -86,6 +99,18 @@ function OrderCreationManagement() {
   // 切換桌號
   const handleChangeTableNumber = (event: SelectChangeEvent) => {
     setTableNumber(event.target.value);
+    if (tableNumberError) {
+      setTableNumberError(false); // 清除錯誤訊息
+    }
+    // 設定 tableInfo
+    const currentTable = tables?.find(
+      (table) => table.tableNumber === Number(event.target.value),
+    );
+    const tableInfo = {
+      tableId: currentTable ? currentTable._id : null,
+      tableToken: currentTable ? currentTable.tableToken : null,
+    };
+    setTable(tableInfo);
   };
 
   // 切換商品類別
@@ -101,25 +126,42 @@ function OrderCreationManagement() {
 
   // submit 事件
   const submitHandler = () => {
+    // 內用時檢查桌號是否必填
+    if (orderType === OrderType.DINE_IN && !tableNumber) {
+      setTableNumberError(true);
+      return;
+    }
+    // 清除錯誤訊息
+    setTableNumberError(false);
+
     submitOrder(undefined, {
-      onSuccess: () => {
+      onSuccess: (res) => {
+        const {
+          message,
+          order: { orderCode },
+        } = res;
+
         setSubmitResult({
           success: true,
-          title: '訂單提交成功!',
-          message: '點擊下方查詢訂單明細',
+          title: message || '訂單提交成功!',
+          message: `訂單編號 - ${orderCode}`,
         });
-        queryClient.invalidateQueries({ queryKey: ['allOrders'] });
+
+        queryClient.invalidateQueries({
+          queryKey: ['allOrders'],
+          exact: false,
+        });
       },
       onError: (error: Error) => {
-        console.error('訂單提交失敗:', error.message);
+        console.error('訂單提交失敗:', error);
         setSubmitResult({
           success: false,
           title: '訂單提交失敗!',
-          message: '請重新掃描桌號 QR Code 或聯絡服務人員',
+          message: '請確認桌位狀態或重新整理',
         });
       },
       onSettled: () => {
-        // clearCart();
+        clearCart();
         setTimeout(() => {
           setIsSubmitResultOpen(true); // 開啟訂單提交結果對話框
         }, 300);
@@ -184,9 +226,10 @@ function OrderCreationManagement() {
                 fullWidth
                 sx={{ m: 0, minWidth: 160, height: isLargeScreen ? 56 : 44 }}
                 size={isLargeScreen ? 'medium' : 'small'}
+                error={!!tableNumberError}
               >
                 <InputLabel id="select-label" color="secondary">
-                  桌號
+                  {tableNumberError ? '桌號為必填' : '桌號'}
                 </InputLabel>
                 <Select
                   labelId="select-label"
@@ -205,9 +248,18 @@ function OrderCreationManagement() {
                     },
                   }}
                 >
-                  <MenuItem value="1">一桌</MenuItem>
-                  <MenuItem value="2">二桌</MenuItem>
-                  <MenuItem value="3">三桌</MenuItem>
+                  {tables &&
+                    tables.map((table) => {
+                      return (
+                        <MenuItem
+                          key={table.tableNumber}
+                          value={table.tableNumber}
+                          disabled={!table.canOrder}
+                        >
+                          {table.tableNumber} 桌
+                        </MenuItem>
+                      );
+                    })}
                 </Select>
               </FormControl>
             </div>
