@@ -18,6 +18,7 @@ import { MdEdit } from 'react-icons/md';
 import { FaTrash } from 'react-icons/fa6';
 import { BiDish } from 'react-icons/bi';
 import { FaCheck } from 'react-icons/fa';
+import axios from 'axios';
 
 // 類型定義
 import { Orders } from '../../../types/orderType';
@@ -31,6 +32,7 @@ import { addonsToString } from '../../../utils/addonsToString';
 // Component
 import OrderConfirmDialog from './OrderConfirmDialog';
 import EditOrderItemDialog from './EditOrderItemDialog';
+import ErrorDialog from './ErrorDialog';
 
 // 自訂 hooks
 import {
@@ -53,11 +55,13 @@ function OrderCard({ order, onShowSnackbar, waitingTimeObj }: OrderCardProps) {
   const [openMenuId, setOpenMenuId] = useState<string | null>(null); // 當前開啟的選單 ID
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] =
     useState<boolean>(false); // 確認對話框開啟狀態
+
   const [selectedItemCode, setSelectedItemCode] = useState<string | null>(null); // 選中的子訂單
   const [confirmDialogType, setConfirmDialogType] = useState<
     'deleteItem' | 'deleteOrder' | 'completeOrder' | null
   >(null); // 判斷確認對話框類型
-
+  const [isErrorDialogOpen, setIsErrorDialogOpen] = useState<boolean>(false); // 錯誤對話框開啟狀態
+  const [errorMessage, setErrorMessage] = useState<string>(''); // 錯誤訊息
   // 新增編輯對話框狀態
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [selectedItemList, setSelectedItemList] = useState<OrderGroup | null>(
@@ -164,6 +168,15 @@ function OrderCard({ order, onShowSnackbar, waitingTimeObj }: OrderCardProps) {
           onShowSnackbar('訂單已刪除！');
           console.log('刪除訂單成功');
         },
+        onError: (err) => {
+          handleConfirmDialogClose();
+          if (axios.isAxiosError(err)) {
+            setErrorMessage(err.response?.data.message);
+          } else {
+            setErrorMessage('發生未知錯誤，請稍後再試。');
+          }
+          setIsErrorDialogOpen(true);
+        },
       },
     );
   };
@@ -197,6 +210,14 @@ function OrderCard({ order, onShowSnackbar, waitingTimeObj }: OrderCardProps) {
   const handleCompleteOrder = () => {
     setConfirmDialogType('completeOrder');
     setIsConfirmDialogOpen(true);
+  };
+
+  // 關閉錯誤對話框
+  const handleErrorDialogClose = () => {
+    setIsErrorDialogOpen(false);
+    setTimeout(() => {
+      setErrorMessage('');
+    }, 200);
   };
 
   // 確認完成訂單
@@ -340,6 +361,9 @@ function OrderCard({ order, onShowSnackbar, waitingTimeObj }: OrderCardProps) {
                     }}
                   >
                     <MenuItem
+                      disabled={
+                        order.orderType === '內用' && order.isPaid === true
+                      }
                       onClick={() =>
                         handleServeStatusChange(
                           itemList.itemCode || '',
@@ -485,6 +509,12 @@ function OrderCard({ order, onShowSnackbar, waitingTimeObj }: OrderCardProps) {
         onClose={handleEditDialogClose}
         onShowSnackbar={onShowSnackbar}
         onSuccess={handleEditSuccess}
+      />
+
+      <ErrorDialog
+        open={isErrorDialogOpen}
+        errorMsg={errorMessage}
+        onClose={handleErrorDialogClose}
       />
     </>
   );

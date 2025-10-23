@@ -40,6 +40,7 @@ export const useSubmitOrder = () => {
     mutationFn: async () => {
       const payload = buildOrderPayload();
       const shouldUseToken = role === 'staff' || role === 'admin';
+      console.log(payload);
       // 如果是員工或管理者，帶上 token
       if (shouldUseToken && !token) {
         throw new Error('使用者 token 是必需的');
@@ -158,8 +159,9 @@ export const useDeleteOrderItem = () => {
       queryClient.invalidateQueries({
         queryKey: ['allOrders'],
       });
-
-      console.log('訂單刪除成功，正在重新獲取訂單列表...');
+      queryClient.invalidateQueries({
+        queryKey: ['allTables'],
+      });
     },
     onError: (err) => {
       if (axios.isAxiosError(err)) {
@@ -206,7 +208,9 @@ export const useDeleteOrder = () => {
         queryKey: ['allOrders'],
       });
 
-      console.log('訂單刪除成功，正在重新獲取訂單列表...');
+      queryClient.invalidateQueries({
+        queryKey: ['allTables'],
+      });
     },
     onError: (err) => {
       if (axios.isAxiosError(err)) {
@@ -262,7 +266,9 @@ export const useUpdateItemServeStatus = () => {
         queryKey: ['allOrders'],
       });
 
-      console.log('送餐狀態更新成功，正在重新獲取訂單列表...');
+      queryClient.invalidateQueries({
+        queryKey: ['allTables'],
+      });
     },
     onError: (err) => {
       if (axios.isAxiosError(err)) {
@@ -309,7 +315,10 @@ export const useUpdateOrderPaymentStatus = () => {
         queryKey: ['allOrders'],
       });
 
-      console.log('結帳狀態更新成功，正在重新獲取訂單列表...');
+      // 新增：取得桌位狀態
+      queryClient.invalidateQueries({
+        queryKey: ['allTables'],
+      });
     },
     onError: (err) => {
       if (axios.isAxiosError(err)) {
@@ -356,7 +365,9 @@ export const useUpdateOrderCompletionStatus = () => {
         queryKey: ['allOrders'],
       });
 
-      console.log('訂單完成狀態更新成功，正在重新獲取訂單列表...');
+      queryClient.invalidateQueries({
+        queryKey: ['allTables'],
+      });
     },
     onError: (err) => {
       if (axios.isAxiosError(err)) {
@@ -412,7 +423,9 @@ export const useUpdateOrderItem = () => {
         queryKey: ['allOrders'],
       });
 
-      console.log('子訂單內容更新成功，正在重新獲取訂單列表...');
+      queryClient.invalidateQueries({
+        queryKey: ['allTables'],
+      });
     },
     onError: (err) => {
       if (axios.isAxiosError(err)) {

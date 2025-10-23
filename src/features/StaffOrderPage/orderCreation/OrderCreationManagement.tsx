@@ -1,5 +1,6 @@
 // React 相關
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
+import queryString from 'query-string';
 
 // 第三方庫
 import { useQueryClient } from '@tanstack/react-query';
@@ -191,6 +192,22 @@ function OrderCreationManagement() {
     return products.filter((product: Product) => product.category === tabView);
   }, [products, tabView]);
 
+  useEffect(() => {
+    const query = queryString.parse(location.search);
+    if (query.tableNumber && tables && tables.length > 0) {
+      setTableNumber(query.tableNumber as string);
+
+      // 設定 tableInfo
+      const currentTable = tables?.find(
+        (table) => table.tableNumber === Number(query.tableNumber),
+      );
+      const tableInfo = {
+        tableId: currentTable ? currentTable._id : null,
+        tableToken: currentTable ? currentTable.tableToken : null,
+      };
+      setTable(tableInfo);
+    }
+  }, [tables, location.search]);
   // ===== 渲染 UI =====
   return (
     <>
@@ -249,11 +266,16 @@ function OrderCreationManagement() {
                 >
                   {tables &&
                     tables.map((table) => {
+                      const canOrder =
+                        !table.currentOrder ||
+                        (table.orderInfo &&
+                          !table.orderInfo.isPaid &&
+                          !table.orderInfo.isDeleted);
                       return (
                         <MenuItem
                           key={table.tableNumber}
-                          value={table.tableNumber}
-                          disabled={!table.canOrder}
+                          value={table.tableNumber.toString()}
+                          disabled={!canOrder}
                         >
                           {table.tableNumber} 桌
                         </MenuItem>

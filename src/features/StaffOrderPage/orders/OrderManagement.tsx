@@ -300,15 +300,14 @@ function OrderManagement() {
 
     if (diffInMinutes < 60) {
       return {
-        diffInText: diffInMinutes > 0 ? `${diffInMinutes} 分鐘` : '剛剛',
+        diffInText: diffInMinutes > 0 ? `${diffInMinutes} 分` : '剛剛',
         diffInMinutes: diffInMinutes,
       };
     } else {
       const hours = Math.floor(diffInMinutes / 60);
       const minutes = diffInMinutes % 60;
       return {
-        diffInText:
-          minutes > 0 ? `${hours} 小時 ${minutes} 分鐘` : `${hours} 小時`,
+        diffInText: minutes > 0 ? `${hours} 時 ${minutes} 分` : `${hours} 時`,
         diffInMinutes: diffInMinutes,
       };
     }
@@ -398,9 +397,7 @@ function OrderManagement() {
           </div>
 
           <div className="space-y-2 2xl:space-y-4">
-            <label className="block text-sm font-medium text-gray-700">
-              訂單分類
-            </label>
+            <p className="block text-sm font-medium text-gray-700">訂單分類</p>
             <div className="flex items-center space-x-3 2xl:space-x-4">
               {filteredStatusStyles.map((style) => {
                 const isActive = activeStatus === style.status;
