@@ -1,47 +1,48 @@
+// React
 import { useState, useEffect } from 'react';
+
+// 第三方庫
 import { useForm, Controller } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { yupResolver } from '@hookform/resolvers/yup';
-
-// 自定義 hooks/stores
-import useAuthStore from '../../stores/useAuthStore';
-import { useResetPasswordMutation } from '../../hooks/useUserOperations';
-import { resetPasswordSchema } from './loginSchema';
-import ConfirmDialog from './ConfirmDialog';
-import useClearErrorMessage from '../../hooks/useAuthError';
-
-// Material UI 元件
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
 import TextField from '@mui/material/TextField';
 
+// Hooks
+import { useResetPasswordMutation } from '../../hooks/useUserOperations';
+import useClearErrorMessage from '../../hooks/useAuthError';
+
+// Stores
+import useAuthStore from '../../stores/useAuthStore';
+
+// Components
+import ResultDialog from '../../components/ResultDialog';
+
+// Schemas
+import { resetPasswordSchema } from './loginSchema';
+
+// ===== 類型定義 =====
 interface FormValues {
   password: string;
   confirmPassword: string;
 }
 
+// ===== 主要元件 =====
 function ResetPassword() {
+  // ===== Hooks =====
   const { mutate: resetPassword, isPending } = useResetPasswordMutation();
   const { account, role, errorMessage } = useAuthStore();
-  const [open, setOpen] = useState<boolean>(false);
   const navigate = useNavigate();
 
-  // 清空錯誤訊息
+  // ===== State =====
+  const [open, setOpen] = useState<boolean>(false);
+
+  // ===== 清空錯誤訊息 =====
   useClearErrorMessage();
 
-  // 判斷是否已經登入
-  useEffect(() => {
-    if (role === 'admin') {
-      navigate('/order-page');
-    } else if (role === 'staff') {
-      navigate('/order-page');
-    } else if (!account) {
-      navigate('/forgot-password', { replace: true });
-    }
-  }, [role, account, navigate]);
-
-  // react-hooks-form 設定
+  // ===== React Hook Form 設定 =====
   const {
     control,
     handleSubmit,
@@ -54,6 +55,20 @@ function ResetPassword() {
     resolver: yupResolver(resetPasswordSchema),
   });
 
+  // ===== Effects =====
+  // 判斷是否已經登入
+  useEffect(() => {
+    if (role === 'admin') {
+      navigate('/order-page');
+    } else if (role === 'staff') {
+      navigate('/order-page');
+    } else if (!account) {
+      navigate('/forgot-password', { replace: true });
+    }
+  }, [role, account, navigate]);
+
+  // ===== 事件處理函數 =====
+  // 表單 submit 事件
   const onSubmit = async (data: FormValues) => {
     resetPassword(
       { account: account!, newPassword: data.confirmPassword },
@@ -71,6 +86,7 @@ function ResetPassword() {
     navigate('/login', { replace: true });
   };
 
+  // ===== Render =====
   return (
     <>
       <div className="flex min-h-screen flex-col items-center justify-center bg-grey-light p-4 md:p-8">
@@ -159,12 +175,16 @@ function ResetPassword() {
           &copy; 2025 Eatery 餐飲管理系統. 保留所有權利.
         </div>
       </div>
-      <ConfirmDialog
-        open={open}
+
+      {/* Result Dialog */}
+      <ResultDialog
+        isOpen={open}
+        resultType="success"
         title="密碼重設成功"
         message="請使用新密碼重新登入"
-        buttonText="登入"
+        btnText="登入"
         onClose={handleDialogClose}
+        onConfirm={handleDialogClose}
       />
     </>
   );

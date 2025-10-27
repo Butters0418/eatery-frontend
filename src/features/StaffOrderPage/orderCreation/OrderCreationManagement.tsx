@@ -192,10 +192,12 @@ function OrderCreationManagement() {
     return products.filter((product: Product) => product.category === tabView);
   }, [products, tabView]);
 
+  // 從 URL 參數設定內用桌號
   useEffect(() => {
     const query = queryString.parse(location.search);
     if (query.tableNumber && tables && tables.length > 0) {
       setTableNumber(query.tableNumber as string);
+      setOrderType(OrderType.DINE_IN);
 
       // 設定 tableInfo
       const currentTable = tables?.find(

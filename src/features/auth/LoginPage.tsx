@@ -1,41 +1,39 @@
+// React
 import { useEffect } from 'react';
+
+// 第三方庫
 import { useForm, Controller } from 'react-hook-form';
 import { useNavigate, NavLink } from 'react-router-dom';
 import { yupResolver } from '@hookform/resolvers/yup';
-
-// 自定義 hooks/stores
-import useAuthStore from '../../stores/useAuthStore';
-import { loginSchema } from './loginSchema';
-import { useLoginMutation } from '../../hooks/useUserOperations';
-import useClearErrorMessage from '../../hooks/useAuthError';
-
-// Material UI 元件
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
 import TextField from '@mui/material/TextField';
 
-// type
+// Hooks
+import { useLoginMutation } from '../../hooks/useUserOperations';
+import useClearErrorMessage from '../../hooks/useAuthError';
+
+// Stores
+import useAuthStore from '../../stores/useAuthStore';
+
+// Types
 import { LoginInfo } from '../../types/userType';
 
+// Schemas
+import { loginSchema } from './loginSchema';
+
+// ===== 主要元件 =====
 function LoginPage() {
+  // ===== Hooks =====
   const { errorMessage, role, token } = useAuthStore();
   const navigate = useNavigate();
   const { mutate: login, isPending } = useLoginMutation();
 
-  // 清空錯誤訊息
+  // ===== 清空錯誤訊息 =====
   useClearErrorMessage();
 
-  // 判斷是否已經登入 - 只有在有 token 的情況下才重導向
-  useEffect(() => {
-    if (token && role === 'admin') {
-      navigate('/order-page');
-    } else if (token && role === 'staff') {
-      navigate('/order-page');
-    }
-  }, [role, token, navigate]);
-
-  // react-hooks-form 設定
+  // ===== React Hook Form 設定 =====
   const {
     control,
     handleSubmit,
@@ -48,6 +46,17 @@ function LoginPage() {
     resolver: yupResolver(loginSchema),
   });
 
+  // ===== Effects =====
+  // 判斷是否已經登入 - 只有在有 token 的情況下才重導向
+  useEffect(() => {
+    if (token && role === 'admin') {
+      navigate('/order-page');
+    } else if (token && role === 'staff') {
+      navigate('/order-page');
+    }
+  }, [role, token, navigate]);
+
+  // ===== 事件處理函數 =====
   // 表單 submit 事件
   const onSubmit = (data: LoginInfo) => {
     login(data, {
@@ -62,6 +71,7 @@ function LoginPage() {
     });
   };
 
+  // ===== Render =====
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-grey-light p-4 md:p-8">
       {/* card */}
