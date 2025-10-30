@@ -156,7 +156,6 @@ function ForgotPassword() {
         message="請查看您的電子郵件信箱"
         btnText="前往驗證"
         onClose={handleDialogClose}
-        onConfirm={handleDialogClose}
       />
     </>
   );

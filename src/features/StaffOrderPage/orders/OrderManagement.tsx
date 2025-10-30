@@ -30,6 +30,7 @@ import { OrderType, OrderStatus } from '../../../types/orderType';
 import { BiSolidError } from 'react-icons/bi';
 import { MdErrorOutline } from 'react-icons/md';
 import { FaRegCheckCircle } from 'react-icons/fa';
+
 // 初始化 dayjs 中文語言包
 dayjs.locale('zh-tw');
 
@@ -360,7 +361,7 @@ function OrderManagement() {
         <div className="space-y-3 rounded-xl bg-white p-3 shadow-custom 2xl:space-y-4 2xl:p-4">
           <div className="space-y-2 2xl:space-y-4">
             <label className="block text-sm font-medium text-gray-700 2xl:mb-2">
-              訂單類型 {orderType}
+              訂單類型
             </label>
             <div className="flex items-center space-x-3 2xl:space-x-4">
               <LocalizationProvider dateAdapter={AdapterDayjs}>

@@ -184,7 +184,6 @@ function ResetPassword() {
         message="請使用新密碼重新登入"
         btnText="登入"
         onClose={handleDialogClose}
-        onConfirm={handleDialogClose}
       />
     </>
   );

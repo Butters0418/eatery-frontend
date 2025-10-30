@@ -25,6 +25,9 @@ import { addonsToString } from '../../../utils/addonsToString.ts';
 import { HiOutlineMinusSm, HiOutlinePlusSm } from 'react-icons/hi';
 import { FaRegTrashCan } from 'react-icons/fa6';
 
+// Type
+import { ResultDialogProps } from '../../../components/ResultDialog.tsx';
+
 // ===== 類型定義 =====
 // 定義 props 的 interface
 interface CheckCartsDialogProps {
@@ -32,13 +35,8 @@ interface CheckCartsDialogProps {
   setIsCartOpen: (open: boolean) => void;
 }
 
-// 對話框提交結果
-interface ResultInfo {
-  isOpen: boolean;
-  type: 'success' | 'error';
-  title: string;
-  message: string;
-}
+// 對話框內容
+type ResultInfo = Omit<ResultDialogProps, 'onClose'>;
 
 // 購物車對話框
 function CheckCartsDialog({
@@ -56,7 +54,7 @@ function CheckCartsDialog({
   // ===== State =====
   const [resultInfo, setResultInfo] = useState<ResultInfo>({
     isOpen: false,
-    type: 'success',
+    resultType: 'success',
     title: '',
     message: '',
   });
@@ -228,11 +226,11 @@ function CheckCartsDialog({
         </div>
       </Dialog>
       <ResultDialog
-        isOpen={resultInfo.isOpen} // 控制顯示
-        resultType={resultInfo.type} // 'success' | 'error'
-        title={resultInfo.title} // 動態標題
-        message={resultInfo.message} // 動態訊息
-        onClose={handleResultDialogClose} // 關閉處理
+        isOpen={resultInfo.isOpen}
+        resultType={resultInfo.resultType}
+        title={resultInfo.title}
+        message={resultInfo.message}
+        onClose={handleResultDialogClose}
       />
     </>
   );
