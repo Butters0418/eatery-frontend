@@ -153,14 +153,6 @@ export const useDeleteOrderItem = () => {
       const deleteRes = await deleteOrderItem(token, orderId, itemCode);
       return deleteRes;
     },
-    onSuccess: () => {
-      // 刪除整張訂單後，重新獲取訂單列表
-      queryClient.invalidateQueries({
-        queryKey: ['allOrders'],
-      });
-
-      console.log('訂單刪除成功，正在重新獲取訂單列表...');
-    },
     onError: (err) => {
       if (axios.isAxiosError(err)) {
         switch (err.response?.status) {
@@ -180,6 +172,15 @@ export const useDeleteOrderItem = () => {
       } else {
         console.error('發生錯誤，請稍後再試');
       }
+    },
+    onSettled: () => {
+      // 刪除整張訂單後，重新獲取訂單列表
+      queryClient.invalidateQueries({
+        queryKey: ['allOrders'],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['allTables'],
+      });
     },
   });
 };
@@ -200,14 +201,6 @@ export const useDeleteOrder = () => {
       const deleteRes = await deleteOrder(token, orderId);
       return deleteRes;
     },
-    onSuccess: () => {
-      // 刪除整張訂單後，重新獲取訂單列表
-      queryClient.invalidateQueries({
-        queryKey: ['allOrders'],
-      });
-
-      console.log('訂單刪除成功，正在重新獲取訂單列表...');
-    },
     onError: (err) => {
       if (axios.isAxiosError(err)) {
         switch (err.response?.status) {
@@ -227,6 +220,16 @@ export const useDeleteOrder = () => {
       } else {
         console.error('發生錯誤，請稍後再試');
       }
+    },
+    onSettled: () => {
+      // 刪除整張訂單後，重新獲取訂單列表
+      queryClient.invalidateQueries({
+        queryKey: ['allOrders'],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ['allTables'],
+      });
     },
   });
 };
@@ -256,14 +259,6 @@ export const useUpdateItemServeStatus = () => {
       );
       return updateRes;
     },
-    onSuccess: () => {
-      // 更新送餐狀態後，重新獲取訂單列表
-      queryClient.invalidateQueries({
-        queryKey: ['allOrders'],
-      });
-
-      console.log('送餐狀態更新成功，正在重新獲取訂單列表...');
-    },
     onError: (err) => {
       if (axios.isAxiosError(err)) {
         switch (err.response?.status) {
@@ -283,6 +278,16 @@ export const useUpdateItemServeStatus = () => {
       } else {
         console.error('發生錯誤，請稍後再試');
       }
+    },
+    onSettled: () => {
+      // 更新送餐狀態後，重新獲取訂單列表
+      queryClient.invalidateQueries({
+        queryKey: ['allOrders'],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ['allTables'],
+      });
     },
   });
 };
@@ -303,14 +308,6 @@ export const useUpdateOrderPaymentStatus = () => {
       const updateRes = await updateOrderPaymentStatus(token, orderId, isPaid);
       return updateRes;
     },
-    onSuccess: () => {
-      // 更新結帳狀態後，重新獲取訂單列表
-      queryClient.invalidateQueries({
-        queryKey: ['allOrders'],
-      });
-
-      console.log('結帳狀態更新成功，正在重新獲取訂單列表...');
-    },
     onError: (err) => {
       if (axios.isAxiosError(err)) {
         switch (err.response?.status) {
@@ -330,6 +327,17 @@ export const useUpdateOrderPaymentStatus = () => {
       } else {
         console.error('發生錯誤，請稍後再試');
       }
+    },
+    onSettled: () => {
+      // 更新結帳狀態後，重新獲取訂單列表
+      queryClient.invalidateQueries({
+        queryKey: ['allOrders'],
+      });
+
+      // 新增：取得桌位狀態
+      queryClient.invalidateQueries({
+        queryKey: ['allTables'],
+      });
     },
   });
 };
@@ -350,14 +358,6 @@ export const useUpdateOrderCompletionStatus = () => {
       const updateRes = await completeOrder(token, orderId);
       return updateRes;
     },
-    onSuccess: () => {
-      // 更新訂單完成狀態後，重新獲取訂單列表
-      queryClient.invalidateQueries({
-        queryKey: ['allOrders'],
-      });
-
-      console.log('訂單完成狀態更新成功，正在重新獲取訂單列表...');
-    },
     onError: (err) => {
       if (axios.isAxiosError(err)) {
         switch (err.response?.status) {
@@ -377,6 +377,16 @@ export const useUpdateOrderCompletionStatus = () => {
       } else {
         console.error('發生錯誤，請稍後再試');
       }
+    },
+    onSettled: () => {
+      // 更新訂單完成狀態後，重新獲取訂單列表
+      queryClient.invalidateQueries({
+        queryKey: ['allOrders'],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ['allTables'],
+      });
     },
   });
 };
@@ -406,14 +416,6 @@ export const useUpdateOrderItem = () => {
       );
       return updateRes;
     },
-    onSuccess: () => {
-      // 更新子訂單內容後，重新獲取訂單列表
-      queryClient.invalidateQueries({
-        queryKey: ['allOrders'],
-      });
-
-      console.log('子訂單內容更新成功，正在重新獲取訂單列表...');
-    },
     onError: (err) => {
       if (axios.isAxiosError(err)) {
         switch (err.response?.status) {
@@ -433,6 +435,16 @@ export const useUpdateOrderItem = () => {
       } else {
         console.error('發生錯誤，請稍後再試');
       }
+    },
+    onSettled: () => {
+      // 更新子訂單內容後，重新獲取訂單列表
+      queryClient.invalidateQueries({
+        queryKey: ['allOrders'],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ['allTables'],
+      });
     },
   });
 };

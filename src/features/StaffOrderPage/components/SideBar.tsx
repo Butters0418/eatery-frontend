@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { FaClipboardList } from 'react-icons/fa';
 import { PiBowlFoodFill } from 'react-icons/pi';
@@ -82,6 +82,11 @@ function SideBar() {
       index: 5,
     },
   ];
+
+  // 監聽路由變化
+  useEffect(() => {
+    setSelectedIndex(getActiveIndex());
+  }, [location.pathname]);
 
   return (
     <aside className="w-52 border-r border-gray-200 bg-white shadow-custom 2xl:w-72">

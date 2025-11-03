@@ -1,41 +1,64 @@
+// React
 import { useState, useRef, useEffect } from 'react';
+
+// 第三方庫
 import { useForm, Controller } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { yupResolver } from '@hookform/resolvers/yup';
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import CircularProgress from '@mui/material/CircularProgress';
+import TextField from '@mui/material/TextField';
 
-// 自定義 hooks/stores
-import useAuthStore from '../../stores/useAuthStore';
-import { verifyCodeSchema } from './loginSchema';
-import ConfirmDialog from './ConfirmDialog';
+// Hooks
 import {
   useResendVerificationCodeMutation,
   useVerifyCodeMutation,
 } from '../../hooks/useUserOperations';
 import useClearErrorMessage from '../../hooks/useAuthError';
 
-// Material UI 元件
-import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
-import CircularProgress from '@mui/material/CircularProgress';
-import TextField from '@mui/material/TextField';
+// Stores
+import useAuthStore from '../../stores/useAuthStore';
 
+// Components
+import ResultDialog from '../../components/ResultDialog';
+
+// Schemas
+import { verifyCodeSchema } from './loginSchema';
+
+// ===== 類型定義 =====
 interface FormValues {
   otp: string;
 }
 
+// ===== 主要元件 =====
 function VerifyCode() {
+  // ===== Hooks =====
   const { account, role, errorMessage } = useAuthStore();
   const { mutate: verifyCode, isPending } = useVerifyCodeMutation();
   const { mutate: resendVerificationCode } =
     useResendVerificationCodeMutation();
-  const [countdown, setCountdown] = useState<number>(0);
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const [open, setOpen] = useState<boolean>(false);
   const navigate = useNavigate();
 
-  // 清空錯誤訊息
+  // ===== State & Refs =====
+  const [countdown, setCountdown] = useState<number>(0);
+  const [open, setOpen] = useState<boolean>(false);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // ===== 清空錯誤訊息 =====
   useClearErrorMessage();
 
+  // ===== React Hook Form 設定 =====
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormValues>({
+    defaultValues: { otp: '' },
+    resolver: yupResolver(verifyCodeSchema),
+  });
+
+  // ===== Effects =====
   // 判斷是否已經登入
   useEffect(() => {
     if (role === 'admin') {
@@ -47,16 +70,7 @@ function VerifyCode() {
     }
   }, [role, account, navigate]);
 
-  // react-hooks-form 設定
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<FormValues>({
-    defaultValues: { otp: '' },
-    resolver: yupResolver(verifyCodeSchema),
-  });
-
+  // ===== 事件處理函數 =====
   // 重新發送驗證碼
   const resentCodeHandler = async () => {
     // 重置倒數
@@ -102,6 +116,7 @@ function VerifyCode() {
     );
   };
 
+  // ===== Render =====
   return (
     <>
       <div className="flex min-h-screen flex-col items-center justify-center bg-grey-light p-4 md:p-8">
@@ -178,11 +193,14 @@ function VerifyCode() {
           &copy; 2025 Eatery 餐飲管理系統. 保留所有權利.
         </div>
       </div>
-      <ConfirmDialog
-        open={open}
+
+      {/* Result Dialog */}
+      <ResultDialog
+        isOpen={open}
+        resultType="success"
         title="驗證碼已寄出"
-        message="請查看您的電子郵件信箱，"
-        buttonText="關閉"
+        message="請查看您的電子郵件信箱"
+        btnText="關閉"
         onClose={handleDialogClose}
       />
     </>

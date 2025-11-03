@@ -13,6 +13,10 @@ import sweetPotatoLeaf from './menu/sweet-potato-leaf.png';
 import tofu from './menu/tofu.png';
 import winterMelonTea from './menu/winter-melon-tea.png';
 import wontonNoodle from './menu/wonton-noodle.png';
+import iconTable from './table-icon/table.svg';
+import iconPan from './table-icon/pan.svg';
+import iconEating from './table-icon/eating.svg';
+import iconSpray from './table-icon/spray.svg';
 
 // Export 所有圖片
 export {
@@ -30,4 +34,8 @@ export {
   tofu,
   winterMelonTea,
   wontonNoodle,
+  iconTable,
+  iconPan,
+  iconEating,
+  iconSpray,
 };

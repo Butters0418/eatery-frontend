@@ -1,45 +1,48 @@
+// React
 import { useState, useEffect } from 'react';
+
+// 第三方庫
 import { useForm, Controller } from 'react-hook-form';
 import { useNavigate, NavLink } from 'react-router-dom';
 import { yupResolver } from '@hookform/resolvers/yup';
-
-// 自定義 hooks/stores
-import useAuthStore from '../../stores/useAuthStore';
-import { forgotPasswordSchema } from './loginSchema';
-import ConfirmDialog from './ConfirmDialog';
-import { useResendVerificationCodeMutation } from '../../hooks/useUserOperations';
-import useClearErrorMessage from '../../hooks/useAuthError';
-
-// Material UI 元件
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
 import TextField from '@mui/material/TextField';
 
+// Hooks
+import { useResendVerificationCodeMutation } from '../../hooks/useUserOperations';
+import useClearErrorMessage from '../../hooks/useAuthError';
+
+// Stores
+import useAuthStore from '../../stores/useAuthStore';
+
+// Components
+import ResultDialog from '../../components/ResultDialog';
+
+// Schemas
+import { forgotPasswordSchema } from './loginSchema';
+
+// ===== 類型定義 =====
 interface FormValues {
   account: string;
 }
 
+// ===== 主要元件 =====
 function ForgotPassword() {
+  // ===== Hooks =====
   const { mutate: resendVerificationCode, isPending } =
     useResendVerificationCodeMutation();
   const { role, errorMessage } = useAuthStore();
-  const [open, setOpen] = useState<boolean>(false);
   const navigate = useNavigate();
 
-  // 清空錯誤訊息
+  // ===== State =====
+  const [open, setOpen] = useState<boolean>(false);
+
+  // ===== 清空錯誤訊息 =====
   useClearErrorMessage();
 
-  // 判斷是否已經登入
-  useEffect(() => {
-    if (role === 'admin') {
-      navigate('/order-page'); // 暫時合為一個頁面
-    } else if (role === 'staff') {
-      navigate('/order-page');
-    }
-  }, [role, navigate]);
-
-  // react-hooks-form 設定
+  // ===== React Hook Form 設定 =====
   const {
     control,
     handleSubmit,
@@ -51,6 +54,17 @@ function ForgotPassword() {
     resolver: yupResolver(forgotPasswordSchema),
   });
 
+  // ===== Effects =====
+  // 判斷是否已經登入
+  useEffect(() => {
+    if (role === 'admin') {
+      navigate('/order-page'); // 暫時合為一個頁面
+    } else if (role === 'staff') {
+      navigate('/order-page');
+    }
+  }, [role, navigate]);
+
+  // ===== 事件處理函數 =====
   // 表單 submit 事件
   const onSubmit = async (data: FormValues) => {
     resendVerificationCode(data.account, {
@@ -66,6 +80,7 @@ function ForgotPassword() {
     navigate('/verify-code', { replace: true });
   };
 
+  // ===== Render =====
   return (
     <>
       <div className="flex min-h-screen flex-col items-center justify-center bg-grey-light p-4 md:p-8">
@@ -132,11 +147,14 @@ function ForgotPassword() {
           &copy; 2025 Eatery 餐飲管理系統. 保留所有權利.
         </div>
       </div>
-      <ConfirmDialog
-        open={open}
+
+      {/* Result Dialog */}
+      <ResultDialog
+        isOpen={open}
+        resultType="success"
         title="驗證碼已寄出"
-        message="請查看您的電子郵件信箱，"
-        buttonText="前往驗證"
+        message="請查看您的電子郵件信箱"
+        btnText="前往驗證"
         onClose={handleDialogClose}
       />
     </>

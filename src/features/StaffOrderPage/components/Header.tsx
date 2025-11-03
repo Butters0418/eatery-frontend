@@ -5,7 +5,7 @@ function Header() {
   const { account, role, setLogout } = useAuthStore();
 
   return (
-    <header className="sticky top-0 z-40 border-b border-gray-200 bg-white/80 shadow-custom backdrop-blur-md">
+    <header className="sticky top-0 z-[100] border-b border-gray-200 bg-white/80 shadow-custom backdrop-blur-md">
       <div className="mx-auto px-4 md:px-6 2xl:px-8">
         <div className="flex h-16 items-center justify-between 2xl:h-20">
           {/* title */}

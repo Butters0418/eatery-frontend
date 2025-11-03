@@ -1,0 +1,99 @@
+<svg
+  id="e3LxiRnpfam1"
+  xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink"
+  viewBox="0 0 1920 1920"
+  shape-rendering="geometricPrecision"
+  text-rendering="geometricPrecision"
+  fill="#4f8fc1ff"
+>
+  <style>
+    #e3LxiRnpfam2_to {
+      animation: e3LxiRnpfam2_to__to 2000ms linear infinite normal forwards;
+    }
+    @keyframes e3LxiRnpfam2_to__to {
+      0% {
+        transform: translate(1232.556634px, 1339.612643px);
+      }
+      50% {
+        transform: translate(1232.556634px, 1559.612643px);
+      }
+      100% {
+        transform: translate(1232.556634px, 1339.612643px);
+      }
+    }
+    #e3LxiRnpfam5 {
+      animation: e3LxiRnpfam5_c_o 2000ms linear infinite normal forwards;
+    }
+    @keyframes e3LxiRnpfam5_c_o {
+      0% {
+        opacity: 1;
+      }
+      50% {
+        opacity: 1;
+      }
+      80% {
+        opacity: 0;
+      }
+      100% {
+        opacity: 0;
+      }
+    }
+    #e3LxiRnpfam19_to {
+      animation: e3LxiRnpfam19_to__to 2000ms linear infinite normal forwards;
+    }
+    @keyframes e3LxiRnpfam19_to__to {
+      0% {
+        transform: translate(1488.381645px, 1100.152611px);
+        animation-timing-function: step-end;
+      }
+      15% {
+        transform: translate(1335.002494px, 1090.899336px);
+        animation-timing-function: step-end;
+      }
+      30% {
+        transform: translate(1241.214246px, 1086.96199px);
+        animation-timing-function: step-end;
+      }
+      45% {
+        transform: translate(1043.539472px, 1080.315815px);
+      }
+      100% {
+        transform: translate(1043.539472px, 1080.315815px);
+      }
+    }
+  </style>
+  <g id="e3LxiRnpfam2_to" transform="translate(1232.556634,1339.612643)">
+    <g transform="rotate(-26.670289) translate(-1237.949005,-1407.017273)">
+      <path
+        d="M1504.01718,1710.66921v-80.1322h-182.22929v80.1322h182.22929Zm-195.22687,6.4988v-93.12979c0-3.59393,2.90589-6.49879,6.49879-6.49879h195.22688c3.59291,0,6.49983,2.90485,6.49983,6.49879l-.00413,93.12979c0,3.59393-2.90589,6.49879-6.49879,6.49879h-195.22379c-3.5929,0-6.49879-2.90485-6.49879-6.49879Zm182.43972-487.54887h-67.97326v7.8883h-3.2494c-6.41214,0-11.60808,5.19697-11.60808,11.61118v107.44261l-152.5525,189.04271c-1.67112,2.06827-2.57167,4.63478-2.57167,7.29206v228.92365h319.25689v-364.45652c0-1.82997-.43738-3.62901-1.26572-5.25783l-65.17878-128.29961v-34.68706c0-6.41421-5.19904-11.61118-11.61118-11.61118h-3.2463v-7.88831Zm21.63377-13.63714c6.41318,0,11.61118-5.19698,11.61118-11.60912v-66.40221l30.20392-.00516c6.41215,0,11.61015-5.19697,11.61015-11.61118l.01135-4.62962c.09696-21.35834.21456-47.93841-15.93649-64.16786-8.46494-8.50104-20.13904-12.81088-34.68706-12.81088l-239.56207.05777c-6.41421,0-11.60293,5.20007-11.60293,11.61221v86.25345c0,6.41111,5.19698,11.61118,11.60809,11.61118h69.89608c24.77588,0,43.99993,26.92564,43.99993,50.0923c0,6.41215,5.2011,11.60912,11.61737,11.60912h111.23048Zm-324.24859-116.44189c.00001,6.41111,5.19491,11.61117,11.61221,11.61117h5.96548v17.54778c0,6.41215,5.19387,11.60912,11.60808,11.60912h33.07371v-81.54233l-33.07371.00309c-6.4142,0-11.60808,5.19904-11.60808,11.61118v17.54778h-5.96548c-6.41008,0-11.6122,5.20006-11.61221,11.6122v.00001Zm83.39604,148.08172c1.93314,1.23787,4.11384,1.84855,6.28733,1.84855c2.89763,0,5.77051-1.08623,7.99145-3.18544l75.77594-71.855c-4.62652-3.96632-10.10924-6.5122-16.04996-6.5122h-55.92367l-22.77673,66.16392c-1.74023,5.06287.20116,10.6539,4.69564,13.54019v-.00002Z"
+        transform="translate(4.468567-1.569357)"
+        clip-rule="evenodd"
+      />
+      <g mask="url(#e3LxiRnpfam18)">
+        <g id="e3LxiRnpfam5">
+          <g transform="matrix(.984808 0.173648-.173648 0.984808 201.935685-168.910681)">
+            <rect width="93.90496" height="15.331422" rx="7" ry="7" transform="matrix(.576007 0 0 0.643477 898.89753 1062.748296)" stroke-width="0" />
+            <rect width="93.90496" height="15.331422" rx="7" ry="7" transform="matrix(.576007 0 0 0.643477 994.780459 1062.748296)" stroke-width="0" />
+            <rect width="93.90496" height="15.331422" rx="7" ry="7" transform="matrix(.576007 0 0 0.643477 1090.663388 1062.748296)" stroke-width="0" />
+          </g>
+          <g transform="matrix(.984808-.173648 0.173648 0.984808-178.857948 198.179071)">
+            <rect width="93.90496" height="15.331422" rx="7" ry="7" transform="matrix(.576007 0 0 0.643477 896.60898 1133.26778)" stroke-width="0" />
+            <rect width="93.90496" height="15.331422" rx="7" ry="7" transform="matrix(.576007 0 0 0.643477 992.491909 1133.26778)" stroke-width="0" />
+            <rect width="93.90496" height="15.331422" rx="7" ry="7" transform="matrix(.576007 0 0 0.643477 1088.374838 1133.26778)" stroke-width="0" />
+          </g>
+          <g transform="translate(.000006-.000044)">
+            <rect width="93.90496" height="15.331422" rx="7" ry="7" transform="matrix(.576007 0 0 0.643477 898.89753 1096.084779)" stroke-width="0" />
+            <rect width="93.90496" height="15.331422" rx="7" ry="7" transform="matrix(.576007 0 0 0.643477 994.780459 1096.084779)" stroke-width="0" />
+            <rect width="93.90496" height="15.331422" rx="7" ry="7" transform="matrix(.576007 0 0 0.643477 1090.663388 1096.084779)" stroke-width="0" />
+          </g>
+        </g>
+        <mask id="e3LxiRnpfam18" transform="translate(60 0)">
+          <g id="e3LxiRnpfam19_to" transform="translate(1488.381645,1100.152611)">
+            <rect width="563.210266" height="504.31246" rx="0" ry="0" transform="translate(-281.605133,-252.15623)" fill="#fff" stroke-width="0" />
+          </g>
+        </mask>
+      </g>
+    </g>
+  </g>
+</svg>

@@ -29,7 +29,6 @@ import CartButtonGroup from './components/CartButtonGroup.tsx';
 import CheckCartsDialog from './components/CheckCartsDialog.tsx';
 import CheckOrdersDialog from './components/CheckReceiptDialog.tsx';
 import AddProductDialog from './components/AddProductDialog.tsx';
-import SubmitResultDialog from './components/SubmitResultDialog.tsx';
 import TopNav from './components/TopNav.tsx';
 import Error from '../../components/Error.tsx';
 
@@ -65,14 +64,6 @@ function CustomerPage() {
     targetProduct: null,
     modelOpen: false,
   });
-
-  // ===== 訂單操作相關狀態 =====
-  const [isSubmitResultOpen, setIsSubmitResultOpen] = useState(false);
-  const [submitResult, seSubmitResult] = useState<{
-    success: boolean;
-    title: string;
-    message: string;
-  } | null>(null);
 
   // ===== 購物車計算 =====
   const totalQuantity = cart.reduce((total, item) => total + item.qty, 0) || 0;
@@ -393,12 +384,7 @@ function CustomerPage() {
       </Button>
 
       {/* 購物車彈窗 */}
-      <CheckCartsDialog
-        isCartOpen={isCartOpen}
-        setIsCartOpen={setIsCartOpen}
-        setSubmitResult={seSubmitResult}
-        setSubmitResultOpen={setIsSubmitResultOpen}
-      />
+      <CheckCartsDialog isCartOpen={isCartOpen} setIsCartOpen={setIsCartOpen} />
 
       {/* 查看訂單明細按鈕*/}
       <Button
@@ -430,12 +416,6 @@ function CustomerPage() {
           setModelProductInfo={setModelProductInfo}
         />
       )}
-
-      <SubmitResultDialog
-        isSubmitResultOpen={isSubmitResultOpen}
-        submitResult={submitResult}
-        setIsSubmitResultOpen={setIsSubmitResultOpen}
-      />
     </>
   );
 }

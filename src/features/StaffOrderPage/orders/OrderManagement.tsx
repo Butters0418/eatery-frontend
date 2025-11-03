@@ -14,6 +14,7 @@ import Snackbar, { SnackbarCloseReason } from '@mui/material/Snackbar';
 
 // Hooks
 import { useAllOrdersQuery } from '../../../hooks/useOrderOperations';
+import useCalculateWaitingTime from '../../../hooks/useCalculateWaitingTime';
 
 // Stores
 import useOrdersStore from '../../../stores/useOrdersStore';
@@ -30,6 +31,7 @@ import { OrderType, OrderStatus } from '../../../types/orderType';
 import { BiSolidError } from 'react-icons/bi';
 import { MdErrorOutline } from 'react-icons/md';
 import { FaRegCheckCircle } from 'react-icons/fa';
+
 // 初始化 dayjs 中文語言包
 dayjs.locale('zh-tw');
 
@@ -99,7 +101,9 @@ function OrderManagement() {
   const [datePickerValue, setDatePickerValue] = useState<Dayjs | null>(dayjs());
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
-  const [now, setNow] = useState(dayjs());
+
+  // ===== custom hooks =====
+  const calculateWaiting = useCalculateWaitingTime();
 
   // ===== 響應式 =====
   const isLargeScreen = useMediaQuery('(min-width: 1536px)');
@@ -293,27 +297,6 @@ function OrderManagement() {
     }));
   }, [orderType, getStatusCounts]);
 
-  // 計算等待時間的函數
-  const calculateWaiting = (createdAt: string) => {
-    const orderTime = dayjs(createdAt);
-    const diffInMinutes = now.diff(orderTime, 'minute');
-
-    if (diffInMinutes < 60) {
-      return {
-        diffInText: diffInMinutes > 0 ? `${diffInMinutes} 分鐘` : '剛剛',
-        diffInMinutes: diffInMinutes,
-      };
-    } else {
-      const hours = Math.floor(diffInMinutes / 60);
-      const minutes = diffInMinutes % 60;
-      return {
-        diffInText:
-          minutes > 0 ? `${hours} 小時 ${minutes} 分鐘` : `${hours} 小時`,
-        diffInMinutes: diffInMinutes,
-      };
-    }
-  };
-
   // 判斷是否為處理中的訂單
   const isPendingOrder = (order: Orders) => {
     if (order.isDeleted || order.isComplete) return false;
@@ -338,14 +321,6 @@ function OrderManagement() {
     }
   }, [filteredStatusStyles, activeStatus]);
 
-  // 每分鐘更新當前時間
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setNow(dayjs());
-    }, 60000);
-    return () => clearInterval(interval);
-  }, []);
-
   // ===== 渲染 UI =====
   return (
     <>
@@ -361,7 +336,7 @@ function OrderManagement() {
         <div className="space-y-3 rounded-xl bg-white p-3 shadow-custom 2xl:space-y-4 2xl:p-4">
           <div className="space-y-2 2xl:space-y-4">
             <label className="block text-sm font-medium text-gray-700 2xl:mb-2">
-              訂單類型 {orderType}
+              訂單類型
             </label>
             <div className="flex items-center space-x-3 2xl:space-x-4">
               <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -398,9 +373,7 @@ function OrderManagement() {
           </div>
 
           <div className="space-y-2 2xl:space-y-4">
-            <label className="block text-sm font-medium text-gray-700">
-              訂單分類
-            </label>
+            <p className="block text-sm font-medium text-gray-700">訂單分類</p>
             <div className="flex items-center space-x-3 2xl:space-x-4">
               {filteredStatusStyles.map((style) => {
                 const isActive = activeStatus === style.status;
