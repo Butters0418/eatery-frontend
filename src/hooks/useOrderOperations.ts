@@ -40,7 +40,6 @@ export const useSubmitOrder = () => {
     mutationFn: async () => {
       const payload = buildOrderPayload();
       const shouldUseToken = role === 'staff' || role === 'admin';
-      console.log(payload);
       // 如果是員工或管理者，帶上 token
       if (shouldUseToken && !token) {
         throw new Error('使用者 token 是必需的');
