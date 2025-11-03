@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import dayjs from 'dayjs';
@@ -10,6 +10,7 @@ import Snackbar, { SnackbarCloseReason } from '@mui/material/Snackbar';
 // Hooks
 import { useTableQuery } from '../../../hooks/useTableOperations';
 import { useAllOrdersQuery } from '../../../hooks/useOrderOperations';
+import useCalculateWaitingTime from '../../../hooks/useCalculateWaitingTime';
 
 // Stores
 import useTableStore from '../../../stores/useTableStore';
@@ -41,8 +42,6 @@ function TableStatusManagement() {
   const [currentTable, setCurrentTable] = useState<number>(0); // 0代表全部桌況
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
-  const [now, setNow] = useState(dayjs());
-
   const today = dayjs().format('YYYY-MM-DD');
   const { isError, isPending } = useAllOrdersQuery(today);
   const navigate = useNavigate();
@@ -87,24 +86,7 @@ function TableStatusManagement() {
   }, [ordersData, currentTable]);
 
   // 計算等待時間的函數
-  const calculateWaiting = (createdAt: string | Date) => {
-    const orderTime = dayjs(createdAt);
-    const diffInMinutes = now.diff(orderTime, 'minute');
-
-    if (diffInMinutes < 60) {
-      return {
-        diffInText: diffInMinutes > 0 ? `${diffInMinutes} 分` : '剛剛',
-        diffInMinutes: diffInMinutes,
-      };
-    } else {
-      const hours = Math.floor(diffInMinutes / 60);
-      const minutes = diffInMinutes % 60;
-      return {
-        diffInText: minutes > 0 ? `${hours} 時 ${minutes} 分` : `${hours} 時`,
-        diffInMinutes: diffInMinutes,
-      };
-    }
-  };
+  const calculateWaiting = useCalculateWaitingTime();
 
   // 判斷是否為處理中的訂單(決定等待時間是否顯示)
   const isPendingOrder = (order: Orders) => {
@@ -157,14 +139,6 @@ function TableStatusManagement() {
   const startOrder = (tableNumber: number) => {
     navigate(`/order-page/order-creation?tableNumber=${tableNumber}`);
   };
-
-  // 每分鐘更新當前時間
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setNow(dayjs());
-    }, 60000);
-    return () => clearInterval(interval);
-  }, []);
 
   return (
     <>

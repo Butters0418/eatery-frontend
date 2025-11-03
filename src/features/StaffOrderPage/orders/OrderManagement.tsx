@@ -14,6 +14,7 @@ import Snackbar, { SnackbarCloseReason } from '@mui/material/Snackbar';
 
 // Hooks
 import { useAllOrdersQuery } from '../../../hooks/useOrderOperations';
+import useCalculateWaitingTime from '../../../hooks/useCalculateWaitingTime';
 
 // Stores
 import useOrdersStore from '../../../stores/useOrdersStore';
@@ -100,7 +101,9 @@ function OrderManagement() {
   const [datePickerValue, setDatePickerValue] = useState<Dayjs | null>(dayjs());
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
-  const [now, setNow] = useState(dayjs());
+
+  // ===== custom hooks =====
+  const calculateWaiting = useCalculateWaitingTime();
 
   // ===== 響應式 =====
   const isLargeScreen = useMediaQuery('(min-width: 1536px)');
@@ -294,26 +297,6 @@ function OrderManagement() {
     }));
   }, [orderType, getStatusCounts]);
 
-  // 計算等待時間的函數
-  const calculateWaiting = (createdAt: string) => {
-    const orderTime = dayjs(createdAt);
-    const diffInMinutes = now.diff(orderTime, 'minute');
-
-    if (diffInMinutes < 60) {
-      return {
-        diffInText: diffInMinutes > 0 ? `${diffInMinutes} 分` : '剛剛',
-        diffInMinutes: diffInMinutes,
-      };
-    } else {
-      const hours = Math.floor(diffInMinutes / 60);
-      const minutes = diffInMinutes % 60;
-      return {
-        diffInText: minutes > 0 ? `${hours} 時 ${minutes} 分` : `${hours} 時`,
-        diffInMinutes: diffInMinutes,
-      };
-    }
-  };
-
   // 判斷是否為處理中的訂單
   const isPendingOrder = (order: Orders) => {
     if (order.isDeleted || order.isComplete) return false;
@@ -337,14 +320,6 @@ function OrderManagement() {
       setActiveStatus(OrderStatus.ALL);
     }
   }, [filteredStatusStyles, activeStatus]);
-
-  // 每分鐘更新當前時間
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setNow(dayjs());
-    }, 60000);
-    return () => clearInterval(interval);
-  }, []);
 
   // ===== 渲染 UI =====
   return (
