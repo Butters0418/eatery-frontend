@@ -19,12 +19,16 @@ import useProductStore from '../../../stores/useProductStore';
 // Components
 import EditProductDialog from './EditProductDialog';
 import MenuCard from '../components/MenuCard';
+import ResultDialog from '../../../components/ResultDialog';
 
 // Types
 import { Product } from '../../../types/productType';
+import { ResultDialogProps } from '../../../components/ResultDialog';
 
 // Icons
 import { HiOutlinePlusSm } from 'react-icons/hi';
+
+type ResultDialogInfo = Omit<ResultDialogProps, 'onClose'>;
 
 function MenuManagement() {
   // ===== Store Hooks =====
@@ -35,6 +39,14 @@ function MenuManagement() {
 
   // ===== 狀態管理 =====
   const [categoryFilter, setCategoryFilter] = useState('所有商品');
+  // 結果燈箱
+  const [resultInfo, setResultInfo] = useState<ResultDialogInfo>({
+    isOpen: false,
+    resultType: 'success',
+    title: '',
+    message: '',
+    btnText: '',
+  });
   const [modelProductInfo, setModelProductInfo] = useState<{
     type: 'new' | 'edit';
     targetProduct: Product | null;
@@ -68,8 +80,13 @@ function MenuManagement() {
   };
 
   // 關閉對話框
-  const handleCloseDialog = () => {
+  const handleCloseProductInfoDialog = () => {
     setModelProductInfo((prev) => ({ ...prev, modelOpen: false }));
+  };
+
+  // 關閉 ResultDialog
+  const handleResultDialogClose = () => {
+    setResultInfo((prev) => ({ ...prev, isOpen: false }));
   };
 
   // 切換分類
@@ -181,6 +198,7 @@ function MenuManagement() {
                     key={product.productId}
                     product={product}
                     onEdit={handleOpenEditProductDialog}
+                    setResultInfo={setResultInfo}
                   />
                 ))}
               </div>
@@ -194,7 +212,16 @@ function MenuManagement() {
         isOpen={modelProductInfo.modelOpen}
         type={modelProductInfo.type}
         targetProduct={modelProductInfo.targetProduct}
-        onClose={handleCloseDialog}
+        onClose={handleCloseProductInfoDialog}
+      />
+
+      <ResultDialog
+        isOpen={resultInfo.isOpen}
+        resultType={resultInfo.resultType}
+        title={resultInfo.title}
+        message={resultInfo.message}
+        btnText={resultInfo.btnText}
+        onClose={handleResultDialogClose}
       />
     </>
   );

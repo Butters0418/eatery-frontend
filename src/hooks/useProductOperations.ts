@@ -152,7 +152,7 @@ export const useDeleteProduct = () => {
       if (!token) {
         throw new Error('使用者 token 是必需的');
       }
-      const deleteRes = deleteProduct(productId, token);
+      const deleteRes = deleteProduct(token, productId);
       return deleteRes;
     },
     onError: (err) => {

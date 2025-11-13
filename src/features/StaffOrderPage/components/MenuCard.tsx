@@ -2,9 +2,11 @@
 import { useState } from 'react';
 
 // 第三方庫
+import FormControlLabel from '@mui/material/FormControlLabel';
 import Button from '@mui/material/Button';
 import ButtonGroup from '@mui/material/ButtonGroup';
 import Switch from '@mui/material/Switch';
+import axios from 'axios';
 
 // Hooks
 import {
@@ -21,74 +23,125 @@ import { formatNumber } from '../../../utils/formatNumber';
 
 // Types
 import { Product } from '../../../types/productType';
+import { ResultDialogProps } from '../../../components/ResultDialog';
 
 // Icons
 import { FaRegTrashCan } from 'react-icons/fa6';
 import { MdEdit } from 'react-icons/md';
 
 // ===== 類型定義 =====
+
+type ResultDialogInfo = Omit<ResultDialogProps, 'onClose'>;
+
 interface MenuCardProps {
   product: Product;
   onEdit: (product: Product) => void;
+  setResultInfo: (resultInfo: ResultDialogInfo) => void;
 }
 
-function MenuCard({ product, onEdit }: MenuCardProps) {
+function MenuCard({ product, onEdit, setResultInfo }: MenuCardProps) {
   // ===== API 相關 Hooks =====
-  const { mutate: toggleAvailability } = useToggleProductAvailability();
-  const { mutate: togglePopular } = useToggleProductPopular();
+  const { mutate: updateProductAvailabilityMutation } =
+    useToggleProductAvailability();
+  const { mutate: updateProductPopularityMutation } = useToggleProductPopular();
   const { mutate: deleteProduct, isPending: isDeleting } = useDeleteProduct();
 
   // ===== 狀態管理 =====
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
 
   // ===== 事件處理函數 =====
-  // 開啟編輯對話框
+  // 開啟編輯燈箱
   const handleOpenEditDialog = () => {
     onEdit(product);
   };
 
-  // 開啟刪除確認對話框
-  const handleOpenDeleteDialog = (event: React.MouseEvent) => {
-    event.stopPropagation();
+  // 開啟刪除確認燈箱
+  const handleOpenDeleteDialog = () => {
     setConfirmDialogOpen(true);
-  };
-
-  // 切換上架狀態
-  const handleToggleAvailability = (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    event.stopPropagation();
-    if (!product._id) return;
-
-    toggleAvailability({
-      productId: product._id,
-      isAvailable: event.target.checked,
-    });
-  };
-
-  // 切換熱門狀態
-  const handleTogglePopular = (event: React.ChangeEvent<HTMLInputElement>) => {
-    event.stopPropagation();
-    if (!product._id) return;
-
-    togglePopular({
-      productId: product._id,
-      isPopular: event.target.checked,
-    });
   };
 
   // 刪除商品
   const handleDeleteProduct = () => {
-    if (!product._id) return;
+    if (!product.productId) return;
 
-    deleteProduct(product._id, {
+    deleteProduct(product.productId, {
       onSuccess: () => {
+        setResultInfo({
+          isOpen: true,
+          resultType: 'success',
+          title: '刪除成功',
+          message: '商品已成功刪除。',
+          btnText: '關 閉',
+        });
+      },
+      onError: (err) => {
+        const errMsg = axios.isAxiosError(err)
+          ? err.response?.data.message
+          : '發生錯誤，請稍後再試';
+        setResultInfo({
+          isOpen: true,
+          resultType: 'error',
+          title: '錯誤',
+          message: errMsg,
+          btnText: '關 閉',
+        });
+      },
+      onSettled: () => {
         setConfirmDialogOpen(false);
       },
-      onError: (error: Error) => {
-        console.error('商品刪除失敗:', error);
-      },
     });
+  };
+
+  // 切換上架狀態
+  const handleUpdateAvailability = (isAvailable: boolean) => {
+    if (!product.productId) return;
+
+    updateProductAvailabilityMutation(
+      {
+        productId: product.productId,
+        isAvailable: isAvailable,
+      },
+      {
+        onError: (err) => {
+          const errMsg = axios.isAxiosError(err)
+            ? err.response?.data.message
+            : '發生錯誤，請稍後再試';
+          setResultInfo({
+            isOpen: true,
+            resultType: 'error',
+            title: '錯誤',
+            message: errMsg,
+            btnText: '關 閉',
+          });
+        },
+      },
+    );
+  };
+
+  // 切換熱門狀態
+  const handleUpdatePopular = (isPopular: boolean) => {
+    if (!product.productId) return;
+
+    updateProductPopularityMutation(
+      {
+        productId: product.productId,
+        isPopular: isPopular,
+      },
+      {
+        onError: (err) => {
+          const errMsg = axios.isAxiosError(err)
+            ? err.response?.data.message
+            : '發生錯誤，請稍後再試';
+          setResultInfo({
+            isOpen: true,
+            resultType: 'error',
+            title: '錯誤',
+            message: errMsg,
+            btnText: '關 閉',
+          });
+        },
+      },
+    );
   };
 
   return (
@@ -123,27 +176,31 @@ function MenuCard({ product, onEdit }: MenuCardProps) {
         <div className="ml-auto flex w-auto shrink-0 items-center gap-4 px-3">
           {/* 上架狀態 */}
           <div className="flex items-center gap-1.5">
-            <span className="text-sm text-gray-600">
-              {product.isAvailable ? '已上架' : '已下架'}
-            </span>
-            <Switch
-              checked={product.isAvailable}
-              onChange={handleToggleAvailability}
-              color="primary"
-              size="small"
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={product.isAvailable}
+                  onChange={() =>
+                    handleUpdateAvailability(!product.isAvailable)
+                  }
+                  color="primary"
+                />
+              }
+              label={product.isAvailable ? '已上架' : '已下架'}
             />
           </div>
 
           {/* 熱門狀態 */}
           <div className="mr-5 flex items-center gap-1.5">
-            <span className="text-sm text-gray-600">
-              {product.isPopular ? '熱門' : '一般'}
-            </span>
-            <Switch
-              checked={product.isPopular}
-              onChange={handleTogglePopular}
-              color="primary"
-              size="small"
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={product.isPopular}
+                  onChange={() => handleUpdatePopular(!product.isPopular)}
+                  color="primary"
+                />
+              }
+              label={product.isPopular ? '熱門' : '一般'}
             />
           </div>
 
