@@ -381,6 +381,21 @@ function EditProductDialog({
     setResultInfo((prev) => ({ ...prev, isOpen: false }));
   };
 
+  // 關閉對話框前檢查
+  const handleClose = () => {
+    if (isUploadingImage) {
+      setResultInfo({
+        isOpen: true,
+        resultType: 'error',
+        title: '提示',
+        message: '圖片正在上傳中，請稍候',
+        btnText: '確定',
+      });
+      return;
+    }
+    onClose();
+  };
+
   // ===== 渲染 UI =====
   return (
     <>
@@ -397,7 +412,8 @@ function EditProductDialog({
             p: 0,
           },
         }}
-        onClose={onClose}
+        onClose={handleClose}
+        disableEscapeKeyDown={isUploadingImage}
       >
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col">
           {/* Header */}
@@ -885,7 +901,8 @@ function EditProductDialog({
             <Button
               type="button"
               variant="text"
-              onClick={onClose}
+              onClick={handleClose}
+              disabled={isUploadingImage}
               sx={{
                 px: 3,
                 py: 1.5,
@@ -903,7 +920,7 @@ function EditProductDialog({
             <Button
               type="submit"
               variant="contained"
-              disabled={isCreating || isUpdating}
+              disabled={isCreating || isUpdating || isUploadingImage}
               sx={{
                 px: 3,
                 py: 1.5,
@@ -919,6 +936,8 @@ function EditProductDialog({
             >
               {isCreating || isUpdating ? (
                 <CircularProgress size={24} color="inherit" />
+              ) : isUploadingImage ? (
+                '圖片上傳中...'
               ) : type === 'new' ? (
                 '儲存商品'
               ) : (
