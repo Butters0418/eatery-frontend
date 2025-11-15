@@ -702,7 +702,7 @@ function EditProductDialog({
                   >
                     {/* 群組名稱 */}
                     <div className="mb-4 flex items-start gap-4">
-                      <label className="flex-1">
+                      <label className="relative flex-1 pb-4">
                         <p className="pb-2 text-base font-medium text-gray-900">
                           群組名稱
                         </p>
@@ -710,21 +710,25 @@ function EditProductDialog({
                           name={`addons.${groupIndex}.group`}
                           control={control}
                           render={({ field }) => (
-                            <TextField
-                              {...field}
-                              placeholder="例如：選擇您的醬料"
-                              fullWidth
-                              size="small"
-                              error={!!errors.addons?.[groupIndex]?.group}
-                              helperText={
-                                errors.addons?.[groupIndex]?.group?.message
-                              }
-                              sx={{
-                                '& .MuiOutlinedInput-root': {
-                                  bgcolor: 'white',
-                                },
-                              }}
-                            />
+                            <>
+                              <TextField
+                                {...field}
+                                placeholder="例如：加麵 / 甜度"
+                                fullWidth
+                                size="small"
+                                error={!!errors.addons?.[groupIndex]?.group}
+                                sx={{
+                                  '& .MuiOutlinedInput-root': {
+                                    bgcolor: 'white',
+                                  },
+                                }}
+                              />
+                              {errors.addons?.[groupIndex]?.group && (
+                                <span className="absolute -bottom-1 left-2 text-sm text-error">
+                                  {errors.addons?.[groupIndex]?.group?.message}
+                                </span>
+                              )}
+                            </>
                           )}
                         />
                       </label>
@@ -742,64 +746,92 @@ function EditProductDialog({
                         (_, optionIndex) => (
                           <div
                             key={optionIndex}
-                            className="flex items-center gap-3"
+                            className="flex w-full items-center gap-3"
                           >
-                            <Controller
-                              name={`addons.${groupIndex}.options.${optionIndex}.name`}
-                              control={control}
-                              render={({ field }) => (
-                                <TextField
-                                  {...field}
-                                  placeholder="選項名稱"
-                                  size="small"
-                                  fullWidth
-                                  error={
-                                    !!errors.addons?.[groupIndex]?.options?.[
+                            <div className="relative w-2/4 pb-4">
+                              <Controller
+                                name={`addons.${groupIndex}.options.${optionIndex}.name`}
+                                control={control}
+                                render={({ field }) => (
+                                  <>
+                                    <TextField
+                                      {...field}
+                                      placeholder="選項名稱"
+                                      size="small"
+                                      fullWidth
+                                      error={
+                                        !!errors.addons?.[groupIndex]
+                                          ?.options?.[optionIndex]?.name
+                                      }
+                                      // helperText={
+                                      //   errors.addons?.[groupIndex]?.options?.[
+                                      //     optionIndex
+                                      //   ]?.name?.message
+                                      // }
+                                      sx={{
+                                        '& .MuiOutlinedInput-root': {
+                                          bgcolor: 'white',
+                                        },
+                                      }}
+                                    />
+                                    {!!errors.addons?.[groupIndex]?.options?.[
                                       optionIndex
-                                    ]?.name
-                                  }
-                                  helperText={
-                                    errors.addons?.[groupIndex]?.options?.[
+                                    ]?.name && (
+                                      <span className="absolute -bottom-1 left-2 text-sm text-error">
+                                        {
+                                          errors.addons?.[groupIndex]
+                                            ?.options?.[optionIndex]?.name
+                                            ?.message
+                                        }
+                                      </span>
+                                    )}
+                                  </>
+                                )}
+                              />
+                            </div>
+                            <div className="relative w-1/3 pb-4">
+                              <Controller
+                                name={`addons.${groupIndex}.options.${optionIndex}.price`}
+                                control={control}
+                                render={({ field }) => (
+                                  <>
+                                    <TextField
+                                      {...field}
+                                      type="number"
+                                      placeholder="0.00"
+                                      size="small"
+                                      label="加價$"
+                                      error={
+                                        !!errors.addons?.[groupIndex]
+                                          ?.options?.[optionIndex]?.price
+                                      }
+                                      // helperText={
+                                      //   errors.addons?.[groupIndex]?.options?.[
+                                      //     optionIndex
+                                      //   ]?.price?.message
+                                      // }
+                                      sx={{
+                                        '& .MuiOutlinedInput-root': {
+                                          bgcolor: 'white',
+                                        },
+                                      }}
+                                    />
+                                    {!!errors.addons?.[groupIndex]?.options?.[
                                       optionIndex
-                                    ]?.name?.message
-                                  }
-                                  sx={{
-                                    '& .MuiOutlinedInput-root': {
-                                      bgcolor: 'white',
-                                    },
-                                  }}
-                                />
-                              )}
-                            />
-                            <Controller
-                              name={`addons.${groupIndex}.options.${optionIndex}.price`}
-                              control={control}
-                              render={({ field }) => (
-                                <TextField
-                                  {...field}
-                                  type="number"
-                                  placeholder="0.00"
-                                  size="small"
-                                  label="加價$"
-                                  error={
-                                    !!errors.addons?.[groupIndex]?.options?.[
-                                      optionIndex
-                                    ]?.price
-                                  }
-                                  helperText={
-                                    errors.addons?.[groupIndex]?.options?.[
-                                      optionIndex
-                                    ]?.price?.message
-                                  }
-                                  sx={{
-                                    width: 200,
-                                    '& .MuiOutlinedInput-root': {
-                                      bgcolor: 'white',
-                                    },
-                                  }}
-                                />
-                              )}
-                            />
+                                    ]?.price && (
+                                      <span className="absolute -bottom-1 left-2 text-sm text-error">
+                                        {
+                                          errors.addons?.[groupIndex]
+                                            ?.options?.[optionIndex]?.price
+                                            ?.message
+                                        }
+                                      </span>
+                                    )}
+                                  </>
+                                )}
+                              />
+                            </div>
+
                             <IconButton
                               size="small"
                               onClick={() =>

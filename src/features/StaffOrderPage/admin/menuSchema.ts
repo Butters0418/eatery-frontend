@@ -3,7 +3,16 @@ import * as yup from 'yup';
 // 加料選項驗證
 const addonOptionSchema = yup.object({
   name: yup.string().required('選項名稱為必填'),
-  price: yup.number().min(0, '價格不可小於 0').required('價格為必填'),
+  price: yup
+    .number()
+    .transform((value, originalValue) => {
+      if (originalValue === '' || originalValue == null) {
+        return undefined; // 空值觸發 required 驗證
+      }
+      return value;
+    })
+    .required('加價金額為必填')
+    .typeError('請輸入有效的數字'),
 });
 
 // 加料群組驗證
