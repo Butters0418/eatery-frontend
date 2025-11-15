@@ -2,7 +2,12 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 
 // 第三方庫
-import { useForm, Controller, useFieldArray } from 'react-hook-form';
+import {
+  useForm,
+  Controller,
+  useFieldArray,
+  type SubmitHandler,
+} from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useDropzone } from 'react-dropzone';
 import Dialog from '@mui/material/Dialog';
@@ -34,9 +39,10 @@ import { uploadImage } from '../../../apis/uploadApi';
 
 // Schemas
 import { menuSchema } from './menuSchema';
+import type { MenuFormValues } from './menuSchema';
 
 // Types
-import { Product, AddonGroup } from '../../../types/productType';
+import { Product } from '../../../types/productType';
 import { ResultDialogProps } from '../../../components/ResultDialog';
 
 // Icons
@@ -52,16 +58,7 @@ interface EditProductDialogProps {
   onClose: () => void;
 }
 
-interface ProductFormData {
-  name: string;
-  description: string;
-  price: number;
-  category: string;
-  imageUrl: string;
-  isAvailable: boolean;
-  isPopular: boolean;
-  addons: AddonGroup[] | null;
-}
+type ProductFormData = MenuFormValues;
 
 type ResultInfo = Omit<ResultDialogProps, 'onClose'>;
 
@@ -101,7 +98,7 @@ function EditProductDialog({
     watch,
 
     formState: { errors },
-  } = useForm<ProductFormData>({
+  } = useForm({
     resolver: yupResolver(menuSchema),
     defaultValues: {
       name: '',
@@ -111,7 +108,7 @@ function EditProductDialog({
       imageUrl: '',
       isAvailable: true,
       isPopular: false,
-      addons: [] as AddonGroup[],
+      addons: [],
     },
   });
 
@@ -193,7 +190,7 @@ function EditProductDialog({
           imageUrl: '',
           isAvailable: true,
           isPopular: false,
-          addons: [] as AddonGroup[],
+          addons: [],
         });
         replace([]); // 清空 addons fields
         setImagePreview('');
@@ -208,7 +205,10 @@ function EditProductDialog({
           imageUrl: targetProduct.imageUrl,
           isAvailable: targetProduct.isAvailable,
           isPopular: targetProduct.isPopular,
-          addons: (targetProduct.addons || []) as AddonGroup[],
+          addons:
+            targetProduct.addons && targetProduct.addons.length > 0
+              ? targetProduct.addons
+              : [],
         });
         // 如果有 addons，設置到 fields；否則清空
         if (targetProduct.addons && targetProduct.addons.length > 0) {
@@ -278,10 +278,10 @@ function EditProductDialog({
     if (value === '__NEW_CATEGORY__') {
       setShowNewCategoryInput(true);
       setNewCategoryInput('');
-      setValue('category', '');
+      setValue('category', '', { shouldValidate: true });
     } else {
       setShowNewCategoryInput(false);
-      setValue('category', value);
+      setValue('category', value, { shouldValidate: true });
     }
   };
 
@@ -289,11 +289,22 @@ function EditProductDialog({
   const handleCancelNewCategory = () => {
     setShowNewCategoryInput(false);
     setNewCategoryInput('');
-    setValue('category', '');
+    setValue('category', '', { shouldValidate: true });
   };
 
   // 表單提交
-  const onSubmit = async (data: ProductFormData) => {
+  const onSubmit: SubmitHandler<ProductFormData> = async (data) => {
+    if (!data.category) {
+      setResultInfo({
+        isOpen: true,
+        resultType: 'error',
+        title: '驗證錯誤',
+        message: '請選擇或輸入分類',
+        btnText: '關閉',
+      });
+      return;
+    }
+
     const productData: Omit<Product, '_id' | 'productId'> = {
       name: data.name,
       description: data.description,
@@ -493,7 +504,9 @@ function EditProductDialog({
                             value={newCategoryInput}
                             onChange={(e) => {
                               setNewCategoryInput(e.target.value);
-                              setValue('category', e.target.value);
+                              setValue('category', e.target.value, {
+                                shouldValidate: true,
+                              });
                             }}
                             placeholder="輸入新分類"
                             fullWidth
