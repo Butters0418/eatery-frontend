@@ -29,13 +29,11 @@ import {
   useCreateProduct,
   useUpdateProduct,
 } from '../../../hooks/useProductOperations';
+import { useUploadImageOperations } from '../../../hooks/useUploadImageOperations';
 
 // Stores
 import useProductStore from '../../../stores/useProductStore';
 import useAuthStore from '../../../stores/useAuthStore';
-
-// APIs
-import { uploadImage } from '../../../apis/uploadApi';
 
 // Schemas
 import { menuSchema } from './menuSchema';
@@ -75,10 +73,11 @@ function EditProductDialog({
   // ===== API Hooks =====
   const { mutate: createProduct, isPending: isCreating } = useCreateProduct();
   const { mutate: updateProduct, isPending: isUpdating } = useUpdateProduct();
+  const { mutate: uploadImageMutation, isPending: isUploadingImage } =
+    useUploadImageOperations();
 
   // ===== 狀態管理 =====
   const [imagePreview, setImagePreview] = useState<string>('');
-  const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [resultInfo, setResultInfo] = useState<ResultInfo>({
     isOpen: false,
     resultType: 'success',
@@ -150,30 +149,32 @@ function EditProductDialog({
         const file = acceptedFiles[0];
         const localPreviewUrl = URL.createObjectURL(file);
         setImagePreview(localPreviewUrl);
-        setIsUploadingImage(true);
 
-        try {
-          const imageUrl = await uploadImage(file, token);
-          setValue('imageUrl', imageUrl, { shouldValidate: true });
-          setImagePreview(imageUrl);
-        } catch (error) {
-          const errMsg = axios.isAxiosError(error)
-            ? error.response?.data.message || '圖片上傳失敗'
-            : '圖片上傳失敗';
-          setResultInfo({
-            isOpen: true,
-            resultType: 'error',
-            title: '上傳失敗',
-            message: errMsg,
-            btnText: '關閉',
-          });
-          setImagePreview('');
-          setValue('imageUrl', '');
-        } finally {
-          setIsUploadingImage(false);
-        }
+        uploadImageMutation(
+          { file, type: 'products' },
+          {
+            onSuccess: (imageUrl) => {
+              setValue('imageUrl', imageUrl, { shouldValidate: true });
+              setImagePreview(imageUrl);
+            },
+            onError: (error) => {
+              const errMsg = axios.isAxiosError(error)
+                ? error.response?.data.message || '圖片上傳失敗'
+                : '圖片上傳失敗';
+              setResultInfo({
+                isOpen: true,
+                resultType: 'error',
+                title: '上傳失敗',
+                message: errMsg,
+                btnText: '關閉',
+              });
+              setImagePreview('');
+              setValue('imageUrl', '');
+            },
+          },
+        );
       },
-      [token, setValue],
+      [token, setValue, uploadImageMutation],
     ),
   });
 
@@ -573,7 +574,10 @@ function EditProductDialog({
                 {/* 商品圖片 */}
                 <div className="space-y-4">
                   <p className="text-base font-medium text-gray-900">
-                    商品圖片
+                    商品圖片{' '}
+                    <span className="text-sm text-gray-400">
+                      檔案不得大於 2MB
+                    </span>
                   </p>
                   <div
                     {...getRootProps()}
@@ -590,7 +594,7 @@ function EditProductDialog({
                       <img
                         src={imagePreview}
                         alt="預覽"
-                        className="h-full w-full rounded-lg object-cover"
+                        className="h-full w-full rounded-lg object-contain"
                       />
                     ) : (
                       <div className="text-center">
