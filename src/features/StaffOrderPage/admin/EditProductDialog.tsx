@@ -95,7 +95,6 @@ function EditProductDialog({
     reset,
     setValue,
     watch,
-
     formState: { errors },
   } = useForm({
     resolver: yupResolver(menuSchema),
