@@ -11,4 +11,5 @@ export const API = {
   tables: `${BASE_API_URL}/api/tables`, // 桌號 API
   products: `${BASE_API_URL}/api/products`, // 商品 API
   orders: `${BASE_API_URL}/api/orders`, // 訂單 API
+  uploadImage: `${BASE_API_URL}/api/upload/image`, // 上傳圖片 API
 };

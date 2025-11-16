@@ -216,7 +216,7 @@ function OrderCreationManagement() {
       <div className="space-y-4 2xl:space-y-6">
         <div className="flex flex-col space-y-2 2xl:space-y-2">
           <h1 className="text-xl font-bold text-gray-900 2xl:text-3xl">
-            開始點餐 {tabView} {orderType} {tableNumber}
+            開始點餐
           </h1>
         </div>
         <div className="flex items-center justify-start space-x-3 rounded-xl bg-white p-3 shadow-custom 2xl:space-x-4 2xl:p-4">

@@ -9,8 +9,6 @@ import { FaCheckCircle } from 'react-icons/fa';
 import { MdErrorOutline } from 'react-icons/md';
 import { AiOutlineQuestionCircle } from 'react-icons/ai';
 
-// Type
-
 // ===== 類型定義 =====
 type ResultType = 'success' | 'error' | 'info';
 

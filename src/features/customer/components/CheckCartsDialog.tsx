@@ -66,7 +66,7 @@ function CheckCartsDialog({
       onSuccess: () => {
         setResultInfo((prev) => ({
           ...prev,
-          type: 'success',
+          resultType: 'success',
           title: '訂單提交成功!',
           message: '點擊下方查詢訂單明細',
         }));
@@ -76,7 +76,7 @@ function CheckCartsDialog({
         console.error('訂單提交失敗:', error);
         setResultInfo((prev) => ({
           ...prev,
-          type: 'error',
+          resultType: 'error',
           title: '訂單提交失敗!',
           message: '請重新掃描桌號 QR Code 或聯絡服務人員',
         }));
