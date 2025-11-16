@@ -66,10 +66,10 @@ export const useCreateProduct = () => {
   return useMutation({
     mutationFn: (productData: Omit<Product, '_id' | 'productId'>) => {
       if (!token) {
-        throw new Error('使用者 token 是必需的');
+        throw new Error('使用者未登入');
       }
-      const postRes = createProduct(token, productData);
-      return postRes;
+      const createRes = createProduct(token, productData);
+      return createRes;
     },
     onError: (err) => {
       if (axios.isAxiosError(err)) {

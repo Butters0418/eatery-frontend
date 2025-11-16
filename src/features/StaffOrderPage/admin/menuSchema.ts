@@ -58,4 +58,4 @@ export const menuSchema = yup.object({
   addons: yup.array().of(addonGroupSchema).nullable().default(null),
 });
 
-export type MenuFormValues = yup.Asserts<typeof menuSchema>;
+export type MenuFormValues = yup.InferType<typeof menuSchema>;

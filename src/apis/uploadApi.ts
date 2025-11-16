@@ -9,7 +9,7 @@ interface UploadImageParams {
   type?: string;
 }
 
-// 上傳圖片到 Firebase Storage
+// 上傳圖片到後端 API
 export const uploadImage = async (token: string, params: UploadImageParams) => {
   const formData = new FormData();
   formData.append('image', params.file);
