@@ -9,6 +9,7 @@ export const API = {
   resendVerifyCode: `${BASE_API_URL}/api/resend-verification-code`, // 重寄驗証碼 API
   resetPassword: `${BASE_API_URL}/api/reset-password`, // 重設密碼 API
   tables: `${BASE_API_URL}/api/tables`, // 桌號 API
+  tableToken: `${BASE_API_URL}/api/table/qr-token`, // 取得桌號 token 與 ID
   products: `${BASE_API_URL}/api/products`, // 商品 API
   orders: `${BASE_API_URL}/api/orders`, // 訂單 API
   uploadImage: `${BASE_API_URL}/api/upload/image`, // 上傳圖片 API

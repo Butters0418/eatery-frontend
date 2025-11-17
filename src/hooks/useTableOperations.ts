@@ -5,11 +5,12 @@ import { useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 
 // APIs
-import { fetchTables } from '../apis/tableApi';
+import { fetchTables, fetchTableToken } from '../apis/tableApi';
 
 // Stores
 import useTableStore from '../stores/useTableStore';
 import useAuthStore from '../stores/useAuthStore';
+import useCartStore from '../stores/useCartStore';
 
 export const useTableQuery = () => {
   // ===== Store Hooks =====
@@ -42,6 +43,44 @@ export const useTableQuery = () => {
   useEffect(() => {
     if (error) {
       console.error('取得桌位失敗:', error.message);
+    }
+  }, [error]);
+
+  return query;
+};
+
+// 取得桌號的  Token 與 id
+export const useTableTokenQuery = (tableNumber: string) => {
+  // ===== Store Hooks =====
+  const setTable = useCartStore((state) => state.setTable);
+
+  // ===== API 查詢 =====
+  const query = useQuery({
+    queryKey: ['tableToken', tableNumber],
+    queryFn: async () => {
+      const tableTokenData = await fetchTableToken(tableNumber);
+      return tableTokenData;
+    },
+    enabled: !!tableNumber, // 只有在 tableNumber 有值時才啟用查詢
+  });
+
+  // ===== 解構查詢結果 =====
+  const { data, isSuccess, error } = query;
+
+  // ===== Effects =====
+  useEffect(() => {
+    if (isSuccess && data) {
+      console.log('取得桌位資訊成功:', data);
+      setTable({
+        tableId: data.tableId as string,
+        tableToken: data.tableToken as string,
+      });
+    }
+  }, [isSuccess, data, setTable]);
+
+  useEffect(() => {
+    if (error) {
+      console.error('取得桌位資訊失敗:', error.message);
     }
   }, [error]);
 
