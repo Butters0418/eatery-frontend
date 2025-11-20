@@ -15,6 +15,7 @@ import Button from '@mui/material/Button';
 // Hooks
 import { useProductQuery } from '../../hooks/useProductOperations';
 import { useOrderReceiptQuery } from '../../hooks/useOrderOperations.ts';
+import { useTableTokenQuery } from '../../hooks/useTableOperations.ts';
 
 // Stores
 import useCartStore from '../../stores/useCartStore.ts';
@@ -51,11 +52,14 @@ interface ModelProductInfo {
 function CustomerPage() {
   // ===== Store Hooks =====
   const products = useProductStore((state) => state.products);
-  const { cart, setTable, isCartOpen, setIsCartOpen } = useCartStore();
+  const { cart, isCartOpen, setIsCartOpen } = useCartStore();
   const { isReceiptOpen, setIsReceiptOpen } = useReceiptStore();
 
   // ===== API 相關 Hooks =====
   const { isPending, status, error } = useProductQuery();
+  const { tableNumber } = queryString.parse(location.search);
+  useTableTokenQuery(tableNumber as string);
+
   useOrderReceiptQuery();
 
   // ===== 商品選擇狀態 =====
@@ -83,18 +87,6 @@ function CustomerPage() {
       {} as Record<string, Product[]>,
     );
   }, [products]);
-
-  // ===== Effects =====
-  // 解析 URL query string 取得桌號
-  useEffect(() => {
-    const query = queryString.parse(location.search);
-    if (query.tableId && query.tableToken) {
-      setTable({
-        tableId: query.tableId as string,
-        tableToken: query.tableToken as string,
-      });
-    }
-  }, []);
 
   // 點擊非商品數量控制區域時重置當前選中商品
   useEffect(() => {

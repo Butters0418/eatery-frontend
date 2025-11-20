@@ -157,24 +157,18 @@ export const useDeleteOrderItem = () => {
       if (axios.isAxiosError(err)) {
         switch (err.response?.status) {
           case 400:
-            console.error(err.response.data.message);
-            break;
           case 403:
-            console.error(err.response.data.message);
-            break;
           case 404:
             console.error(err.response.data.message);
             break;
           default:
-            console.error('發生錯誤，請稍後再試');
+            console.error('發生錯誤,請稍後再試');
             break;
         }
-      } else {
-        console.error('發生錯誤，請稍後再試');
       }
     },
     onSettled: () => {
-      // 刪除整張訂單後，重新獲取訂單列表
+      // 刪除整張訂單後,重新獲取訂單列表
       queryClient.invalidateQueries({
         queryKey: ['allOrders'],
       });
@@ -205,24 +199,18 @@ export const useDeleteOrder = () => {
       if (axios.isAxiosError(err)) {
         switch (err.response?.status) {
           case 400:
-            console.error(err.response.data.message);
-            break;
           case 403:
-            console.error(err.response.data.message);
-            break;
           case 404:
             console.error(err.response.data.message);
             break;
           default:
-            console.error('發生錯誤，請稍後再試');
+            console.error('發生錯誤,請稍後再試');
             break;
         }
-      } else {
-        console.error('發生錯誤，請稍後再試');
       }
     },
     onSettled: () => {
-      // 刪除整張訂單後，重新獲取訂單列表
+      // 刪除整張訂單後,重新獲取訂單列表
       queryClient.invalidateQueries({
         queryKey: ['allOrders'],
       });
@@ -263,24 +251,18 @@ export const useUpdateItemServeStatus = () => {
       if (axios.isAxiosError(err)) {
         switch (err.response?.status) {
           case 400:
-            console.error(err.response.data.message);
-            break;
           case 403:
-            console.error(err.response.data.message);
-            break;
           case 404:
             console.error(err.response.data.message);
             break;
           default:
-            console.error('發生錯誤，請稍後再試');
+            console.error('發生錯誤,請稍後再試');
             break;
         }
-      } else {
-        console.error('發生錯誤，請稍後再試');
       }
     },
     onSettled: () => {
-      // 更新送餐狀態後，重新獲取訂單列表
+      // 更新送餐狀態後,重新獲取訂單列表
       queryClient.invalidateQueries({
         queryKey: ['allOrders'],
       });
@@ -312,29 +294,23 @@ export const useUpdateOrderPaymentStatus = () => {
       if (axios.isAxiosError(err)) {
         switch (err.response?.status) {
           case 400:
-            console.error(err.response.data.message);
-            break;
           case 403:
-            console.error(err.response.data.message);
-            break;
           case 404:
             console.error(err.response.data.message);
             break;
           default:
-            console.error('發生錯誤，請稍後再試');
+            console.error('發生錯誤,請稍後再試');
             break;
         }
-      } else {
-        console.error('發生錯誤，請稍後再試');
       }
     },
     onSettled: () => {
-      // 更新結帳狀態後，重新獲取訂單列表
+      // 更新結帳狀態後,重新獲取訂單列表
       queryClient.invalidateQueries({
         queryKey: ['allOrders'],
       });
 
-      // 新增：取得桌位狀態
+      // 新增:取得桌位狀態
       queryClient.invalidateQueries({
         queryKey: ['allTables'],
       });
@@ -362,24 +338,18 @@ export const useUpdateOrderCompletionStatus = () => {
       if (axios.isAxiosError(err)) {
         switch (err.response?.status) {
           case 400:
-            console.error(err.response.data.message);
-            break;
           case 403:
-            console.error(err.response.data.message);
-            break;
           case 404:
             console.error(err.response.data.message);
             break;
           default:
-            console.error('發生錯誤，請稍後再試');
+            console.error('發生錯誤,請稍後再試');
             break;
         }
-      } else {
-        console.error('發生錯誤，請稍後再試');
       }
     },
     onSettled: () => {
-      // 更新訂單完成狀態後，重新獲取訂單列表
+      // 更新訂單完成狀態後,重新獲取訂單列表
       queryClient.invalidateQueries({
         queryKey: ['allOrders'],
       });
@@ -420,24 +390,18 @@ export const useUpdateOrderItem = () => {
       if (axios.isAxiosError(err)) {
         switch (err.response?.status) {
           case 400:
-            console.error(err.response.data.message);
-            break;
           case 403:
-            console.error(err.response.data.message);
-            break;
           case 404:
             console.error(err.response.data.message);
             break;
           default:
-            console.error('發生錯誤，請稍後再試');
+            console.error('發生錯誤,請稍後再試');
             break;
         }
-      } else {
-        console.error('發生錯誤，請稍後再試');
       }
     },
     onSettled: () => {
-      // 更新子訂單內容後，重新獲取訂單列表
+      // 更新子訂單內容後,重新獲取訂單列表
       queryClient.invalidateQueries({
         queryKey: ['allOrders'],
       });

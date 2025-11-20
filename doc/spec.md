@@ -184,7 +184,7 @@ POST   /api/upload/image             # 圖片上傳
 interface IUser {
   account: string; // 帳號 (email 格式 for admin)
   password: string; // 加密密碼
-  role: "admin" | "staff"; // 角色
+  role: 'admin' | 'staff'; // 角色
   isLocked: boolean; // 是否鎖定
   loginFailCount: number; // 登入失敗次數
   verificationCode?: string; // 驗證碼 (admin 限定)
@@ -192,7 +192,6 @@ interface IUser {
   createdAt: Date;
   updatedAt: Date;
 }
-
 ```
 
 ### 商品 (Product)
@@ -220,7 +219,6 @@ interface AddonOption {
   name: string; // 選項名稱
   price: number; // 加價金額
 }
-
 ```
 
 ### 桌位 (Table)
@@ -230,23 +228,21 @@ interface ITable {
   tableNumber: number; // 桌號
   status: TableStatus; // 狀態 (空閒/使用中)
   currentOrder?: ObjectId | null; // 目前訂單 ID
-  qrImage: string; // QR Code 圖片
   tableToken: string; // 桌號驗證 Token
   updated_at: Date;
 }
 
 enum TableStatus {
-  Available = "空閒",
-  InUse = "使用中",
+  Available = '空閒',
+  InUse = '使用中',
 }
-
 ```
 
 ### 訂單 (Order)
 
 ```tsx
 interface IOrder {
-  orderType: "內用" | "外帶"; // 訂單類型
+  orderType: '內用' | '外帶'; // 訂單類型
   orderCode: string; // 訂單編號
   tableId?: ObjectId; // 桌位 ID (內用限定)
   orderList: OrderListItem[]; // 訂單項目列表
@@ -274,7 +270,6 @@ interface OrderItem {
   addons: Addon[] | null; // 選擇的加料
   compositeId?: string; // 複合 ID (前端用)
 }
-
 ```
 
 ## 🌐 WebSocket 即時通知
@@ -283,16 +278,15 @@ interface OrderItem {
 
 ```jsx
 // 建立 WebSocket 連線
-const ws = new WebSocket("ws://localhost:3000");
+const ws = new WebSocket('ws://localhost:3000');
 
 // 身份驗證 (Staff/Admin)
 ws.send(
   JSON.stringify({
-    type: "auth",
-    token: "your-jwt-token",
-  })
+    type: 'auth',
+    token: 'your-jwt-token',
+  }),
 );
-
 ```
 
 ### 通知類型
@@ -466,43 +460,43 @@ npm start
 ```jsx
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
+  content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   theme: {
     extend: {
       colors: {
         primary: {
-          light: "#FF9B54",
-          DEFAULT: "#FF7629",
-          dark: "#E35A00",
+          light: '#FF9B54',
+          DEFAULT: '#FF7629',
+          dark: '#E35A00',
         },
         secondary: {
-          light: "#F0F9FF",
-          DEFAULT: "#38B2AC",
-          dark: "#2C7A7B",
+          light: '#F0F9FF',
+          DEFAULT: '#38B2AC',
+          dark: '#2C7A7B',
         },
         grey: {
-          light: "#F7F7F7",
-          DEFAULT: "#6B7280",
-          dark: "#374151",
+          light: '#F7F7F7',
+          DEFAULT: '#6B7280',
+          dark: '#374151',
         },
         error: {
-          light: "#FF7A70",
-          DEFAULT: "#FF4B3E",
-          dark: "#CC392F",
+          light: '#FF7A70',
+          DEFAULT: '#FF4B3E',
+          dark: '#CC392F',
         },
       },
       boxShadow: {
-        custom: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
+        custom:
+          '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
       },
       borderRadius: {
-        xl: "1rem",
-        "2xl": "1.5rem",
+        xl: '1rem',
+        '2xl': '1.5rem',
       },
     },
   },
   plugins: [],
 };
-
 ```
 
 ### 預設管理員帳號

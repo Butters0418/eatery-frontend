@@ -75,20 +75,14 @@ export const useCreateProduct = () => {
       if (axios.isAxiosError(err)) {
         switch (err.response?.status) {
           case 400:
-            console.error(err.response.data.message);
-            break;
           case 403:
-            console.error(err.response.data.message);
-            break;
           case 404:
             console.error(err.response.data.message);
             break;
           default:
-            console.error('發生錯誤，請稍後再試');
+            console.error('發生錯誤,請稍後再試');
             break;
         }
-      } else {
-        console.error('發生錯誤，請稍後再試');
       }
     },
     onSettled: () => {
@@ -120,20 +114,14 @@ export const useUpdateProduct = () => {
       if (axios.isAxiosError(err)) {
         switch (err.response?.status) {
           case 400:
-            console.error(err.response.data.message);
-            break;
           case 403:
-            console.error(err.response.data.message);
-            break;
           case 404:
             console.error(err.response.data.message);
             break;
           default:
-            console.error('發生錯誤，請稍後再試');
+            console.error('發生錯誤,請稍後再試');
             break;
         }
-      } else {
-        console.error('發生錯誤，請稍後再試');
       }
     },
     onSettled: () => {
@@ -159,20 +147,14 @@ export const useDeleteProduct = () => {
       if (axios.isAxiosError(err)) {
         switch (err.response?.status) {
           case 400:
-            console.error(err.response.data.message);
-            break;
           case 403:
-            console.error(err.response.data.message);
-            break;
           case 404:
             console.error(err.response.data.message);
             break;
           default:
-            console.error('發生錯誤，請稍後再試');
+            console.error('發生錯誤,請稍後再試');
             break;
         }
-      } else {
-        console.error('發生錯誤，請稍後再試');
       }
     },
     onSettled: () => {
@@ -208,20 +190,14 @@ export const useToggleProductAvailability = () => {
       if (axios.isAxiosError(err)) {
         switch (err.response?.status) {
           case 400:
-            console.error(err.response.data.message);
-            break;
           case 403:
-            console.error(err.response.data.message);
-            break;
           case 404:
             console.error(err.response.data.message);
             break;
           default:
-            console.error('發生錯誤，請稍後再試');
+            console.error('發生錯誤,請稍後再試');
             break;
         }
-      } else {
-        console.error('發生錯誤，請稍後再試');
       }
     },
     onSettled: () => {
@@ -253,20 +229,14 @@ export const useToggleProductPopular = () => {
       if (axios.isAxiosError(err)) {
         switch (err.response?.status) {
           case 400:
-            console.error(err.response.data.message);
-            break;
           case 403:
-            console.error(err.response.data.message);
-            break;
           case 404:
             console.error(err.response.data.message);
             break;
           default:
-            console.error('發生錯誤，請稍後再試');
+            console.error('發生錯誤,請稍後再試');
             break;
         }
-      } else {
-        console.error('發生錯誤，請稍後再試');
       }
     },
     onSettled: () => {

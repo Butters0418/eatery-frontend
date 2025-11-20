@@ -24,7 +24,6 @@ export interface Table {
   tableNumber: number;
   status: Status;
   currentOrder: string | null;
-  qrImage: string | null;
   tableToken: string;
   orderInfo: null | TableOrderInfo;
 }
