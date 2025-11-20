@@ -40,17 +40,15 @@ export const useLoginMutation = () => {
       if (axios.isAxiosError(err)) {
         switch (err.response?.status) {
           case 401:
-            setErrorMessage(err.response.data.message);
-            break;
           case 403:
             setErrorMessage(err.response.data.message);
             break;
           default:
-            setErrorMessage('登入失敗，請稍後再試');
+            setErrorMessage('登入失敗,請稍後再試');
             break;
         }
       } else {
-        setErrorMessage('登入失敗，請稍後再試');
+        setErrorMessage('登入失敗,請稍後再試');
       }
     },
   });
@@ -101,17 +99,10 @@ export const useResendVerificationCodeMutation = () => {
     },
     onError: (err) => {
       setLogout();
-      if (axios.isAxiosError(err)) {
-        switch (err.response?.status) {
-          case 400:
-            setErrorMessage(err.response.data.message);
-            break;
-          default:
-            setErrorMessage('發生錯誤，請稍後再試');
-            break;
-        }
+      if (axios.isAxiosError(err) && err.response?.status === 400) {
+        setErrorMessage(err.response.data.message);
       } else {
-        setErrorMessage('發生錯誤，請稍後再試');
+        setErrorMessage('發生錯誤,請稍後再試');
       }
     },
   });
@@ -134,17 +125,10 @@ export const useVerifyCodeMutation = () => {
     },
     onSuccess: () => {},
     onError: (err) => {
-      if (axios.isAxiosError(err)) {
-        switch (err.response?.status) {
-          case 400:
-            setErrorMessage(err.response.data.message);
-            break;
-          default:
-            setErrorMessage('發生錯誤，請稍後再試');
-            break;
-        }
+      if (axios.isAxiosError(err) && err.response?.status === 400) {
+        setErrorMessage(err.response.data.message);
       } else {
-        setErrorMessage('發生錯誤，請稍後再試');
+        setErrorMessage('發生錯誤,請稍後再試');
       }
     },
   });
@@ -170,20 +154,16 @@ export const useResetPasswordMutation = () => {
       if (axios.isAxiosError(err)) {
         switch (err.response?.status) {
           case 400:
-            setErrorMessage(err.response.data.message);
-            break;
           case 403:
-            setErrorMessage(err.response.data.message);
-            break;
           case 404:
             setErrorMessage(err.response.data.message);
             break;
           default:
-            setErrorMessage('發生錯誤，請稍後再試');
+            setErrorMessage('發生錯誤,請稍後再試');
             break;
         }
       } else {
-        setErrorMessage('發生錯誤，請稍後再試');
+        setErrorMessage('發生錯誤,請稍後再試');
       }
     },
   });

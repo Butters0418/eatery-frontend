@@ -6,7 +6,12 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 
 // APIs
-import { fetchTables, fetchTableToken, createTable, deleteTable } from '../apis/tableApi';
+import {
+  fetchTables,
+  fetchTableToken,
+  createTable,
+  deleteTable,
+} from '../apis/tableApi';
 
 // Stores
 import useTableStore from '../stores/useTableStore';
@@ -110,20 +115,14 @@ export const useCreateTable = () => {
       if (axios.isAxiosError(err)) {
         switch (err.response?.status) {
           case 400:
-            console.error(err.response.data.message);
-            break;
           case 403:
-            console.error(err.response.data.message);
-            break;
           case 404:
             console.error(err.response.data.message);
             break;
           default:
-            console.error('發生錯誤，請稍後再試');
+            console.error('發生錯誤,請稍後再試');
             break;
         }
-      } else {
-        console.error('發生錯誤，請稍後再試');
       }
     },
   });
@@ -148,20 +147,14 @@ export const useDeleteTable = () => {
       if (axios.isAxiosError(err)) {
         switch (err.response?.status) {
           case 400:
-            console.error(err.response.data.message);
-            break;
           case 403:
-            console.error(err.response.data.message);
-            break;
           case 404:
             console.error(err.response.data.message);
             break;
           default:
-            console.error('發生錯誤，請稍後再試');
+            console.error('發生錯誤,請稍後再試');
             break;
         }
-      } else {
-        console.error('發生錯誤，請稍後再試');
       }
     },
   });
