@@ -2,16 +2,18 @@
 import { useEffect } from 'react';
 
 // 第三方庫
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import axios from 'axios';
 
 // APIs
-import { fetchTables, fetchTableToken } from '../apis/tableApi';
+import { fetchTables, fetchTableToken, createTable, deleteTable } from '../apis/tableApi';
 
 // Stores
 import useTableStore from '../stores/useTableStore';
 import useAuthStore from '../stores/useAuthStore';
 import useCartStore from '../stores/useCartStore';
 
+// 取得所有桌號狀態
 export const useTableQuery = () => {
   // ===== Store Hooks =====
   const setTables = useTableStore((state) => state.setTables);
@@ -85,4 +87,82 @@ export const useTableTokenQuery = (tableNumber: string) => {
   }, [error]);
 
   return query;
+};
+
+// 新增桌子
+export const useCreateTable = () => {
+  // ===== Store Hooks =====
+  const { token } = useAuthStore();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (tableNumber: number) => {
+      if (!token) {
+        throw new Error('使用者未登入');
+      }
+      const createRes = createTable(token, tableNumber);
+      return createRes;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['allTables'] });
+    },
+    onError: (err) => {
+      if (axios.isAxiosError(err)) {
+        switch (err.response?.status) {
+          case 400:
+            console.error(err.response.data.message);
+            break;
+          case 403:
+            console.error(err.response.data.message);
+            break;
+          case 404:
+            console.error(err.response.data.message);
+            break;
+          default:
+            console.error('發生錯誤，請稍後再試');
+            break;
+        }
+      } else {
+        console.error('發生錯誤，請稍後再試');
+      }
+    },
+  });
+};
+
+// 刪除桌子
+export const useDeleteTable = () => {
+  const { token } = useAuthStore();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (tableId: string) => {
+      if (!token) {
+        throw new Error('使用者未登入');
+      }
+      return deleteTable(token, tableId);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['allTables'] });
+    },
+    onError: (err) => {
+      if (axios.isAxiosError(err)) {
+        switch (err.response?.status) {
+          case 400:
+            console.error(err.response.data.message);
+            break;
+          case 403:
+            console.error(err.response.data.message);
+            break;
+          case 404:
+            console.error(err.response.data.message);
+            break;
+          default:
+            console.error('發生錯誤，請稍後再試');
+            break;
+        }
+      } else {
+        console.error('發生錯誤，請稍後再試');
+      }
+    },
+  });
 };

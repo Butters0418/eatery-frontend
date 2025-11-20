@@ -21,3 +21,27 @@ export const fetchTableToken = async (tableNumber: string) => {
   const res = await axios.get(`${tableTokenUrl}?code=T-${normalized}`);
   return res.data;
 };
+
+// 新增桌子
+export const createTable = async (token: string, tableNumber: number) => {
+  const res = await axios.post(
+    apiUrl,
+    { tableNumber },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  );
+  return res.data;
+};
+
+// 刪除桌子
+export const deleteTable = async (token: string, tableId: string) => {
+  const res = await axios.delete(`${apiUrl}/${tableId}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return res.data;
+};

@@ -9,6 +9,8 @@ import Select, { SelectChangeEvent } from '@mui/material/Select';
 import Skeleton from 'react-loading-skeleton';
 import { useMediaQuery } from '@mui/material';
 import 'react-loading-skeleton/dist/skeleton.css';
+import Alert from '@mui/material/Alert';
+import AlertTitle from '@mui/material/AlertTitle';
 
 // Hooks
 import { useProductQuery } from '../../../hooks/useProductOperations';
@@ -126,6 +128,10 @@ function MenuManagement() {
           <h1 className="text-xl font-bold text-gray-900 2xl:text-3xl">
             菜單管理
           </h1>
+          <Alert severity="warning">
+            <AlertTitle>注意事項</AlertTitle>
+            請避免於營業時間刪除商品，以免影響訂單操作。
+          </Alert>
         </div>
 
         {/* 操作列 */}
