@@ -908,10 +908,8 @@ function EditProductDialog({
                 fontSize: '1rem',
                 fontWeight: 600,
                 color: 'grey.600',
+                bgcolor: 'grey.100',
                 borderRadius: 2,
-                '&:hover': {
-                  bgcolor: 'grey.100',
-                },
               }}
             >
               取消

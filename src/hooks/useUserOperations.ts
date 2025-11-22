@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import useAuthStore from '../stores/useAuthStore';
 
 // 第三方庫
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 
 // APIs
@@ -14,6 +14,12 @@ import {
   resendVerificationCode,
   verifyCode,
   resetPassword,
+  fetchAllUsers,
+  createUser,
+  deleteUser,
+  updateUser,
+  unlockUserAccount,
+  changePassword,
 } from '../apis/userApi';
 
 // type
@@ -164,6 +170,201 @@ export const useResetPasswordMutation = () => {
         }
       } else {
         setErrorMessage('發生錯誤,請稍後再試');
+      }
+    },
+  });
+};
+
+// ===== Admin 帳號管理相關 Hooks =====
+
+// 取得所有使用者
+export const useUsersQuery = () => {
+  const { token } = useAuthStore();
+
+  return useQuery({
+    queryKey: ['users'],
+    queryFn: async () => {
+      if (!token) {
+        throw new Error('使用者 token 是必需的');
+      }
+      const users = await fetchAllUsers(token);
+      return users;
+    },
+    enabled: !!token,
+  });
+};
+
+// 新增店員
+export const useCreateStaffMutation = () => {
+  const { token } = useAuthStore();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (staffInfo: { account: string; password: string }) => {
+      if (!token) {
+        throw new Error('使用者 token 是必需的');
+      }
+      const response = await createUser(token, staffInfo);
+      return response;
+    },
+    onError: (err) => {
+      if (axios.isAxiosError(err)) {
+        switch (err.response?.status) {
+          case 400:
+          case 401:
+          case 403:
+          case 409:
+            console.error(err.response.data.message);
+            break;
+          default:
+            console.error('新增店員失敗,請稍後再試');
+            break;
+        }
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['users'] });
+    },
+  });
+};
+
+// 更新店員資訊
+export const useUpdateStaffMutation = () => {
+  const { token } = useAuthStore();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      userId,
+      updateInfo,
+    }: {
+      userId: string;
+      updateInfo: { account?: string; password?: string };
+    }) => {
+      if (!token) {
+        throw new Error('使用者 token 是必需的');
+      }
+      const response = await updateUser(token, userId, updateInfo);
+      return response;
+    },
+    onError: (err) => {
+      if (axios.isAxiosError(err)) {
+        switch (err.response?.status) {
+          case 400:
+          case 401:
+          case 403:
+          case 404:
+            console.error(err.response.data.message);
+            break;
+          default:
+            console.error('更新帳號失敗,請稍後再試');
+            break;
+        }
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['users'] });
+    },
+  });
+};
+
+// 刪除店員
+export const useDeleteStaffMutation = () => {
+  const { token } = useAuthStore();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (userId: string) => {
+      if (!token) {
+        throw new Error('使用者 token 是必需的');
+      }
+      const response = await deleteUser(token, userId);
+      return response;
+    },
+    onError: (err) => {
+      if (axios.isAxiosError(err)) {
+        switch (err.response?.status) {
+          case 400:
+          case 401:
+          case 403:
+          case 404:
+            console.error(err.response.data.message);
+            break;
+          default:
+            console.error('刪除帳號失敗,請稍後再試');
+            break;
+        }
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['users'] });
+    },
+  });
+};
+
+// 解鎖店員
+export const useUnlockStaffMutation = () => {
+  const { token } = useAuthStore();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (userId: string) => {
+      if (!token) {
+        throw new Error('使用者 token 是必需的');
+      }
+      const response = await unlockUserAccount(token, userId);
+      return response;
+    },
+    onError: (err) => {
+      if (axios.isAxiosError(err)) {
+        switch (err.response?.status) {
+          case 400:
+          case 401:
+          case 403:
+          case 404:
+            console.error(err.response.data.message);
+            break;
+          default:
+            console.error('解鎖帳號失敗,請稍後再試');
+            break;
+        }
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['users'] });
+    },
+  });
+};
+
+// 修改管理員密碼
+export const useChangeAdminPasswordMutation = () => {
+  const { token } = useAuthStore();
+
+  return useMutation({
+    mutationFn: async (passwords: {
+      currentPassword: string;
+      newPassword: string;
+    }) => {
+      if (!token) {
+        throw new Error('使用者 token 是必需的');
+      }
+      const response = await changePassword(token, passwords);
+      return response;
+    },
+    onError: (err) => {
+      if (axios.isAxiosError(err)) {
+        switch (err.response?.status) {
+          case 400:
+          case 401:
+          case 403:
+          case 404:
+          case 500:
+            console.error(err.response.data.message);
+            break;
+          default:
+            console.error('修改密碼失敗,請稍後再試');
+            break;
+        }
       }
     },
   });
