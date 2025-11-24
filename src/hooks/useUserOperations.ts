@@ -214,7 +214,7 @@ export const useCreateStaffMutation = () => {
           case 401:
           case 403:
           case 409:
-            console.error(err.response.data.message);
+            console.error(err.response?.data?.message);
             break;
           default:
             console.error('新增店員失敗,請稍後再試');
@@ -254,7 +254,7 @@ export const useUpdateStaffMutation = () => {
           case 401:
           case 403:
           case 404:
-            console.error(err.response.data.message);
+            console.error(err.response?.data?.message);
             break;
           default:
             console.error('更新帳號失敗,請稍後再試');
@@ -322,7 +322,7 @@ export const useUnlockStaffMutation = () => {
           case 401:
           case 403:
           case 404:
-            console.error(err.response.data.message);
+            console.error(err.response?.data?.message);
             break;
           default:
             console.error('解鎖帳號失敗,請稍後再試');
@@ -359,7 +359,7 @@ export const useChangeAdminPasswordMutation = () => {
           case 403:
           case 404:
           case 500:
-            console.error(err.response.data.message);
+            console.error(err.response?.data?.message);
             break;
           default:
             console.error('修改密碼失敗,請稍後再試');

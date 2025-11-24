@@ -511,7 +511,7 @@ function AccountManagement() {
                         {user.account}
                       </p>
                       <div className="mt-1 flex flex-wrap items-center gap-3 text-sm text-grey">
-                        <span>登入失敗：{user.loginFailCount ?? 0} 次</span>
+                        <span>登入失敗：{user.loginFailCount} 次</span>
                         <span>狀態：{user.isLocked ? '已鎖定' : '正常'}</span>
                       </div>
                     </div>

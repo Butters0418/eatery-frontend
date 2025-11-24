@@ -8,13 +8,13 @@ export const adminPasswordSchema: AnyObjectSchema = yup.object({
     .trim()
     .required('請輸入舊密碼')
     .min(6, '密碼至少 6 碼')
-    .matches(/^[^\s]+$/, '密碼不能包含空白字元'),
+    .matches(/^\S*$/, '密碼不能包含空白字元'),
   newPassword: yup
     .string()
     .trim()
     .required('請輸入新密碼')
     .min(6, '密碼至少 6 碼')
-    .matches(/^[^\s]+$/, '密碼不能包含空白字元'),
+    .matches(/^\S*$/, '密碼不能包含空白字元'),
   confirmPassword: yup
     .string()
     .trim()
@@ -30,7 +30,7 @@ export const createStaffSchema: AnyObjectSchema = yup.object({
     .trim()
     .required('請輸入密碼')
     .min(6, '密碼至少 6 碼')
-    .matches(/^[^\s]+$/, '密碼不能包含空白字元'),
+    .matches(/^\S*$/, '密碼不能包含空白字元'),
 }) as AnyObjectSchema;
 
 // ===== 更新員工帳號驗證 =====
@@ -46,6 +46,6 @@ export const updateStaffSchema: AnyObjectSchema = yup.object({
     })
     .test('password-space', '密碼不能包含空白字元', (value) => {
       if (!value) return true;
-      return /^[^\s]+$/.test(value);
+      return /^\S*$/.test(value);
     }),
 }) as AnyObjectSchema;
