@@ -102,12 +102,8 @@ export const changePassword = async (
   token: string,
   passwords: { currentPassword: string; newPassword: string },
 ) => {
-  const response = await axios.put(
-    API.changePassword,
-    { ...passwords },
-    {
-      headers: { Authorization: `Bearer ${token}` },
-    },
-  );
+  const response = await axios.put(API.changePassword, passwords, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
   return response.data;
 };
