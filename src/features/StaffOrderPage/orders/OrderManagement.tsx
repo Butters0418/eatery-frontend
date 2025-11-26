@@ -1,5 +1,5 @@
 // React 相關
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 
 // 第三方庫
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -15,10 +15,19 @@ import Snackbar, { SnackbarCloseReason } from '@mui/material/Snackbar';
 // Hooks
 import { useAllOrdersQuery } from '../../../hooks/useOrderOperations';
 import useCalculateWaitingTime from '../../../hooks/useCalculateWaitingTime';
+import { useOrderSocketSubscription } from '../../../hooks/useOrderSocket';
 
 // Stores
 import useOrdersStore from '../../../stores/useOrdersStore';
 import useAuthStore from '../../../stores/useAuthStore';
+
+// Services
+import {
+  ORDER_SOCKET_EVENT_TYPES,
+  BroadcastEventType,
+  BroadcastPayloadMap,
+} from '../../../services/socketClient';
+import { buildSocketSnackbarMessage } from '../../../utils/orderSocketMessage';
 
 // Components
 import OrderCard from '../components/OrderCard';
@@ -119,10 +128,10 @@ function OrderManagement() {
 
   // ===== 事件處理函數 =====
   // 顯示 Snackbar 並設定訊息
-  const handleShowSnackbar = (message: string) => {
+  const handleShowSnackbar = useCallback((message: string) => {
     setSnackbarMessage(message);
     setSnackbarOpen(true);
-  };
+  }, []);
 
   // 關閉 Snackbar
   const handleSnackbarClose = (
@@ -134,6 +143,24 @@ function OrderManagement() {
     }
     setSnackbarOpen(false);
   };
+
+  const handleSocketNotification = useCallback(
+    (
+      eventType: BroadcastEventType,
+      payload: BroadcastPayloadMap[BroadcastEventType],
+    ) => {
+      const message = buildSocketSnackbarMessage(eventType, payload);
+      if (message) {
+        handleShowSnackbar(message);
+      }
+    },
+    [handleShowSnackbar],
+  );
+
+  useOrderSocketSubscription(
+    ORDER_SOCKET_EVENT_TYPES,
+    handleSocketNotification,
+  );
 
   // ===== 數據處理與計算 =====
   // 根據 orderType 和 activeStatus 過濾訂單
@@ -495,7 +522,7 @@ function OrderManagement() {
       <Snackbar
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
         open={snackbarOpen}
-        autoHideDuration={2000}
+        autoHideDuration={3500}
         onClose={handleSnackbarClose}
       >
         <p className="text-md flex items-center justify-center gap-1 rounded-xl bg-secondary px-5 py-1.5 text-lg text-white">

@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import dayjs from 'dayjs';
@@ -11,10 +11,21 @@ import Snackbar, { SnackbarCloseReason } from '@mui/material/Snackbar';
 import { useTableQuery } from '../../../hooks/useTableOperations';
 import { useAllOrdersQuery } from '../../../hooks/useOrderOperations';
 import useCalculateWaitingTime from '../../../hooks/useCalculateWaitingTime';
+import { useOrderSocketSubscription } from '../../../hooks/useOrderSocket';
 
 // Stores
 import useTableStore from '../../../stores/useTableStore';
 import useOrdersStore from '../../../stores/useOrdersStore';
+
+// Services
+import {
+  ORDER_SOCKET_EVENT_TYPES,
+  BroadcastEventType,
+  BroadcastPayloadMap,
+} from '../../../services/socketClient';
+
+// Utils
+import { buildSocketSnackbarMessage } from '../../../utils/orderSocketMessage';
 
 // Components
 import OrderCard from '../components/OrderCard';
@@ -46,10 +57,10 @@ function TableStatusManagement() {
   const { isError, isPending } = useAllOrdersQuery(today);
   const navigate = useNavigate();
   // 顯示 Snackbar 並設定訊息
-  const handleShowSnackbar = (message: string) => {
+  const handleShowSnackbar = useCallback((message: string) => {
     setSnackbarMessage(message);
     setSnackbarOpen(true);
-  };
+  }, []);
 
   // 關閉 Snackbar
   const handleSnackbarClose = (
@@ -61,6 +72,24 @@ function TableStatusManagement() {
     }
     setSnackbarOpen(false);
   };
+
+  const handleSocketNotification = useCallback(
+    (
+      eventType: BroadcastEventType,
+      payload: BroadcastPayloadMap[BroadcastEventType],
+    ) => {
+      const message = buildSocketSnackbarMessage(eventType, payload);
+      if (message) {
+        handleShowSnackbar(message);
+      }
+    },
+    [handleShowSnackbar],
+  );
+
+  useOrderSocketSubscription(
+    ORDER_SOCKET_EVENT_TYPES,
+    handleSocketNotification,
+  );
 
   // 篩選並排序訂單資料
   const filteredOrdersData = useMemo(() => {

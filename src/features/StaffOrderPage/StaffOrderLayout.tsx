@@ -1,9 +1,12 @@
 import { Outlet } from 'react-router-dom';
 import Header from './components/Header';
 import SideBar from './components/SideBar';
+import useOrderSocketConnection from '../../hooks/useOrderSocket';
 
 // 員工點餐頁 (staff 及 admin 可造訪)
 function StaffOrderLayout() {
+  useOrderSocketConnection();
+
   return (
     <div className="min-h-screen bg-grey-light">
       <Header />
