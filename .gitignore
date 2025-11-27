@@ -23,6 +23,7 @@ dist-ssr
 *.sln
 *.sw?
 
+.env
 .bmad-core/
 .github/
 STRUCTURE.md
