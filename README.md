@@ -1,50 +1,142 @@
-# React + TypeScript + Vite
+# 餐飲點餐系統 - 前端專案
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## 📋 專案概述
 
-Currently, two official plugins are available:
+這是一個餐飲點餐系統的前端應用，使用 React + TypeScript + Vite 開發，部署於 Vercel。系統分為**顧客點餐頁**與**後台管理頁**兩大區塊，支援即時 WebSocket 通知。
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **前端登入頁**：https://eatery.butters.idv.tw/login
+- **後端 Repo**：https://github.com/Butters0418/eatery-backend
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+## 🚀 功能驗證指南
 
-- Configure the top-level `parserOptions` property like this:
+> 以下說明各角色的操作路徑，可依序操作以驗證系統完整流程。
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+### ⚠️ 同時測試後台與顧客頁的注意事項
+
+若要在同一台裝置上**同時開啟後台（Staff/Admin）與顧客點餐頁**，建議將顧客點餐頁開在**無痕模式（Private / Incognito）**。
+
+原因：後台登入後會在瀏覽器中保留 JWT Token，顧客頁的送單邏輯會偵測到此 Token，進而以員工身份送出訂單，導致行為不符合預期。
+
+| 視窗                        | 建議開啟方式 |
+| --------------------------- | ------------ |
+| 後台管理頁（Staff / Admin） | 一般視窗     |
+| 顧客點餐頁                  | 無痕視窗     |
+
+---
+
+## 🛍 顧客點餐頁
+
+### 入口 URL 或掃描桌號 QRCode
+
+```
+https://eatery.butters.idv.tw/?tableNumber=1
 ```
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+> `tableNumber` 為桌號，可替換為任意整數（如 `?tableNumber=2`）
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+### 操作流程
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
+1. **進入點餐頁** — 透過上方 URL 進入，系統會自動取得該桌的 Table Token
+2. **瀏覽菜單** — 可查看所有已上架且開啟的商品，點擊商品可查看詳細資訊與加料選項
+3. **加入購物車** — 選擇商品與加料後加入購物車
+4. **送出訂單** — 確認購物車內容後送出，系統即時通知後台
+5. **加點功能** — 訂單送出後，同桌再次點餐會自動追加到同一訂單（需未結帳）
+6. **查看訂單狀態** — 可查看目前桌號的訂單與出餐狀態
+
+---
+
+## 👨‍💼 後台管理頁
+
+### 入口 URL
+
 ```
+https://eatery.butters.idv.tw/login
+```
+
+### 帳號資訊
+
+| 角色  | 帳號                        | 密碼    |
+| ----- | --------------------------- | ------- |
+| Admin | butters.test.demo@gmail.com | 1234567 |
+| Staff | staff001                    | 1234567 |
+| Staff | staff002                    | 1234567 |
+
+> ⚠️ 注意：Staff 登入密碼**錯誤 3 次**將鎖定帳號，需由 Admin 手動解鎖。
+>
+> ⚠️ 注意：**Admin** 登入密碼**錯誤 3 次**，帳號將需要透過 **Email 驗證碼重設密碼**才能解鎖。
+> 若測試過程中不幸觸發此狀況，可登入以下測試用 Gmail 收取驗證信：
+>
+> | 項目     | 資訊                        |
+> | -------- | --------------------------- |
+> | Email    | butters.test.demo@gmail.com |
+> | Password | @test1111                   |
+>
+> ⚠️ 此為測試用信箱，**請勿更改 Gmail 的任何相關設定**。
+
+### 🧑‍🍳 Staff 功能
+
+登入後可操作：
+
+| 功能           | 說明                           |
+| -------------- | ------------------------------ |
+| 查看進行中訂單 | 即時顯示所有內用與外帶訂單     |
+| 新增外帶訂單   | 選擇商品後直接建立，預設已結帳 |
+| 編輯訂單項目   | 修改**未出餐**的餐點數量或加料 |
+| 刪除訂單項目   | 刪除**未出餐**的餐點           |
+| 標記出餐       | 將餐點標記為已出餐             |
+| 結帳           | 全部出餐後可標記訂單結帳       |
+| 完成訂單       | 結帳後完成訂單，自動重置桌位   |
+| 即時通知       | WebSocket 接收新訂單、加點通知 |
+
+### 👑 Admin 功能
+
+擁有 Staff 全部功能，另外包含：
+
+| 功能         | 說明                                                         |
+| ------------ | ------------------------------------------------------------ |
+| 商品管理     | 新增 / 編輯 / 刪除商品，設定上架狀態與熱門標記，支援圖片上傳 |
+| 店員帳號管理 | 新增 / 編輯 / 刪除 Staff 帳號，解鎖被鎖定的帳號              |
+| 桌位管理     | 新增 / 刪除桌位                                              |
+| 修改密碼     | Admin 自行修改密碼                                           |
+| 忘記密碼     | 透過 Email 驗證碼重設密碼                                    |
+
+---
+
+## 🔄 完整操作示範流程
+
+以下為建議的端對端驗證順序：
+
+```
+1. 以 Admin 帳號登入後台
+   → 確認商品列表、桌位列表
+
+2. 開新無痕分頁，以顧客身份進入 ?tableNumber=1 或掃描桌號 QRCode
+   → 瀏覽菜單、加入購物車、送出訂單
+
+3. 回到後台（Staff 或 Admin 皆可）
+   → 確認即時收到新訂單通知（WebSocket）
+   → 標記部分餐點出餐
+
+4. 回到顧客頁
+   → 再次點餐（加點流程），確認追加至同一訂單
+
+5. 回到後台
+   → 全部出餐後執行結帳
+   → 點選完成訂單，確認桌位重置
+
+6. 測試外帶訂單
+   → 以 Staff 登入，新增外帶訂單
+   → 確認外帶訂單狀態預設已結帳
+```
+
+---
+
+## 🏗 技術架構
+
+- **框架**：React 18 + TypeScript + Vite
+- **部署**：Vercel
+- **即時通訊**：WebSocket（接收訂單通知）
+- **認證**：JWT Token（Staff/Admin）、Table Token（顧客點餐）
+- **後端**：Node.js + Express + MongoDB（部署於 Render）

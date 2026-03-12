@@ -57,8 +57,12 @@ function CustomerPage() {
 
   // ===== API 相關 Hooks =====
   const { isPending, status, error } = useProductQuery();
-  const { tableNumber } = queryString.parse(location.search);
-  useTableTokenQuery(tableNumber as string);
+  const { tableNumber, tableId, tableToken } = queryString.parse(location.search);
+  useTableTokenQuery({
+    tableNumber: tableNumber as string,
+    tableId: tableId as string,
+    tableToken: tableToken as string,
+  });
 
   useOrderReceiptQuery();
 

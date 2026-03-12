@@ -15,7 +15,7 @@ import { Orders, FormattedReceipt } from '../types/orderType';
 
 // 訂單明轉為前端使用資料
 export const formatReceiptData = (order: Orders): FormattedReceipt => {
-  console.log('formatReceiptData', order);
+  // console.log('formatReceiptData', order);
   return {
     createdAt: dayjs(order.createdAt)
       .tz('Asia/Taipei')

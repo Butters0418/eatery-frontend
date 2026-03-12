@@ -42,7 +42,7 @@ export const useTableQuery = () => {
   // ===== Effects =====
   useEffect(() => {
     if (isSuccess && data) {
-      console.log('取得桌位成功:', data);
+      // console.log('取得桌位成功:', data);
       setTables(data);
     }
   }, [isSuccess, data, setTables]);
@@ -57,18 +57,34 @@ export const useTableQuery = () => {
 };
 
 // 取得桌號的  Token 與 id
-export const useTableTokenQuery = (tableNumber: string) => {
+export const useTableTokenQuery = (params: {
+  tableNumber?: string;
+  tableId?: string;
+  tableToken?: string;
+}) => {
+  const { tableNumber, tableId: existingTableId, tableToken: existingTableToken } = params;
+
   // ===== Store Hooks =====
   const setTable = useCartStore((state) => state.setTable);
 
-  // ===== API 查詢 =====
+  // 若 URL 已帶有 tableId 與 tableToken，直接寫入 store，不打 API
+  useEffect(() => {
+    if (existingTableId && existingTableToken) {
+      setTable({
+        tableId: existingTableId,
+        tableToken: existingTableToken,
+      });
+    }
+  }, [existingTableId, existingTableToken, setTable]);
+
+  // ===== API 查詢（僅在 tableNumber 存在且尚未有 tableId/tableToken 時啟用）=====
   const query = useQuery({
     queryKey: ['tableToken', tableNumber],
     queryFn: async () => {
-      const tableTokenData = await fetchTableToken(tableNumber);
+      const tableTokenData = await fetchTableToken(tableNumber!);
       return tableTokenData;
     },
-    enabled: !!tableNumber, // 只有在 tableNumber 有值時才啟用查詢
+    enabled: !!tableNumber && !existingTableId && !existingTableToken,
   });
 
   // ===== 解構查詢結果 =====
@@ -77,11 +93,16 @@ export const useTableTokenQuery = (tableNumber: string) => {
   // ===== Effects =====
   useEffect(() => {
     if (isSuccess && data) {
-      console.log('取得桌位資訊成功:', data);
       setTable({
         tableId: data.tableId as string,
         tableToken: data.tableToken as string,
       });
+      // 取得後將 URL 換成 tableId + tableToken，避免重整重新發請求
+      const newParams = new URLSearchParams({
+        tableId: data.tableId,
+        tableToken: data.tableToken,
+      });
+      window.history.replaceState({}, '', `?${newParams.toString()}`);
     }
   }, [isSuccess, data, setTable]);
 
