@@ -35,6 +35,7 @@ https://eatery.butters.idv.tw/?tableNumber=1
 ```
 
 > `tableNumber` 為桌號，可替換為任意整數（如 `?tableNumber=2`）
+<img src="https://github.com/user-attachments/assets/e82e085a-1859-4bf7-93ca-5ebcac5025ac" width="300">
 
 ### 操作流程
 
