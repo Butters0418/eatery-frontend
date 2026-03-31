@@ -35,7 +35,7 @@ https://eatery.butters.idv.tw/?tableNumber=1
 ```
 
 > `tableNumber` 為桌號，可替換為任意整數（如 `?tableNumber=2`）
-<img src="https://github.com/user-attachments/assets/e82e085a-1859-4bf7-93ca-5ebcac5025ac" width="300">
+> <img src="https://github.com/user-attachments/assets/e82e085a-1859-4bf7-93ca-5ebcac5025ac" width="300">
 
 ### 操作流程
 
@@ -137,6 +137,11 @@ https://eatery.butters.idv.tw/login
 ## 🏗 技術架構
 
 - **框架**：React 18 + TypeScript + Vite
+- **路由管理**：React Router
+- **狀態管理**：Zustand，全域狀態管理，persist 中介層
+- **資料呼叫與快取**：React Query + Axios
+- **表單管理**：React Hook Form + Yup (Schema 驗證)
+- **UI**：MUI + Tailwind CSS
 - **部署**：Vercel
 - **即時通訊**：WebSocket（接收訂單通知）
 - **認證**：JWT Token（Staff/Admin）、Table Token（顧客點餐）
