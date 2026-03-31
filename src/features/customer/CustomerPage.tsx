@@ -18,6 +18,7 @@ import { useOrderReceiptQuery } from '../../hooks/useOrderOperations.ts';
 import { useTableTokenQuery } from '../../hooks/useTableOperations.ts';
 
 // Stores
+import useAuthStore from '../../stores/useAuthStore.ts';
 import useCartStore from '../../stores/useCartStore.ts';
 import useProductStore from '../../stores/useProductStore.ts';
 import useReceiptStore from '../../stores/useReceiptStore.ts';
@@ -51,13 +52,21 @@ interface ModelProductInfo {
 // 顧客點餐頁
 function CustomerPage() {
   // ===== Store Hooks =====
+  const setLogout = useAuthStore((state) => state.setLogout);
   const products = useProductStore((state) => state.products);
   const { cart, isCartOpen, setIsCartOpen } = useCartStore();
   const { isReceiptOpen, setIsReceiptOpen } = useReceiptStore();
 
+  // 清除 staff/admin token，避免測試時有過期 token 造成錯誤
+  useEffect(() => {
+    setLogout();
+  }, [setLogout]);
+
   // ===== API 相關 Hooks =====
   const { isPending, status, error } = useProductQuery();
-  const { tableNumber, tableId, tableToken } = queryString.parse(location.search);
+  const { tableNumber, tableId, tableToken } = queryString.parse(
+    location.search,
+  );
   useTableTokenQuery({
     tableNumber: tableNumber as string,
     tableId: tableId as string,
